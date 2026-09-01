@@ -224,7 +224,6 @@ body {
   line-height: 1.1;
 }
 .ficha .resumo { margin: 0; color: var(--creme-fraco); font-size: 14px; }
-.ficha p.descricao { margin: 16px 0 0; color: var(--creme-fraco); font-size: 15px; line-height: 1.55; }
 
 .dados { margin-top: 18px; display: grid; gap: 8px; }
 .dado {

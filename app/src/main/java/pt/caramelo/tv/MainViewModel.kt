@@ -186,7 +186,7 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
     // --- Deep links (configuracao por ADB) ---------------------------------
 
     /**
-     * caramelotv://set?id=thcp-3&title=...&desc=...&url=...&image=...
+     * caramelotv://set?id=thcp-3&title=...&url=...&image=...
      * caramelotv://play?id=cbd-0
      * caramelotv://base?url=http://172.20.10.6:8000
      * caramelotv://reset
@@ -220,7 +220,6 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
                         catalog.replace(
                             item.copy(
                                 title = uri.getQueryParameter("title") ?: item.title,
-                                description = uri.getQueryParameter("desc") ?: item.description,
                                 videoUrl = uri.getQueryParameter("url") ?: item.videoUrl,
                                 imageUrl = uri.getQueryParameter("image") ?: item.imageUrl,
                             ),

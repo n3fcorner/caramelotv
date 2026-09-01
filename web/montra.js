@@ -71,7 +71,6 @@ function abrir(produto, seccao) {
       <p class="ficha-linha">${escapar(seccao.nome)}</p>
       <h3>${escapar(produto.nome)}</h3>
       ${resumo ? `<p class="resumo">${escapar(resumo)}</p>` : ''}
-      <p class="descricao">${escapar(produto.descricao)}</p>
       <dl class="dados">
         ${produto.cultivo ? dado('❁', 'Cultivo', produto.cultivo) : ''}
         ${produto.aroma ? dado('≋', 'Aroma', produto.aroma) : ''}

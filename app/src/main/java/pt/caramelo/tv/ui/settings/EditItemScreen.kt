@@ -45,7 +45,6 @@ fun EditItemScreen(
     onCancel: () -> Unit,
 ) {
     var title by rememberSaveable(item.id) { mutableStateOf(item.title) }
-    var description by rememberSaveable(item.id) { mutableStateOf(item.description) }
     var videoUrl by rememberSaveable(item.id) { mutableStateOf(item.videoUrl) }
     var imageUrl by rememberSaveable(item.id) { mutableStateOf(item.imageUrl) }
 
@@ -63,7 +62,6 @@ fun EditItemScreen(
         M3Theme(colorScheme = editorColors()) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Field("Título", title) { title = it }
-                Field("Descrição", description, singleLine = false) { description = it }
                 Field("URL do vídeo (mp4 ou m3u8)", videoUrl) { videoUrl = it }
                 Field("URL da imagem", imageUrl) { imageUrl = it }
             }
@@ -80,7 +78,6 @@ fun EditItemScreen(
                     onSave(
                         item.copy(
                             title = title.trim(),
-                            description = description.trim(),
                             videoUrl = videoUrl.trim(),
                             imageUrl = imageUrl.trim(),
                         ),

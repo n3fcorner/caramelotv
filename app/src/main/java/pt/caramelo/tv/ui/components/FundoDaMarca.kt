@@ -5,13 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -22,12 +20,15 @@ import pt.caramelo.tv.ui.theme.Lilas
 /**
  * Fundo da marca, partilhado pelos tres ecras para nao haver duas ideias de fundo.
  *
- * Duas camadas, ambas muito esbatidas de proposito:
- *  1. o proprio logotipo geometrico em contorno, ampliado ate sair do ecra — e o
- *     padrao dos materiais da marca, e nao um conjunto de formas inventadas;
- *  2. a mascote, encostada ao canto e a sangrar pelos bordos.
+ * As duas camadas sao formas cheias, em tom sobre tom, e nao contornos: com linhas
+ * a mascote e o logotipo cruzavam-se e o fundo virava um emaranhado. Os PNG ja vem
+ * em monocromatico roxo, por isso nao levam tinta por cima — o relevo vem da propria
+ * ilustracao.
  *
- * Nada disto pode disputar atencao com o produto: sao texturas, nao ilustracoes.
+ *  1. o logotipo geometrico, ampliado ate sair do ecra, confinado a esquerda;
+ *  2. a mascote, encostada ao canto direito e a sangrar pelos bordos.
+ *
+ * Nada disto pode disputar atencao com o produto.
  */
 @Composable
 fun FundoDaMarca(
@@ -41,41 +42,28 @@ fun FundoDaMarca(
             .background(MaterialTheme.colorScheme.background)
             .clipToBounds(),
     ) {
-        // ContentScale.Crop faz o que os materiais da marca fazem: amplia a marca ate
-        // ela nao caber e deixa a moldura corta-la. So se leem fragmentos — arcos,
-        // quadrados, o triangulo do focinho.
-        //
-        // Fica confinada aos 62% da esquerda: a mascote ocupa os 30% da direita, e
-        // sobrepostas as duas viravam um emaranhado de linhas.
+        // Padrao espalhado em vez do logotipo ampliado: as pecas de que o logo e
+        // feito, giradas e de tamanhos varios. Le como textura e nao entra em
+        // conflito com a mascote.
         if (comMarca) {
-            Image(
-                painter = painterResource(R.drawable.marca_contorno),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.CenterStart,
-                alpha = 0.08f,
-                colorFilter = ColorFilter.tint(Lilas),
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .fillMaxHeight()
-                    .fillMaxWidth(0.62f)
-                    .offset(x = (-90).dp),
+            PadraoCaramelo(
+                cor = Lilas.copy(alpha = 0.13f),
+                modifier = Modifier.fillMaxSize(),
             )
         }
 
         if (comMascote) {
             Image(
-                painter = painterResource(R.drawable.mascote_contorno),
+                painter = painterResource(R.drawable.mascote_fundo),
                 contentDescription = null,
                 contentScale = ContentScale.FillHeight,
-                alpha = 0.14f,
-                colorFilter = ColorFilter.tint(Lilas),
+                alpha = 0.85f,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     // A altura do ecra e o limite; o que sobra em largura sangra pelo
                     // bordo direito, como um carimbo cortado pela moldura.
                     .fillMaxHeight()
-                    .offset(x = 132.dp, y = 40.dp),
+                    .offset(x = 168.dp, y = 30.dp),
             )
         }
     }

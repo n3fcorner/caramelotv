@@ -42,7 +42,6 @@ data class MenuItem(
     val slot: Int,
     val section: Section,
     val title: String = "",
-    val description: String = "",
     val videoUrl: String = "",
     val imageUrl: String = "",
     val orientation: MediaOrientation = MediaOrientation.SQUARE,

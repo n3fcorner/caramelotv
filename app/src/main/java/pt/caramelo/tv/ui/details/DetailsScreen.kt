@@ -47,7 +47,8 @@ import pt.caramelo.tv.ui.theme.RoxoProfundo
  * Ficha do produto: cartaz quadrado a esquerda, texto a direita — a mesma composicao
  * do leitor, de proposito.
  *
- * E aqui, e so aqui, que aparece a descricao: a miniatura fica so com o nome.
+ * A ficha diz o que se ve e se cheira. Sem texto corrido: e materia regulada
+ * e tem de sair da marca.
  */
 @Composable
 fun DetailsScreen(
@@ -128,17 +129,6 @@ fun DetailsScreen(
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = Espaco.minimo),
-                )
-            }
-
-            if (item.description.isNotBlank()) {
-                Text(
-                    text = item.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 5,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = Espaco.largo),
                 )
             }
 

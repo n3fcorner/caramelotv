@@ -105,7 +105,7 @@ flores passaria despercebido — são produtos artesanais, visualmente distintos
 
 | Secção | Grelha | Produtos |
 |---|---|---|
-| **Infusão THCP** | 3×3 | 5 com vídeo · MAC, Gorilla Mandarini e Berry Pie em breve · 1 livre |
+| **Infusão** | 3×3 | 5 com vídeo · MAC, Gorilla Mandarini e Berry Pie em breve · 1 livre |
 | **CBD** | 3×2 | 4 com vídeo · Critical Berry e Uranium em breve |
 | **Hash** | 3×1 | Static e Sticky Peach · 1 livre |
 

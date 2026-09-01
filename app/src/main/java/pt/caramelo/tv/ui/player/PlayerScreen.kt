@@ -200,9 +200,7 @@ fun PlayerScreen(
                 }
             },
     ) {
-        // Sem a marca geometrica: o painel de video tapa a esquerda, onde ela vive,
-        // e o pouco que sobrava ia sobrepor-se aos contornos da mascote.
-        FundoDaMarca(comMarca = false)
+        FundoDaMarca()
 
         Row(
             modifier = Modifier

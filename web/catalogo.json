@@ -5,66 +5,146 @@
       "id": "infusao",
       "nome": "Infusão",
       "produtos": [
-        { "slug": "blueberry-small", "nome": "Blueberry Small", "formato": "Flor", "cultivo": "Indoor", "infundido": true,
-          "aroma": "Mirtilo e frutos silvestres",
-          "descricao": "Flor de interior infundida, em formato small buds. Cabeças pequenas e uniformes, de tom escuro e bem cobertas." },
-        { "slug": "bubba-kush", "nome": "Bubba Kush", "formato": "Flor", "cultivo": "Greenhouse", "infundido": true,
-          "aroma": "Terroso e café, fundo doce",
-          "descricao": "Flor de estufa infundida. Genética índica clássica, de cabeça densa e cor profunda." },
-        { "slug": "critical-berry", "nome": "Critical Berry", "formato": "Flor", "cultivo": "", "infundido": true,
-          "aroma": "Frutos vermelhos sobre fundo terroso",
-          "descricao": "Flor infundida, da família Critical. Cabeça compacta e clara, com pistilos alaranjados." },
-        { "slug": "smash-cali", "nome": "Smash Cali", "formato": "Flor", "cultivo": "Glasshouse", "infundido": true,
-          "aroma": "Cítrico e doce",
-          "descricao": "Flor de glasshouse infundida. Tom claro e pistilos muito vivos, de aspeto californiano." },
-        { "slug": "sour-lifter", "nome": "Sour Lifter", "formato": "Flor", "cultivo": "Glasshouse", "infundido": true,
-          "aroma": "Ácido e cítrico, fundo a diesel",
-          "descricao": "Flor de glasshouse infundida. Cabeças alongadas, com mistura de verdes e castanhos." },
-        { "slug": "", "nome": "MAC", "formato": "Flor", "cultivo": "", "infundido": true,
-          "aroma": "Cítrico e cremoso, fundo a diesel",
-          "descricao": "Miracle Alien Cookies infundida. Entra em breve na linha." },
-        { "slug": "", "nome": "Gorilla Mandarini", "formato": "Flor", "cultivo": "", "infundido": true,
-          "aroma": "Tangerina sobre fundo resinoso",
-          "descricao": "Cruzamento da família Gorilla com tangerina, infundido. Entra em breve na linha." },
-        { "slug": "", "nome": "Berry Pie", "formato": "Flor", "cultivo": "", "infundido": true,
-          "aroma": "Frutos vermelhos e doce de forno",
-          "descricao": "Flor infundida, de perfil doce e frutado. Entra em breve na linha." }
+        {
+          "slug": "blueberry-small",
+          "nome": "Blueberry Small",
+          "formato": "Flor",
+          "cultivo": "Indoor",
+          "infundido": true,
+          "aroma": "Mirtilo e frutos silvestres"
+        },
+        {
+          "slug": "bubba-kush",
+          "nome": "Bubba Kush",
+          "formato": "Flor",
+          "cultivo": "Greenhouse",
+          "infundido": true,
+          "aroma": "Terroso e café, fundo doce"
+        },
+        {
+          "slug": "critical-berry",
+          "nome": "Critical Berry",
+          "formato": "Flor",
+          "cultivo": "",
+          "infundido": true,
+          "aroma": "Frutos vermelhos sobre fundo terroso"
+        },
+        {
+          "slug": "smash-cali",
+          "nome": "Smash Cali",
+          "formato": "Flor",
+          "cultivo": "Glasshouse",
+          "infundido": true,
+          "aroma": "Cítrico e doce"
+        },
+        {
+          "slug": "sour-lifter",
+          "nome": "Sour Lifter",
+          "formato": "Flor",
+          "cultivo": "Glasshouse",
+          "infundido": true,
+          "aroma": "Ácido e cítrico, fundo a diesel"
+        },
+        {
+          "slug": "",
+          "nome": "MAC",
+          "formato": "Flor",
+          "cultivo": "",
+          "infundido": true,
+          "aroma": "Cítrico e cremoso, fundo a diesel"
+        },
+        {
+          "slug": "",
+          "nome": "Gorilla Mandarini",
+          "formato": "Flor",
+          "cultivo": "",
+          "infundido": true,
+          "aroma": "Tangerina sobre fundo resinoso"
+        },
+        {
+          "slug": "",
+          "nome": "Berry Pie",
+          "formato": "Flor",
+          "cultivo": "",
+          "infundido": true,
+          "aroma": "Frutos vermelhos e doce de forno"
+        }
       ]
     },
     {
       "id": "cbd",
       "nome": "CBD",
       "produtos": [
-        { "slug": "grape-cali", "nome": "Grape Cali", "formato": "Flor", "cultivo": "Glasshouse", "infundido": false,
-          "aroma": "Uva e frutos escuros, fundo doce",
-          "descricao": "Flor de CBD cultivada em glasshouse. Cabeças compactas de tom escuro com pistilos alaranjados e boa cobertura de tricoma." },
-        { "slug": "lemon-trip", "nome": "Lemon Trip", "formato": "Flor", "cultivo": "Greenhouse", "infundido": false,
-          "aroma": "Limão e casca fresca, fundo herbáceo",
-          "descricao": "Flor de CBD de estufa. Cabeças alongadas de verde vivo, com aroma cítrico marcado assim que se abre o frasco." },
-        { "slug": "mela-sour", "nome": "Mela Sour", "formato": "Flor", "cultivo": "", "infundido": false,
-          "aroma": "Maçã verde e ácido, fundo doce",
-          "descricao": "Flor de CBD de cabeça grande e bem resinada, com tons acastanhados e muito pistilo à vista." },
-        { "slug": "solero-cream", "nome": "Solero Cream", "formato": "Flor", "cultivo": "Indoor", "infundido": false,
-          "aroma": "Cremoso e doce, baunilha e citrinos",
-          "descricao": "Flor de CBD de interior. Das mais resinadas da linha, de tom claro e tricoma denso." },
-        { "slug": "", "nome": "Critical Berry", "formato": "Flor", "cultivo": "", "infundido": false,
-          "aroma": "Frutos vermelhos sobre fundo terroso",
-          "descricao": "A Critical Berry em versão CBD, sem infusão. Entra em breve na linha." },
-        { "slug": "", "nome": "Uranium", "formato": "Flor", "cultivo": "", "infundido": false,
-          "aroma": "Intenso e resinoso",
-          "descricao": "Flor de CBD a entrar em breve na linha." }
+        {
+          "slug": "grape-cali",
+          "nome": "Grape Cali",
+          "formato": "Flor",
+          "cultivo": "Glasshouse",
+          "infundido": false,
+          "aroma": "Uva e frutos escuros, fundo doce"
+        },
+        {
+          "slug": "lemon-trip",
+          "nome": "Lemon Trip",
+          "formato": "Flor",
+          "cultivo": "Greenhouse",
+          "infundido": false,
+          "aroma": "Limão e casca fresca, fundo herbáceo"
+        },
+        {
+          "slug": "mela-sour",
+          "nome": "Mela Sour",
+          "formato": "Flor",
+          "cultivo": "",
+          "infundido": false,
+          "aroma": "Maçã verde e ácido, fundo doce"
+        },
+        {
+          "slug": "solero-cream",
+          "nome": "Solero Cream",
+          "formato": "Flor",
+          "cultivo": "Indoor",
+          "infundido": false,
+          "aroma": "Cremoso e doce, baunilha e citrinos"
+        },
+        {
+          "slug": "",
+          "nome": "Critical Berry",
+          "formato": "Flor",
+          "cultivo": "",
+          "infundido": false,
+          "aroma": "Frutos vermelhos sobre fundo terroso"
+        },
+        {
+          "slug": "",
+          "nome": "Uranium",
+          "formato": "Flor",
+          "cultivo": "",
+          "infundido": false,
+          "aroma": "Intenso e resinoso"
+        }
       ]
     },
     {
       "id": "hash",
       "nome": "Hash",
       "produtos": [
-        { "slug": "static", "nome": "Static", "formato": "Hash", "cultivo": "", "infundido": true,
-          "aroma": "Concentrado e terroso",
-          "descricao": "Hash infundido, obtido por peneiração estática a seco. O vídeo mostra a placa a ser aberta dentro da câmara." },
-        { "slug": "sticky-peach-piattella", "nome": "Sticky Peach", "formato": "Hash piattella", "cultivo": "", "infundido": true,
-          "aroma": "Pêssego doce",
-          "descricao": "Hash em formato piattella infundido. Pasta clara e maleável, cortada à faca." }
+        {
+          "slug": "static",
+          "nome": "Static",
+          "formato": "Hash",
+          "cultivo": "",
+          "infundido": true,
+          "aroma": "Concentrado e terroso"
+        },
+        {
+          "slug": "sticky-peach-piattella",
+          "nome": "Sticky Peach",
+          "formato": "Hash piattella",
+          "cultivo": "",
+          "infundido": true,
+          "aroma": "Pêssego doce"
+        }
       ]
     }
   ]
