@@ -106,6 +106,17 @@ fun SettingsScreen(
                     checked = catalog.settings.resumePlayback,
                     onToggle = { onSettingsChange(catalog.settings.copy(resumePlayback = it)) },
                 )
+                SelectableRow(
+                    label = "Montra automática",
+                    value = rotuloDaEspera(catalog.settings.attractSeconds),
+                    onClick = {
+                        onSettingsChange(
+                            catalog.settings.copy(
+                                attractSeconds = proximaEspera(catalog.settings.attractSeconds),
+                            ),
+                        )
+                    },
+                )
                 ToggleRow(
                     label = "Repetir o clipe",
                     checked = catalog.settings.loopPlayback,
@@ -144,4 +155,19 @@ fun SettingsScreen(
             }
         }
     }
+}
+
+/** Segundos de comando parado ate a montra arrancar sozinha. Zero desliga. */
+private val ESPERAS = listOf(0, 30, 60, 120, 300)
+
+private fun proximaEspera(actual: Int): Int {
+    val i = ESPERAS.indexOf(actual)
+    return ESPERAS[if (i < 0) 0 else (i + 1) % ESPERAS.size]
+}
+
+private fun rotuloDaEspera(segundos: Int): String = when {
+    segundos <= 0 -> "Desligada"
+    segundos < 60 -> "$segundos s parado"
+    segundos == 60 -> "1 min parado"
+    else -> "${segundos / 60} min parado"
 }

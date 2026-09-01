@@ -62,6 +62,7 @@ fun HomeScreen(
     onEditItem: (MenuItem) -> Unit,
     onContinue: () -> Unit,
     onSettings: () -> Unit,
+    onMontra: () -> Unit,
     onInteracao: () -> Unit,
 ) {
     val infusao = catalog.section(Section.INFUSAO)
@@ -104,6 +105,7 @@ fun HomeScreen(
             temContinuar = catalog.lastWatched() != null,
             onContinue = onContinue,
             onSettings = onSettings,
+            onMontra = onMontra,
         )
 
         Row(
@@ -188,6 +190,7 @@ private fun Cabecalho(
     temContinuar: Boolean,
     onContinue: () -> Unit,
     onSettings: () -> Unit,
+    onMontra: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -219,6 +222,9 @@ private fun Cabecalho(
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(Espaco.curto)) {
+            // Arranca a passagem automatica ja, em vez de esperar pelo tempo de
+            // inactividade. E o botao que se carrega ao abrir a loja.
+            TvButton(text = "Montra", onClick = onMontra, primary = true)
             if (temContinuar) {
                 TvButton(text = "Continuar", onClick = onContinue, discreto = true)
             }

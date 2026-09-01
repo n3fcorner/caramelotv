@@ -132,6 +132,7 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
             onEditItem = { viewModel.push(Screen.EditItem(it.id)) },
             onContinue = { catalog.lastWatched()?.let { viewModel.play(it, resume = true) } },
             onSettings = { viewModel.push(Screen.Settings) },
+            onMontra = viewModel::iniciarAtrator,
             onInteracao = viewModel::registarInteracao,
         )
 

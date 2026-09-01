@@ -72,7 +72,8 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
         }
     }
 
-    private fun iniciarAtrator() {
+    /** Arranca a montra automatica ja, sem esperar pelo tempo de inactividade. */
+    fun iniciarAtrator() {
         // popTo mexe na pilha mas nao conta como interaccao humana.
         val primeiro = catalog.value?.items?.firstOrNull { it.hasVideo } ?: return
         focusedId = primeiro.id
