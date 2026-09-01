@@ -1,0 +1,279 @@
+/* Paleta da marca, a mesma da app de TV. */
+:root {
+  --roxo: #573B89;
+  --roxo-claro: #6B4BA5;
+  --roxo-fundo: #2E1F4C;
+  --roxo-profundo: #1E1433;
+  --amarelo: #FFBE00;
+  --creme: #F5EED1;
+  --creme-fraco: #BFB49A;
+  --verde: #46C47A;
+  --lilas: #C9B6E8;
+  --espaco: 12px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--roxo-fundo);
+  color: var(--creme);
+  font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+  /* Respeita o entalhe e a barra inferior do iPhone. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* --- fundo da marca: o logotipo em contorno e a mascote, muito esbatidos --- */
+.fundo {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.fundo img { position: absolute; opacity: .08; }
+.fundo-marca {
+  left: -18%;
+  top: 4%;
+  width: 92%;
+  max-width: 620px;
+}
+.fundo-mascote {
+  right: -14%;
+  bottom: -4%;
+  height: 62%;
+  opacity: .10;
+}
+
+.cabecalho, main, .rodape { position: relative; z-index: 1; }
+
+/* --- cabecalho --- */
+.cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 18px 8px;
+}
+.cabecalho .logo { height: 44px; }
+.wordmark img { display: block; height: 30px; }
+.wordmark span {
+  display: block;
+  color: var(--amarelo);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .42em;
+  margin-top: 2px;
+}
+
+/* --- seccoes --- */
+.seccao { padding: 18px 18px 0; }
+.seccao h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  color: var(--amarelo);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+.seccao h2::before {
+  content: "";
+  width: 20px;
+  height: 3px;
+  background: var(--amarelo);
+  flex: none;
+}
+
+.grelha {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--espaco);
+}
+@media (min-width: 560px) { .grelha { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 860px) { .grelha { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1200px) {
+  .grelha { grid-template-columns: repeat(5, 1fr); }
+  .seccao, .cabecalho, .rodape { max-width: 1200px; margin-inline: auto; }
+}
+
+/* --- cartao de produto: so tipografia sobre a foto, como na TV --- */
+.cartao {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: var(--roxo);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform .18s ease;
+}
+.cartao:active { transform: scale(.97); }
+@media (hover: hover) {
+  .cartao:hover { transform: scale(1.03); }
+  .cartao:hover img { filter: none; }
+}
+.cartao:focus-visible { outline: 3px solid var(--amarelo); outline-offset: 2px; }
+
+.cartao img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(.78);
+  transition: filter .18s ease;
+}
+.cartao .sem-foto {
+  width: 100%;
+  height: 100%;
+  background: var(--roxo-claro);
+}
+
+.cartao .nome {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(30, 20, 51, .9);
+  padding: 8px 10px;
+}
+.cartao .nome strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  line-height: 1.25;
+}
+.cartao .breve {
+  display: block;
+  margin-top: 2px;
+  color: var(--amarelo);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .16em;
+}
+
+/* --- ficha do produto --- */
+.ficha {
+  width: min(560px, 94vw);
+  max-height: 92dvh;
+  padding: 0;
+  border: 0;
+  background: var(--roxo-fundo);
+  color: var(--creme);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.ficha::backdrop { background: rgba(0, 0, 0, .78); }
+
+.fechar {
+  position: sticky;
+  top: 0;
+  float: right;
+  margin: 8px 8px 0;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: rgba(30, 20, 51, .9);
+  color: var(--creme);
+  font-size: 17px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.ficha video, .ficha .cartaz {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+  background: var(--roxo-profundo);
+}
+.ficha-texto { padding: 18px; }
+.ficha-linha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--amarelo);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+.ficha-linha::before {
+  content: "";
+  width: 20px;
+  height: 3px;
+  background: var(--amarelo);
+  flex: none;
+}
+.ficha h3 {
+  margin: 8px 0 4px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.ficha .resumo { margin: 0; color: var(--creme-fraco); font-size: 14px; }
+.ficha p.descricao { margin: 16px 0 0; color: var(--creme-fraco); font-size: 15px; line-height: 1.55; }
+
+.dados { margin-top: 18px; display: grid; gap: 8px; }
+.dado {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--roxo);
+  padding: 12px;
+}
+.dado .icone {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: var(--roxo-profundo);
+  color: var(--verde);
+  font-size: 15px;
+}
+.dado dt {
+  color: var(--amarelo);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.dado dd { margin: 2px 0 0; font-size: 15px; }
+
+.aviso {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--roxo);
+  color: var(--amarelo);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+/* --- rodape --- */
+.rodape {
+  padding: 28px 18px calc(28px + env(safe-area-inset-bottom));
+  color: var(--creme-fraco);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.rodape p { margin: 0; }
+.rodape a { color: var(--amarelo); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

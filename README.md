@@ -274,6 +274,29 @@ Três vias, da mais lenta à mais prática:
    espaços ou `?`/`&`, codifica-o em percent-encoding.
 3. **No código:** `data/DefaultCatalog.kt`, para mudar o estado inicial.
 
+## Montra no telemóvel
+
+A mesma montra numa página web, para abrir no telemóvel e mandar por link:
+
+**https://caramelo-montra.vercel.app**
+
+Vive em [web/](web/) — HTML, CSS e JavaScript simples, sem compilação. O catálogo
+está em `web/catalogo.json`, **à parte do catálogo da app** (`data/DefaultCatalog.kt`):
+mudar um não muda o outro, e convém rever os dois quando um produto mudar.
+
+Os vídeos são versões leves, 640×640, geradas por
+[preparar-web.sh](scripts/preparar-web.sh) — 113 MB passam a 38 MB, porque quem abre
+o link está muitas vezes em dados móveis.
+
+```bash
+./scripts/preparar-web.sh          # versões para telemóvel
+cp videos/web-movel/*.mp4 web/media/
+cd web && vercel deploy --prod
+```
+
+O `playsinline` no `<video>` não é decorativo: sem ele o Safari do iPhone salta
+para ecrã inteiro e sai da página.
+
 ## Onde continuar
 
 - `ControlPanel.kt` — acrescentar uma entrada em `PanelAction` e tratá-la na `MainActivity`.
