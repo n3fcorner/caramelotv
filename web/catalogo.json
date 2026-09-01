@@ -11,7 +11,15 @@
           "formato": "Flor",
           "cultivo": "Indoor",
           "infundido": true,
-          "aroma": "Mirtilo e frutos silvestres"
+          "aroma": "Mirtilo e frutos silvestres",
+          "genetica": "Blueberry de DJ Short",
+          "tipo": "Índica",
+          "indica": 80,
+          "terpenos": [
+            "Mirceno",
+            "Pineno",
+            "Cariofileno"
+          ]
         },
         {
           "slug": "bubba-kush",
@@ -19,7 +27,15 @@
           "formato": "Flor",
           "cultivo": "Greenhouse",
           "infundido": true,
-          "aroma": "Terroso e café, fundo doce"
+          "aroma": "Terroso e café, fundo doce",
+          "genetica": "OG Kush × Northern Lights (atribuída)",
+          "tipo": "Índica",
+          "indica": 80,
+          "terpenos": [
+            "Mirceno",
+            "Cariofileno",
+            "Limoneno"
+          ]
         },
         {
           "slug": "critical-berry",
@@ -27,7 +43,15 @@
           "formato": "Flor",
           "cultivo": "",
           "infundido": true,
-          "aroma": "Frutos vermelhos sobre fundo terroso"
+          "aroma": "Frutos vermelhos sobre fundo terroso",
+          "genetica": "Família Critical",
+          "tipo": "Híbrida",
+          "indica": 65,
+          "terpenos": [
+            "Mirceno",
+            "Cariofileno",
+            "Limoneno"
+          ]
         },
         {
           "slug": "smash-cali",
@@ -43,7 +67,15 @@
           "formato": "Flor",
           "cultivo": "Glasshouse",
           "infundido": true,
-          "aroma": "Ácido e cítrico, fundo a diesel"
+          "aroma": "Ácido e cítrico, fundo a diesel",
+          "genetica": "Suver Haze #50 × Gorilla Glue #4",
+          "tipo": "Sativa",
+          "indica": 30,
+          "terpenos": [
+            "Mirceno",
+            "Terpineol",
+            "Limoneno"
+          ]
         },
         {
           "slug": "",
@@ -52,7 +84,15 @@
           "cultivo": "",
           "infundido": true,
           "aroma": "Cítrico e cremoso, fundo a diesel",
-          "foto": "mac"
+          "foto": "mac",
+          "genetica": "Alien Cookies × Miracle 15",
+          "tipo": "Híbrida",
+          "indica": 50,
+          "terpenos": [
+            "Limoneno",
+            "Cariofileno",
+            "Pineno"
+          ]
         },
         {
           "slug": "",
@@ -149,6 +189,15 @@
           "cultivo": "",
           "infundido": true,
           "aroma": "Pêssego doce"
+        },
+        {
+          "slug": "",
+          "foto": "mango-melt",
+          "nome": "Mango Melt",
+          "formato": "Hash piattella",
+          "cultivo": "",
+          "infundido": true,
+          "aroma": "Manga madura e resina"
         }
       ]
     }

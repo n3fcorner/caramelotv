@@ -276,3 +276,25 @@ body {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* --- perfil indica/sativa --- */
+.perfil { margin-top: 16px; }
+.perfil-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  color: var(--amarelo);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.perfil-topo .perfil-valor {
+  color: var(--creme-fraco);
+  letter-spacing: .06em;
+  text-transform: none;
+  font-weight: 400;
+}
+.perfil-barra { display: flex; height: 8px; margin-top: 8px; }
+.perfil-barra i { background: var(--amarelo); }
+.perfil-barra b { background: var(--verde); }

@@ -77,7 +77,10 @@ function abrir(produto, seccao) {
       <dl class="dados">
         ${produto.cultivo ? dado('❁', 'Cultivo', produto.cultivo) : ''}
         ${produto.aroma ? dado('≋', 'Aroma', produto.aroma) : ''}
+        ${produto.genetica ? dado('✦', 'Genética', produto.genetica) : ''}
+        ${produto.terpenos ? dado('◇', 'Terpenos', produto.terpenos.join(' · ')) : ''}
       </dl>
+      ${barra(produto)}
       ${temVideo ? '' : '<p class="aviso">Em breve na linha</p>'}
     </div>`;
 
@@ -89,6 +92,25 @@ const dado = (icone, titulo, valor) => `
     <span class="icone" aria-hidden="true">${icone}</span>
     <div><dt>${escapar(titulo)}</dt><dd>${escapar(valor)}</dd></div>
   </div>`;
+
+/**
+ * Peso da indica contra o da sativa. So aparece com genetica documentada — uma
+ * barra a meio para toda a gente seria decoracao, nao dado.
+ */
+function barra(produto) {
+  const peso = produto.indica
+  if (typeof peso !== 'number' || peso < 0 || peso > 100) return ''
+  return `
+    <div class="perfil">
+      <div class="perfil-topo">
+        <span>${escapar(produto.tipo || 'Perfil')}</span>
+        <span class="perfil-valor">Índica ${peso} · Sativa ${100 - peso}</span>
+      </div>
+      <div class="perfil-barra">
+        <i style="flex:${peso}"></i><b style="flex:${100 - peso}"></b>
+      </div>
+    </div>`
+}
 
 function fechar() {
   // Parar o video antes de fechar, ou continua a tocar em segundo plano.
