@@ -46,6 +46,7 @@ const CATALOGO = {
   mac: ['mac'],
   'gorilla-mandarini': ['gorilla mandarini', 'gorilla mandarin'],
   'berry-pie': ['berry pie', 'beryy pie'],
+  'mango-melt': ['mango melt piattella', 'mango melt'],
 }
 
 const AGENTE =
@@ -125,8 +126,14 @@ const CARTAZES = 'videos/web/posters'
 
 // As fotos vem em 1080x1620 com fundo transparente. Ficam melhor recompostas num
 // quadrado com o roxo da marca por tras do que recortadas a bruta.
-const FUNDO = '0x241A3D'
+//
+// O fundo e exactamente o do mosaico na app, para nao se ver a costura entre a
+// foto e o cartao. E a flor assenta em cima, nao ao centro: em baixo passa a
+// faixa com o nome, e ao centro ela ficava com o pe tapado.
+const FUNDO = '0x1E1433'
 const LADO = 720
+const ALTURA_FLOR = 0.76
+const TOPO = 0.03
 
 async function cartaz(origem, destino) {
   await corre('ffmpeg', [
@@ -134,7 +141,8 @@ async function cartaz(origem, destino) {
     '-f', 'lavfi', '-i', `color=c=${FUNDO}:s=${LADO}x${LADO}`,
     '-i', origem,
     '-filter_complex',
-    `[1]scale=-1:${Math.round(LADO * 0.82)}[b];[0][b]overlay=(W-w)/2:(H-h)/2:format=auto`,
+    `[1]scale=-1:${Math.round(LADO * ALTURA_FLOR)}[b];` +
+      `[0][b]overlay=(W-w)/2:${Math.round(LADO * TOPO)}:format=auto`,
     '-frames:v', '1', '-q:v', '3', destino,
   ])
 }

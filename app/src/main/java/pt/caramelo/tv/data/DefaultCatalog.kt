@@ -29,14 +29,20 @@ object DefaultCatalog {
         produto(
             Section.INFUSAO, 0, "Blueberry Small", "blueberry-small",
             LINHA_INFUSAO, "Flor", "Indoor", "Mirtilo e frutos silvestres", infundido = true,
+            genetica = "Blueberry de DJ Short", tipo = "Índica", indica = 80,
+            terpenos = listOf("Mirceno", "Pineno", "Cariofileno"),
         ),
         produto(
             Section.INFUSAO, 1, "Bubba Kush", "bubba-kush",
             LINHA_INFUSAO, "Flor", "Greenhouse", "Terroso e café, fundo doce", infundido = true,
+            genetica = "OG Kush × Northern Lights (atribuída)", tipo = "Índica", indica = 80,
+            terpenos = listOf("Mirceno", "Cariofileno", "Limoneno"),
         ),
         produto(
             Section.INFUSAO, 2, "Critical Berry", "critical-berry",
             LINHA_INFUSAO, "Flor", "", "Frutos vermelhos sobre fundo terroso", infundido = true,
+            genetica = "Família Critical", tipo = "Híbrida", indica = 65,
+            terpenos = listOf("Mirceno", "Cariofileno", "Limoneno"),
         ),
         produto(
             Section.INFUSAO, 3, "Smash Cali", "smash-cali",
@@ -45,8 +51,14 @@ object DefaultCatalog {
         produto(
             Section.INFUSAO, 4, "Sour Lifter", "sour-lifter",
             LINHA_INFUSAO, "Flor", "Glasshouse", "Ácido e cítrico, fundo a diesel", infundido = true,
+            genetica = "Suver Haze #50 × Gorilla Glue #4", tipo = "Sativa", indica = 30,
+            terpenos = listOf("Mirceno", "Terpineol", "Limoneno"),
         ),
-        emBreve(Section.INFUSAO, 5, "MAC", LINHA_INFUSAO, "Cítrico e cremoso, fundo a diesel", "mac"),
+        emBreve(
+            Section.INFUSAO, 5, "MAC", LINHA_INFUSAO, "Cítrico e cremoso, fundo a diesel", "mac",
+            genetica = "Alien Cookies × Miracle 15", tipo = "Híbrida", indica = 50,
+            terpenos = listOf("Limoneno", "Cariofileno", "Pineno"),
+        ),
         emBreve(Section.INFUSAO, 6, "Gorilla Mandarini", LINHA_INFUSAO, "Tangerina sobre fundo resinoso", "gorilla-mandarini"),
         emBreve(Section.INFUSAO, 7, "Berry Pie", LINHA_INFUSAO, "Frutos vermelhos e doce de forno", "berry-pie"),
         livre(Section.INFUSAO, 8),
@@ -82,7 +94,10 @@ object DefaultCatalog {
             Section.HASH, 1, "Sticky Peach", "sticky-peach-piattella",
             LINHA_INFUSAO, "Hash piattella", "", "Pêssego doce", infundido = true,
         ),
-        livre(Section.HASH, 2),
+        produto(
+            Section.HASH, 2, "Mango Melt", "mango-melt",
+            LINHA_INFUSAO, "Hash piattella", "", "Manga madura e resina", infundido = true,
+        ),
     )
 
     // --- construtores -------------------------------------------------------
@@ -97,15 +112,22 @@ object DefaultCatalog {
         cultivo: String,
         aroma: String,
         infundido: Boolean = false,
+        genetica: String = "",
+        tipo: String = "",
+        indica: Int = -1,
+        terpenos: List<String> = emptyList(),
     ) = MenuItem(
         id = id(section, slot),
         slot = slot,
         section = section,
         title = titulo,
-        videoUrl = "media/$slug.mp4",
+        videoUrl = if (temVideo(slug)) "media/$slug.mp4" else "",
         imageUrl = "posters/$slug.jpg",
-        strain = Strain(linha, formato, cultivo, aroma, infundido),
+        strain = Strain(linha, formato, cultivo, aroma, infundido, genetica, tipo, indica, terpenos),
     )
+
+    /** Nem todos os produtos com foto ja tem clipe filmado. */
+    private fun temVideo(slug: String) = slug !in SEM_VIDEO
 
     /**
      * Produto ja anunciado mas ainda sem video: aparece com a etiqueta Em breve.
@@ -118,6 +140,10 @@ object DefaultCatalog {
         linha: String,
         aroma: String,
         slug: String = "",
+        genetica: String = "",
+        tipo: String = "",
+        indica: Int = -1,
+        terpenos: List<String> = emptyList(),
     ) = MenuItem(
         id = id(section, slot),
         slot = slot,
@@ -129,14 +155,23 @@ object DefaultCatalog {
             format = "Flor",
             aroma = aroma,
             infused = linha == LINHA_INFUSAO,
+            genetics = genetica,
+            type = tipo,
+            indica = indica,
+            terpenes = terpenos,
         ),
     )
 
+    /** Slot por preencher: leva o caramelo em medalha, em vez de um rectangulo vazio. */
     private fun livre(section: Section, slot: Int) = MenuItem(
         id = id(section, slot),
         slot = slot,
         section = section,
+        imageUrl = "posters/livre.jpg",
     )
+
+    /** O Mango Melt ainda nao tem clipe: entra so com a foto de estudio. */
+    private val SEM_VIDEO = setOf("mango-melt")
 
     private fun id(section: Section, slot: Int) = when (section) {
         Section.INFUSAO -> "thcp-$slot"

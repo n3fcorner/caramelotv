@@ -3,6 +3,8 @@ package pt.caramelo.tv.ui.details
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -42,6 +45,7 @@ import pt.caramelo.tv.ui.theme.Creme
 import pt.caramelo.tv.ui.theme.Espaco
 import pt.caramelo.tv.ui.theme.Overscan
 import pt.caramelo.tv.ui.theme.RoxoProfundo
+import pt.caramelo.tv.ui.theme.VerdeClaro
 
 /**
  * Ficha do produto: cartaz quadrado a esquerda, texto a direita — a mesma composicao
@@ -91,6 +95,7 @@ fun DetailsScreen(
             modifier = Modifier
                 .weight(0.44f)
                 .fillMaxHeight()
+                .verticalScroll(rememberScrollState())
                 .graphicsLayer {
                     alpha = ficha
                     // Entra a deslizar da direita, o sentido de leitura da ficha.
@@ -133,19 +138,19 @@ fun DetailsScreen(
             }
 
             if (item.strain.aroma.isNotBlank()) {
-                Text(
-                    text = "AROMA",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Amarelo,
-                    letterSpacing = 2.sp,
-                    modifier = Modifier.padding(top = Espaco.largo),
-                )
-                Text(
-                    text = item.strain.aroma,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Creme,
-                    modifier = Modifier.padding(top = Espaco.minimo),
-                )
+                Campo("Aroma", item.strain.aroma)
+            }
+
+            if (item.strain.genetics.isNotBlank()) {
+                Campo("Genética", item.strain.genetics)
+            }
+
+            if (item.strain.terpenes.isNotEmpty()) {
+                Campo("Terpenos dominantes", item.strain.terpenes.joinToString(" · "))
+            }
+
+            if (item.strain.temPerfil) {
+                BarraIndicaSativa(item.strain.indica, item.strain.type)
             }
 
             Row(
@@ -180,6 +185,66 @@ fun DetailsScreen(
             }
         }
     }
+    }
+}
+
+/** Rotulo em amarelo mais o valor, o par que se repete por toda a ficha. */
+@Composable
+private fun Campo(rotulo: String, valor: String) {
+    Column(Modifier.padding(top = Espaco.largo)) {
+        Text(
+            text = rotulo.uppercase(),
+            style = MaterialTheme.typography.labelSmall,
+            color = Amarelo,
+            letterSpacing = 2.sp,
+        )
+        Text(
+            text = valor,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Creme,
+            modifier = Modifier.padding(top = Espaco.minimo),
+        )
+    }
+}
+
+/**
+ * Peso da indica contra o da sativa. So aparece quando a genetica esta
+ * documentada — uma barra a meio para toda a gente seria decoracao, nao dado.
+ */
+@Composable
+private fun BarraIndicaSativa(indica: Int, tipo: String) {
+    val peso = indica.coerceIn(0, 100)
+    Column(Modifier.padding(top = Espaco.largo)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = if (tipo.isBlank()) "PERFIL" else tipo.uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                color = Amarelo,
+                letterSpacing = 2.sp,
+            )
+            Text(
+                text = "Índica $peso · Sativa ${100 - peso}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Row(
+            modifier = Modifier
+                .padding(top = Espaco.curto)
+                .fillMaxWidth()
+                .height(8.dp),
+        ) {
+            Box(Modifier.weight(peso.coerceAtLeast(1).toFloat()).fillMaxHeight().background(Amarelo))
+            Box(
+                Modifier
+                    .weight((100 - peso).coerceAtLeast(1).toFloat())
+                    .fillMaxHeight()
+                    .background(VerdeClaro),
+            )
+        }
     }
 }
 
