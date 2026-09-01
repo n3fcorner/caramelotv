@@ -51,7 +51,8 @@
           "formato": "Flor",
           "cultivo": "",
           "infundido": true,
-          "aroma": "Cítrico e cremoso, fundo a diesel"
+          "aroma": "Cítrico e cremoso, fundo a diesel",
+          "foto": "mac"
         },
         {
           "slug": "",
@@ -59,7 +60,8 @@
           "formato": "Flor",
           "cultivo": "",
           "infundido": true,
-          "aroma": "Tangerina sobre fundo resinoso"
+          "aroma": "Tangerina sobre fundo resinoso",
+          "foto": "gorilla-mandarini"
         },
         {
           "slug": "",
@@ -67,7 +69,8 @@
           "formato": "Flor",
           "cultivo": "",
           "infundido": true,
-          "aroma": "Frutos vermelhos e doce de forno"
+          "aroma": "Frutos vermelhos e doce de forno",
+          "foto": "berry-pie"
         }
       ]
     },
@@ -113,7 +116,8 @@
           "formato": "Flor",
           "cultivo": "",
           "infundido": false,
-          "aroma": "Frutos vermelhos sobre fundo terroso"
+          "aroma": "Frutos vermelhos sobre fundo terroso",
+          "foto": "critical-berry"
         },
         {
           "slug": "",
@@ -121,7 +125,8 @@
           "formato": "Flor",
           "cultivo": "",
           "infundido": false,
-          "aroma": "Intenso e resinoso"
+          "aroma": "Intenso e resinoso",
+          "foto": "uranium"
         }
       ]
     },

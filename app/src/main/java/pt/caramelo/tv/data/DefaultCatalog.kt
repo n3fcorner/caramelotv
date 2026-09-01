@@ -46,9 +46,9 @@ object DefaultCatalog {
             Section.INFUSAO, 4, "Sour Lifter", "sour-lifter",
             LINHA_INFUSAO, "Flor", "Glasshouse", "Ácido e cítrico, fundo a diesel", infundido = true,
         ),
-        emBreve(Section.INFUSAO, 5, "MAC", LINHA_INFUSAO, "Cítrico e cremoso, fundo a diesel"),
-        emBreve(Section.INFUSAO, 6, "Gorilla Mandarini", LINHA_INFUSAO, "Tangerina sobre fundo resinoso"),
-        emBreve(Section.INFUSAO, 7, "Berry Pie", LINHA_INFUSAO, "Frutos vermelhos e doce de forno"),
+        emBreve(Section.INFUSAO, 5, "MAC", LINHA_INFUSAO, "Cítrico e cremoso, fundo a diesel", "mac"),
+        emBreve(Section.INFUSAO, 6, "Gorilla Mandarini", LINHA_INFUSAO, "Tangerina sobre fundo resinoso", "gorilla-mandarini"),
+        emBreve(Section.INFUSAO, 7, "Berry Pie", LINHA_INFUSAO, "Frutos vermelhos e doce de forno", "berry-pie"),
         livre(Section.INFUSAO, 8),
     )
 
@@ -69,8 +69,8 @@ object DefaultCatalog {
             Section.CBD, 3, "Solero Cream", "solero-cream",
             LINHA_CBD, "Flor", "Indoor", "Cremoso e doce, baunilha e citrinos",
         ),
-        emBreve(Section.CBD, 4, "Critical Berry", LINHA_CBD, "Frutos vermelhos sobre fundo terroso"),
-        emBreve(Section.CBD, 5, "Uranium", LINHA_CBD, "Intenso e resinoso"),
+        emBreve(Section.CBD, 4, "Critical Berry", LINHA_CBD, "Frutos vermelhos sobre fundo terroso", "critical-berry"),
+        emBreve(Section.CBD, 5, "Uranium", LINHA_CBD, "Intenso e resinoso", "uranium"),
     )
 
     private fun hash(): List<MenuItem> = listOf(
@@ -107,18 +107,23 @@ object DefaultCatalog {
         strain = Strain(linha, formato, cultivo, aroma, infundido),
     )
 
-    /** Produto ja anunciado mas ainda sem video: aparece com a etiqueta Em breve. */
+    /**
+     * Produto ja anunciado mas ainda sem video: aparece com a etiqueta Em breve.
+     * Leva cartaz na mesma — a foto de estudio do fornecedor chega para o mostrar.
+     */
     private fun emBreve(
         section: Section,
         slot: Int,
         titulo: String,
         linha: String,
         aroma: String,
+        slug: String = "",
     ) = MenuItem(
         id = id(section, slot),
         slot = slot,
         section = section,
         title = titulo,
+        imageUrl = if (slug.isBlank()) "" else "posters/$slug.jpg",
         strain = Strain(
             line = linha,
             format = "Flor",

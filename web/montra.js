@@ -60,10 +60,13 @@ function abrir(produto, seccao) {
 
   // playsinline e obrigatorio no Safari do iPhone: sem ele o video salta para
   // ecra inteiro e sai da pagina.
+  const foto = produto.slug || produto.foto
   const media = temVideo
     ? `<video src="${video(produto.slug)}" poster="${cartaz(produto.slug)}"
               controls playsinline preload="metadata"></video>`
-    : '<div class="cartaz"></div>';
+    : foto
+      ? `<img class="cartaz" src="${cartaz(foto)}" alt="">`
+      : '<div class="cartaz"></div>';
 
   fichaConteudo.innerHTML = `
     ${media}
