@@ -56,15 +56,24 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
             while (true) {
                 delay(1_000)
                 val segundos = catalog.value?.settings?.attractSeconds ?: 0
-                if (segundos <= 0 || current != Screen.Home) continue
-                if (System.currentTimeMillis() - ultimaInteracao > segundos * 1_000L) {
-                    iniciarAtrator()
-                }
+                if (segundos <= 0) continue
+                // Ja esta a andar sozinha: nada a fazer.
+                val ecra = current
+                if (ecra is Screen.Player && ecra.atrator) continue
+                if (System.currentTimeMillis() - ultimaInteracao <= segundos * 1_000L) continue
+
+                // O comando esta parado. Onde quer que a app tenha ficado — num
+                // detalhe, nas definicoes — volta ao menu e comeca a montra. Sem
+                // isto, bastava alguem deixar a app num submenu para ela ficar
+                // parada o resto do dia.
+                if (ecra != Screen.Home) popTo(Screen.Home)
+                iniciarAtrator()
             }
         }
     }
 
     private fun iniciarAtrator() {
+        // popTo mexe na pilha mas nao conta como interaccao humana.
         val primeiro = catalog.value?.items?.firstOrNull { it.hasVideo } ?: return
         focusedId = primeiro.id
         push(Screen.Player(primeiro.id, 0L, atrator = true))
@@ -94,6 +103,7 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
 
     fun push(screen: Screen) {
         stack.add(screen)
+        registarInteracao()
     }
 
     /** Devolve false quando ja estamos na raiz e nao ha para onde recuar. */
@@ -107,6 +117,8 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
     fun popTo(screen: Screen) {
         while (stack.size > 1 && stack.last() != screen) stack.removeAt(stack.lastIndex)
     }
+
+    /** Guarda o instante do ultimo toque no comando, para o modo atrator. */
 
     // --- Acoes de conteudo -------------------------------------------------
 

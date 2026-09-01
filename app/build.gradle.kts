@@ -1,8 +1,17 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+}
+
+// A chave de assinatura fica fora do git: quem a tiver assina em nome da marca.
+val ficheiroChave = rootProject.file("keystore.properties")
+val chave = Properties().apply {
+    if (ficheiroChave.exists()) FileInputStream(ficheiroChave).use { load(it) }
 }
 
 android {
@@ -17,10 +26,23 @@ android {
         versionName = "1.0"
     }
 
+    signingConfigs {
+        if (chave.isNotEmpty()) {
+            create("release") {
+                storeFile = rootProject.file(chave.getProperty("storeFile"))
+                storePassword = chave.getProperty("storePassword")
+                keyAlias = chave.getProperty("keyAlias")
+                keyPassword = chave.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (chave.isNotEmpty()) signingConfig = signingConfigs.getByName("release")
         }
     }
 

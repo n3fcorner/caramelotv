@@ -98,7 +98,7 @@ fun HomeScreen(
                 }
             }
             .padding(horizontal = Overscan.horizontal, vertical = Overscan.vertical),
-        verticalArrangement = Arrangement.spacedBy(Espaco.largo),
+        verticalArrangement = Arrangement.spacedBy(Espaco.medio),
     ) {
         Cabecalho(
             temContinuar = catalog.lastWatched() != null,
@@ -119,7 +119,7 @@ fun HomeScreen(
 
             Column(
                 modifier = Modifier.weight(0.50f).fillMaxHeight(),
-                verticalArrangement = Arrangement.spacedBy(Espaco.largo),
+                verticalArrangement = Arrangement.spacedBy(Espaco.medio),
             ) {
                 Seccao(
                     titulo = Section.CBD.label,
@@ -168,7 +168,7 @@ private fun Seccao(
     modifier: Modifier = Modifier,
     conteudo: @Composable () -> Unit,
 ) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(Espaco.curto)) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(Espaco.minimo)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.width(20.dp).height(3.dp).background(Amarelo))
             Text(
@@ -198,7 +198,7 @@ private fun Cabecalho(
             Image(
                 painter = painterResource(R.drawable.logo_caramelo),
                 contentDescription = "Caramelo do Brasil",
-                modifier = Modifier.height(44.dp),
+                modifier = Modifier.height(38.dp),
             )
             Column(Modifier.padding(start = Espaco.medio)) {
                 // O lettering original da marca em vez do nome composto em Poppins:
@@ -206,7 +206,7 @@ private fun Cabecalho(
                 Image(
                     painter = painterResource(R.drawable.lettering_caramelo),
                     contentDescription = "Caramelo",
-                    modifier = Modifier.height(42.dp),
+                    modifier = Modifier.height(36.dp),
                 )
                 Text(
                     text = "DO BRASIL",

@@ -27,7 +27,7 @@ private val CarameloColors = darkColorScheme(
 /** Margens de seguranca contra overscan: muitas TVs cortam os primeiros pixeis do painel. */
 object Overscan {
     val horizontal = 40.dp
-    val vertical = 26.dp
+    val vertical = 22.dp
 }
 
 /**

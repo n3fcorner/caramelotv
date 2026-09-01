@@ -113,7 +113,7 @@ fun ProductTile(
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
                     .background(RoxoProfundo.copy(alpha = 0.90f))
-                    .padding(horizontal = Espaco.curto, vertical = Espaco.curto),
+                    .padding(horizontal = Espaco.curto, vertical = 6.dp),
             ) {
                 // A regua abre da esquerda a medida que o foco entra.
                 Box(
@@ -127,11 +127,14 @@ fun ProductTile(
                 Text(
                     text = item.displayTitle.uppercase(),
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = lerp(13.sp, 17.sp, p),
-                        lineHeight = lerp(17.sp, 21.sp, p),
+                        fontSize = lerp(12.5.sp, 17.sp, p),
+                        lineHeight = lerp(15.sp, 20.sp, p),
                         letterSpacing = lerp(2.2.sp, 0.6.sp, p),
                     ),
                     color = Creme.copy(alpha = 0.72f + 0.28f * p),
+                    // Duas linhas sempre reservadas: com nomes de uma e de duas
+                    // linhas misturados, as faixas ficavam com alturas aos saltos.
+                    minLines = 2,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -139,10 +142,12 @@ fun ProductTile(
                 if (item.state == ItemState.EM_BREVE) {
                     Text(
                         text = "EM BREVE",
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 11.sp,
+                            lineHeight = 14.sp,
+                        ),
                         color = Amarelo,
-                        letterSpacing = 2.sp,
-                        modifier = Modifier.padding(top = Espaco.minimo),
+                        letterSpacing = 1.6.sp,
                     )
                 }
             }
