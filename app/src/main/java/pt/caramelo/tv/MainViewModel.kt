@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import pt.caramelo.tv.data.CatalogRepository
@@ -36,11 +37,59 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
     var focusedId by mutableStateOf<String?>(null)
         private set
 
-    var exitDialogVisible by mutableStateOf(false)
-        private set
-
     fun onFocused(id: String) {
         focusedId = id
+        registarInteracao()
+    }
+
+    // --- Modo atrator -------------------------------------------------------
+
+    private var ultimaInteracao = System.currentTimeMillis()
+
+    /** Qualquer toque no comando adia a montra automatica. */
+    fun registarInteracao() {
+        ultimaInteracao = System.currentTimeMillis()
+    }
+
+    init {
+        viewModelScope.launch {
+            while (true) {
+                delay(1_000)
+                val segundos = catalog.value?.settings?.attractSeconds ?: 0
+                if (segundos <= 0 || current != Screen.Home) continue
+                if (System.currentTimeMillis() - ultimaInteracao > segundos * 1_000L) {
+                    iniciarAtrator()
+                }
+            }
+        }
+    }
+
+    private fun iniciarAtrator() {
+        val primeiro = catalog.value?.items?.firstOrNull { it.hasVideo } ?: return
+        focusedId = primeiro.id
+        push(Screen.Player(primeiro.id, 0L, atrator = true))
+    }
+
+    /**
+     * No modo atrator o passo e sobre o catalogo inteiro, para a montra mostrar tudo.
+     * Quando e alguem no comando, [skip] fica dentro da seccao.
+     */
+    fun proximoNoAtrator(actual: MenuItem) {
+        val lista = catalog.value?.items?.filter { it.hasVideo }.orEmpty()
+        if (lista.isEmpty()) return
+        val i = lista.indexOfFirst { it.id == actual.id }
+        val proximo = lista[(i + 1).mod(lista.size)]
+        focusedId = proximo.id
+        replaceTop(Screen.Player(proximo.id, 0L, atrator = true))
+    }
+
+    /** Alguem pegou no comando durante a montra automatica: passa a sessao normal. */
+    fun assumirControlo() {
+        registarInteracao()
+        val ecra = current
+        if (ecra is Screen.Player && ecra.atrator) {
+            replaceTop(ecra.copy(atrator = false))
+        }
     }
 
     fun push(screen: Screen) {
@@ -51,15 +100,12 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
     fun pop(): Boolean {
         if (stack.size <= 1) return false
         stack.removeAt(stack.lastIndex)
+        registarInteracao()
         return true
     }
 
     fun popTo(screen: Screen) {
         while (stack.size > 1 && stack.last() != screen) stack.removeAt(stack.lastIndex)
-    }
-
-    fun showExitDialog(visible: Boolean) {
-        exitDialogVisible = visible
     }
 
     // --- Acoes de conteudo -------------------------------------------------

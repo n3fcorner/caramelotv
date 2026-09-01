@@ -97,8 +97,11 @@ fun PlayerScreen(
     videoUrl: String,
     startPositionMs: Long,
     loop: Boolean,
+    atrator: Boolean,
     onExit: (positionMs: Long, finished: Boolean) -> Unit,
     onSkip: (delta: Int) -> Unit,
+    onFimDoAtrator: () -> Unit,
+    onControlo: () -> Unit,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -109,11 +112,14 @@ fun PlayerScreen(
     var duracao by remember { mutableLongStateOf(0L) }
     var progresso by remember { mutableFloatStateOf(0f) }
 
+    val fimDoAtrator by rememberUpdatedState(onFimDoAtrator)
+
     val player = remember(item.id, videoUrl) {
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(ExoMediaItem.fromUri(videoUrl))
             if (startPositionMs > 0) seekTo(startPositionMs)
-            repeatMode = if (loop) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
+            // Na montra automatica o clipe nao repete: acaba e passa ao seguinte.
+            repeatMode = if (loop && !atrator) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
             playWhenReady = true
             prepare()
         }
@@ -127,6 +133,10 @@ fun PlayerScreen(
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 aReproduzir = isPlaying
+            }
+
+            override fun onPlaybackStateChanged(estado: Int) {
+                if (atrator && estado == Player.STATE_ENDED) fimDoAtrator()
             }
         }
         player.addListener(listener)
@@ -168,6 +178,8 @@ fun PlayerScreen(
             .focusable()
             .onPreviewKeyEvent { evento ->
                 if (evento.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                // Alguem pegou no comando: a montra deixa de andar sozinha.
+                onControlo()
                 when (evento.key) {
                     Key.DirectionCenter, Key.Enter, Key.Spacebar -> {
                         if (player.isPlaying) player.pause() else player.play()
@@ -188,7 +200,9 @@ fun PlayerScreen(
                 }
             },
     ) {
-        FundoDaMarca()
+        // Sem a marca geometrica: o painel de video tapa a esquerda, onde ela vive,
+        // e o pouco que sobrava ia sobrepor-se aos contornos da mascote.
+        FundoDaMarca(comMarca = false)
 
         Row(
             modifier = Modifier
@@ -214,6 +228,7 @@ fun PlayerScreen(
             FichaDoProduto(
                 item = item,
                 aReproduzir = aReproduzir,
+                atrator = atrator,
                 modifier = Modifier.weight(0.45f).fillMaxHeight(),
             )
         }
@@ -315,6 +330,7 @@ private fun PainelDeVideo(
 private fun FichaDoProduto(
     item: MenuItem,
     aReproduzir: Boolean,
+    atrator: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier, verticalArrangement = Arrangement.Center) {
@@ -365,7 +381,11 @@ private fun FichaDoProduto(
         }
 
         Text(
-            text = if (aReproduzir) "● A reproduzir" else "❚❚ Em pausa",
+            text = when {
+                atrator -> "▶ Montra automática · carrega numa tecla"
+                aReproduzir -> "● A reproduzir"
+                else -> "❚❚ Em pausa"
+            },
             style = MaterialTheme.typography.labelMedium,
             color = if (aReproduzir) Amarelo else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = Espaco.largo),

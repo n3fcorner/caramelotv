@@ -62,6 +62,7 @@ fun HomeScreen(
     onEditItem: (MenuItem) -> Unit,
     onContinue: () -> Unit,
     onSettings: () -> Unit,
+    onInteracao: () -> Unit,
 ) {
     val infusao = catalog.section(Section.INFUSAO)
     val cbd = catalog.section(Section.CBD)
@@ -86,6 +87,9 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .onPreviewKeyEvent { evento ->
+                // Qualquer tecla adia a montra automatica, mesmo as que nao mexem
+                // o foco (por exemplo carregar na margem da grelha).
+                onInteracao()
                 if (evento.type == KeyEventType.KeyUp && evento.key == Key.Menu) {
                     onSettings()
                     true

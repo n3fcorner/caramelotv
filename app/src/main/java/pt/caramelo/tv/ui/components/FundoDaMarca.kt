@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,6 +32,7 @@ import pt.caramelo.tv.ui.theme.Lilas
 @Composable
 fun FundoDaMarca(
     modifier: Modifier = Modifier,
+    comMarca: Boolean = true,
     comMascote: Boolean = true,
 ) {
     Box(
@@ -42,15 +44,24 @@ fun FundoDaMarca(
         // ContentScale.Crop faz o que os materiais da marca fazem: amplia a marca ate
         // ela nao caber e deixa a moldura corta-la. So se leem fragmentos — arcos,
         // quadrados, o triangulo do focinho.
-        Image(
-            painter = painterResource(R.drawable.marca_contorno),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            alignment = Alignment.CenterStart,
-            alpha = 0.08f,
-            colorFilter = ColorFilter.tint(Lilas),
-            modifier = Modifier.fillMaxSize().offset(x = (-90).dp),
-        )
+        //
+        // Fica confinada aos 62% da esquerda: a mascote ocupa os 30% da direita, e
+        // sobrepostas as duas viravam um emaranhado de linhas.
+        if (comMarca) {
+            Image(
+                painter = painterResource(R.drawable.marca_contorno),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.CenterStart,
+                alpha = 0.08f,
+                colorFilter = ColorFilter.tint(Lilas),
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.62f)
+                    .offset(x = (-90).dp),
+            )
+        }
 
         if (comMascote) {
             Image(

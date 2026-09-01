@@ -2,6 +2,7 @@ package pt.caramelo.tv
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -58,11 +59,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Montra: o painel nao pode adormecer enquanto a app estiver a frente.
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         intent?.data?.let(viewModel::handleDeepLink)
 
         setContent {
             CarameloTheme {
-                CarameloRoot(viewModel = viewModel, onExitApp = { finish() })
+                CarameloRoot(viewModel = viewModel)
             }
         }
     }
@@ -77,15 +80,16 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun CarameloRoot(viewModel: MainViewModel, onExitApp: () -> Unit) {
+private fun CarameloRoot(viewModel: MainViewModel) {
     val catalog by viewModel.catalog.collectAsStateWithLifecycle()
     val loaded = catalog ?: run {
         LoadingScreen()
         return
     }
 
-    // Back global: recua na pilha e, na raiz, pergunta se e para sair.
-    BackHandler { if (!viewModel.pop()) viewModel.showExitDialog(true) }
+    // Back recua na pilha e, na raiz, nao faz nada: numa montra ninguem deve sair
+    // sem querer. Para sair mesmo, o botao Home do comando continua a funcionar.
+    BackHandler { viewModel.pop() }
 
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         SharedTransitionLayout(Modifier.fillMaxSize()) {
@@ -111,13 +115,6 @@ private fun CarameloRoot(viewModel: MainViewModel, onExitApp: () -> Unit) {
                 }
             }
         }
-
-        if (viewModel.exitDialogVisible) {
-            ExitDialog(
-                onConfirm = onExitApp,
-                onDismiss = { viewModel.showExitDialog(false) },
-            )
-        }
     }
 }
 
@@ -135,6 +132,7 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
             onEditItem = { viewModel.push(Screen.EditItem(it.id)) },
             onContinue = { catalog.lastWatched()?.let { viewModel.play(it, resume = true) } },
             onSettings = { viewModel.push(Screen.Settings) },
+            onInteracao = viewModel::registarInteracao,
         )
 
         is Screen.Details -> WithItem(catalog, screen.id, viewModel) { item ->
@@ -154,10 +152,13 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
                 videoUrl = catalog.videoUrlOf(item),
                 startPositionMs = screen.startPositionMs,
                 loop = catalog.settings.loopPlayback,
+                atrator = screen.atrator,
                 onExit = { position, finished ->
                     viewModel.savePosition(item.id, position, finished)
                 },
                 onSkip = { delta -> viewModel.skip(item, delta) },
+                onFimDoAtrator = { viewModel.proximoNoAtrator(item) },
+                onControlo = viewModel::assumirControlo,
             )
         }
 
@@ -207,33 +208,5 @@ private fun LoadingScreen() {
         contentAlignment = Alignment.Center,
     ) {
         Text("A carregar...", style = MaterialTheme.typography.titleMedium)
-    }
-}
-
-@Composable
-private fun ExitDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    val confirmButton = remember { FocusRequester() }
-    LaunchedEffect(Unit) { runCatching { confirmButton.requestFocus() } }
-
-    // Registado depois do BackHandler global, por isso apanha o Back primeiro.
-    BackHandler { onDismiss() }
-
-    Box(
-        modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.72f)),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-        ) {
-            Text("Sair do Caramelo do Brasil?", style = MaterialTheme.typography.titleLarge)
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                TvButton(text = "Ficar", onClick = onDismiss, primary = true, focusRequester = confirmButton)
-                TvButton(text = "Sair", onClick = onConfirm)
-            }
-        }
     }
 }

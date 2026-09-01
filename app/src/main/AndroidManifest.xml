@@ -3,6 +3,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Obrigatorio para a app ser reconhecida como app de TV -->
     <uses-feature
@@ -46,6 +47,16 @@
                 <data android:scheme="caramelotv" />
             </intent-filter>
         </activity>
+
+        <!-- Abre a montra quando a TV arranca. -->
+        <receiver
+            android:name=".ArranqueAutomatico"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
