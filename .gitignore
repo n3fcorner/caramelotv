@@ -1,0 +1,18 @@
+# Build
+.gradle/
+build/
+app/build/
+*.apk
+
+# Configuracao local da maquina
+local.properties
+*.keystore
+keystore.properties
+
+# Media: 944 MB de originais e os derivados. Ficam fora do repositorio —
+# reproduzem-se com ./scripts/preparar-media.sh a partir dos originais.
+videos/
+Caeamelo fotos/
+
+# macOS
+.DS_Store

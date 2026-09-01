@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  O Android bloqueia HTTP em claro desde o SDK 28. Os videos e cartazes vivem num
+  servidor da rede local, sem TLS, por isso a excepcao e necessaria. Quando o
+  alojamento passar a HTTPS, isto pode desaparecer.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

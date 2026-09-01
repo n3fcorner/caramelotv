@@ -1,0 +1,2 @@
+-dontwarn kotlinx.serialization.**
+-keepclassmembers class pt.caramelo.tv.data.model.** { *; }
