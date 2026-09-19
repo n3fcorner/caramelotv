@@ -18,3 +18,11 @@ Caeamelo fotos/
 .DS_Store
 web/media/
 videos/web-movel/
+
+# Derivados locais dos scripts e do Kotlin
+.kotlin/
+scripts/__pycache__/
+scripts/.vision-recortar
+
+# Versoes antigas da arte: ficam na maquina, nao no repositorio
+arte/anteriores/

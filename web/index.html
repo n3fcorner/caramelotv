@@ -1,46 +1,56 @@
 <!doctype html>
-<html lang="pt-PT">
+<html lang="pt-PT" data-theme="dark" class="cdb">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Caramelo do Brasil — Montra</title>
+<title>Caramelo do Brasil · Montra</title>
 <meta name="description" content="A montra da Caramelo do Brasil: flores de infusão, CBD e hash.">
-<meta name="theme-color" content="#2E1F4C">
-<meta property="og:title" content="Caramelo do Brasil — Montra">
+<meta name="theme-color" content="#2C2044">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Caramelo">
+<meta property="og:title" content="Caramelo do Brasil · Montra">
 <meta property="og:description" content="Flores de infusão, CBD e hash.">
 <meta property="og:type" content="website">
-<link rel="icon" href="assets/logo_caramelo.png">
-<link rel="apple-touch-icon" href="assets/logo_caramelo.png">
+<link rel="icon" href="assets/medalha.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
 
+<!-- O padrão da marca nos cantos, como na app de TV: linhas douradas do logótipo. -->
 <div class="fundo" aria-hidden="true">
-  <img class="fundo-marca" src="assets/marca_contorno.png" alt="">
-  <img class="fundo-mascote" src="assets/mascote_contorno.png" alt="">
+  <img class="padrao padrao-cima" src="assets/padrao-cima.webp" alt="">
+  <img class="padrao padrao-baixo" src="assets/padrao-baixo.webp" alt="">
 </div>
 
 <header class="cabecalho">
-  <img class="logo" src="assets/logo_caramelo.png" alt="">
+  <img class="logo" src="assets/logo.png" alt="">
   <div class="wordmark">
-    <img src="assets/lettering_caramelo.png" alt="Caramelo">
+    <img src="assets/lettering.png" alt="Caramelo">
     <span>DO BRASIL</span>
   </div>
 </header>
 
+<nav class="seccoes" id="seccoes" aria-label="Secções"></nav>
+
 <main id="montra" aria-live="polite"></main>
 
 <footer class="rodape">
-  <p>Produtos em conformidade com a legislação europeia e portuguesa.</p>
-  <p><a href="https://caramelodobrasil.com">caramelodobrasil.com</a></p>
+  <p class="assinatura">Afinal, somos todos <em>Caramelos.</em></p>
+  <p class="legal">Produtos em conformidade com a legislação europeia e portuguesa.</p>
 </footer>
 
 <dialog id="ficha" class="ficha">
-  <button class="fechar" type="button" aria-label="Fechar">✕</button>
-  <div class="ficha-conteudo"></div>
+  <header class="ficha-topo">
+    <div class="miniaturas" role="tablist" aria-label="Referências desta secção"></div>
+    <button class="fechar" type="button" aria-label="Fechar">✕</button>
+  </header>
+  <div class="pista" tabindex="0"></div>
 </dialog>
 
 <script src="montra.js"></script>

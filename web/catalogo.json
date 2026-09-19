@@ -19,7 +19,8 @@
             "Mirceno",
             "Pineno",
             "Cariofileno"
-          ]
+          ],
+          "video": true
         },
         {
           "slug": "bubba-kush",
@@ -35,7 +36,8 @@
             "Mirceno",
             "Cariofileno",
             "Limoneno"
-          ]
+          ],
+          "video": true
         },
         {
           "slug": "critical-berry",
@@ -51,7 +53,8 @@
             "Mirceno",
             "Cariofileno",
             "Limoneno"
-          ]
+          ],
+          "video": true
         },
         {
           "slug": "smash-cali",
@@ -59,7 +62,16 @@
           "formato": "Flor",
           "cultivo": "Glasshouse",
           "infundido": true,
-          "aroma": "Cítrico e doce"
+          "aroma": "Cítrico e doce",
+          "genetica": "",
+          "tipo": "Híbrida",
+          "indica": 50,
+          "terpenos": [
+            "Limoneno",
+            "Cariofileno",
+            "Mirceno"
+          ],
+          "video": true
         },
         {
           "slug": "sour-lifter",
@@ -75,16 +87,16 @@
             "Mirceno",
             "Terpineol",
             "Limoneno"
-          ]
+          ],
+          "video": true
         },
         {
-          "slug": "",
+          "slug": "mac",
           "nome": "MAC",
           "formato": "Flor",
           "cultivo": "",
           "infundido": true,
           "aroma": "Cítrico e cremoso, fundo a diesel",
-          "foto": "mac",
           "genetica": "Alien Cookies × Miracle 15",
           "tipo": "Híbrida",
           "indica": 50,
@@ -92,25 +104,110 @@
             "Limoneno",
             "Cariofileno",
             "Pineno"
-          ]
+          ],
+          "video": false
         },
         {
-          "slug": "",
+          "slug": "gorilla-mandarini",
           "nome": "Gorilla Mandarini",
           "formato": "Flor",
-          "cultivo": "",
+          "cultivo": "Glasshouse",
           "infundido": true,
           "aroma": "Tangerina sobre fundo resinoso",
-          "foto": "gorilla-mandarini"
+          "genetica": "Gorilla Glue × Mandarine (atribuída)",
+          "tipo": "Híbrida",
+          "indica": 55,
+          "terpenos": [
+            "Cariofileno",
+            "Limoneno",
+            "Mirceno"
+          ],
+          "video": true
         },
         {
-          "slug": "",
+          "slug": "berry-pie",
           "nome": "Berry Pie",
           "formato": "Flor",
-          "cultivo": "",
+          "cultivo": "Glasshouse",
           "infundido": true,
           "aroma": "Frutos vermelhos e doce de forno",
-          "foto": "berry-pie"
+          "genetica": "Cookies × Blueberry (atribuída)",
+          "tipo": "Híbrida",
+          "indica": 60,
+          "terpenos": [
+            "Cariofileno",
+            "Mirceno",
+            "Limoneno"
+          ],
+          "video": true
+        },
+        {
+          "slug": "white-banger",
+          "nome": "White Banger",
+          "formato": "Flor",
+          "cultivo": "Indoor",
+          "infundido": true,
+          "aroma": "Terroso e a pinho, fundo resinoso",
+          "genetica": "",
+          "tipo": "Híbrida",
+          "indica": 50,
+          "terpenos": [
+            "Pineno",
+            "Mirceno",
+            "Cariofileno"
+          ],
+          "video": true
+        },
+        {
+          "slug": "pulsar",
+          "nome": "Pulsar",
+          "formato": "Flor",
+          "cultivo": "Indoor",
+          "infundido": true,
+          "aroma": "Doce e resinoso, fundo terroso",
+          "genetica": "",
+          "tipo": "Híbrida",
+          "indica": 55,
+          "terpenos": [
+            "Mirceno",
+            "Cariofileno",
+            "Limoneno"
+          ],
+          "video": true
+        },
+        {
+          "slug": "peanut-butter",
+          "nome": "Peanut Butter",
+          "formato": "Flor",
+          "cultivo": "Greenhouse",
+          "infundido": true,
+          "aroma": "Amendoim torrado, fundo doce",
+          "genetica": "Do-Si-Dos × Mendo Breath (atribuída)",
+          "tipo": "Índica",
+          "indica": 70,
+          "terpenos": [
+            "Cariofileno",
+            "Limoneno",
+            "Mirceno"
+          ],
+          "video": true
+        },
+        {
+          "slug": "sky",
+          "nome": "Sky",
+          "formato": "Flor",
+          "cultivo": "Indoor",
+          "infundido": true,
+          "aroma": "Fresco e floral",
+          "genetica": "",
+          "tipo": "Híbrida",
+          "indica": 45,
+          "terpenos": [
+            "Terpinoleno",
+            "Linalol",
+            "Pineno"
+          ],
+          "video": true
         }
       ]
     },
@@ -124,7 +221,16 @@
           "formato": "Flor",
           "cultivo": "Glasshouse",
           "infundido": false,
-          "aroma": "Uva e frutos escuros, fundo doce"
+          "aroma": "Uva e frutos escuros, fundo doce",
+          "genetica": "",
+          "tipo": "Híbrida",
+          "indica": 60,
+          "terpenos": [
+            "Mirceno",
+            "Limoneno",
+            "Cariofileno"
+          ],
+          "video": true
         },
         {
           "slug": "lemon-trip",
@@ -132,15 +238,33 @@
           "formato": "Flor",
           "cultivo": "Greenhouse",
           "infundido": false,
-          "aroma": "Limão e casca fresca, fundo herbáceo"
+          "aroma": "Limão e casca fresca, fundo herbáceo",
+          "genetica": "",
+          "tipo": "Sativa",
+          "indica": 35,
+          "terpenos": [
+            "Limoneno",
+            "Terpinoleno",
+            "Pineno"
+          ],
+          "video": true
         },
         {
           "slug": "mela-sour",
           "nome": "Mela Sour",
           "formato": "Flor",
-          "cultivo": "",
+          "cultivo": "Indoor",
           "infundido": false,
-          "aroma": "Maçã verde e ácido, fundo doce"
+          "aroma": "Maçã verde e ácido, fundo doce",
+          "genetica": "Descendente de Tangie (selecção Doweedo)",
+          "tipo": "Sativa",
+          "indica": 35,
+          "terpenos": [
+            "Mirceno",
+            "Limoneno",
+            "Pineno"
+          ],
+          "video": true
         },
         {
           "slug": "solero-cream",
@@ -148,25 +272,50 @@
           "formato": "Flor",
           "cultivo": "Indoor",
           "infundido": false,
-          "aroma": "Cremoso e doce, baunilha e citrinos"
+          "aroma": "Cremoso e doce, baunilha e citrinos",
+          "genetica": "",
+          "tipo": "Híbrida",
+          "indica": 50,
+          "terpenos": [
+            "Mirceno",
+            "Cariofileno",
+            "Pineno"
+          ],
+          "video": true
         },
         {
-          "slug": "",
+          "slug": "critical-berry-cbd",
           "nome": "Critical Berry",
           "formato": "Flor",
-          "cultivo": "",
+          "cultivo": "Greenhouse",
           "infundido": false,
           "aroma": "Frutos vermelhos sobre fundo terroso",
-          "foto": "critical-berry"
+          "genetica": "Família Critical",
+          "tipo": "Híbrida",
+          "indica": 65,
+          "terpenos": [
+            "Mirceno",
+            "Cariofileno",
+            "Limoneno"
+          ],
+          "video": true
         },
         {
-          "slug": "",
+          "slug": "uranium",
           "nome": "Uranium",
           "formato": "Flor",
           "cultivo": "",
           "infundido": false,
           "aroma": "Intenso e resinoso",
-          "foto": "uranium"
+          "genetica": "",
+          "tipo": "Híbrida",
+          "indica": 55,
+          "terpenos": [
+            "Mirceno",
+            "Cariofileno",
+            "Humuleno"
+          ],
+          "video": true
         }
       ]
     },
@@ -180,7 +329,16 @@
           "formato": "Hash",
           "cultivo": "",
           "infundido": true,
-          "aroma": "Concentrado e terroso"
+          "aroma": "Manga fresca, intenso",
+          "genetica": "",
+          "tipo": "Híbrida",
+          "indica": 50,
+          "terpenos": [
+            "Mirceno",
+            "Ocimeno",
+            "Limoneno"
+          ],
+          "video": true
         },
         {
           "slug": "sticky-peach-piattella",
@@ -188,16 +346,84 @@
           "formato": "Hash piattella",
           "cultivo": "",
           "infundido": true,
-          "aroma": "Pêssego doce"
+          "aroma": "Pêssego doce",
+          "genetica": "",
+          "tipo": "Híbrida",
+          "indica": 55,
+          "terpenos": [
+            "Limoneno",
+            "Linalol",
+            "Cariofileno"
+          ],
+          "video": true
         },
         {
-          "slug": "",
-          "foto": "mango-melt",
+          "slug": "mango-melt",
           "nome": "Mango Melt",
           "formato": "Hash piattella",
           "cultivo": "",
           "infundido": true,
-          "aroma": "Manga madura e resina"
+          "aroma": "Manga madura e resina",
+          "genetica": "",
+          "tipo": "Híbrida",
+          "indica": 50,
+          "terpenos": [
+            "Mirceno",
+            "Ocimeno",
+            "Limoneno"
+          ],
+          "video": true
+        },
+        {
+          "slug": "papaya-og",
+          "nome": "Papaya OG",
+          "formato": "Hash",
+          "cultivo": "",
+          "infundido": true,
+          "aroma": "Papaia madura, fundo resinoso",
+          "genetica": "Papaya × OG Kush (atribuída)",
+          "tipo": "Índica",
+          "indica": 70,
+          "terpenos": [
+            "Mirceno",
+            "Cariofileno",
+            "Limoneno"
+          ],
+          "video": true
+        },
+        {
+          "slug": "la-mousse",
+          "nome": "La Mousse",
+          "formato": "Hash",
+          "cultivo": "",
+          "infundido": true,
+          "aroma": "Doce e cremoso, fundo terroso",
+          "genetica": "",
+          "tipo": "Híbrida",
+          "indica": 60,
+          "terpenos": [
+            "Cariofileno",
+            "Linalol",
+            "Mirceno"
+          ],
+          "video": true
+        },
+        {
+          "slug": "og-ivory-dry",
+          "nome": "OG Ivory Dry",
+          "formato": "Hash",
+          "cultivo": "",
+          "infundido": true,
+          "aroma": "Seco e especiado, fundo a pinho",
+          "genetica": "Família OG (atribuída)",
+          "tipo": "Índica",
+          "indica": 70,
+          "terpenos": [
+            "Mirceno",
+            "Limoneno",
+            "Cariofileno"
+          ],
+          "video": true
         }
       ]
     }

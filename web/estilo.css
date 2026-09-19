@@ -1,300 +1,365 @@
-/* Paleta da marca, a mesma da app de TV. */
-:root {
-  --roxo: #573B89;
-  --roxo-claro: #6B4BA5;
-  --roxo-fundo: #2E1F4C;
-  --roxo-profundo: #1E1433;
-  --amarelo: #FFBE00;
-  --creme: #F5EED1;
-  --creme-fraco: #BFB49A;
-  --verde: #46C47A;
-  --lilas: #C9B6E8;
-  --espaco: 12px;
-}
+/* Montra da Caramelo do Brasil no telemóvel.
+   Tudo o que é cor, espaço, tipo e forma vem de tokens.css (--cdb-*). Aqui só a
+   composição. Modo escuro forçado (data-theme="dark" no <html>): é a montra da TV. */
 
 * { box-sizing: border-box; }
-
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+/* Com a ficha aberta a página de trás não anda. */
+html.aberto { overflow: hidden; }
 
 body {
+  position: relative;
   margin: 0;
   min-height: 100dvh;
-  background: var(--roxo-fundo);
-  color: var(--creme);
-  font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
-  /* Respeita o entalhe e a barra inferior do iPhone. */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right)
-           env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: var(--cdb-fundo);
+  color: var(--cdb-tinta);
+  font-family: "Montserrat", var(--cdb-fonte);
+  font-weight: var(--cdb-peso-medium);
+  font-size: var(--cdb-t-body);
+  line-height: var(--cdb-lh-body);
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  overflow-x: hidden;
 }
 
-/* --- fundo da marca: o logotipo em contorno e a mascote, muito esbatidos --- */
-.fundo {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
-.fundo img { position: absolute; opacity: .08; }
-.fundo-marca {
-  left: -18%;
-  top: 4%;
-  width: 92%;
-  max-width: 620px;
-}
-.fundo-mascote {
-  right: -14%;
-  bottom: -4%;
-  height: 62%;
-  opacity: .10;
-}
+/* --- fundo: o padrão dourado da marca nos dois cantos da página, como na TV ----
+   Absoluto e não fixo: uma camada fixa por trás de 24 fotografias obriga o Safari
+   do iPhone a recompor tudo a cada frame de scroll. Assim é pintado uma vez. */
+.fundo { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.padrao { position: absolute; width: 70%; max-width: 420px; opacity: .55; }
+.padrao-cima { right: -6%; top: -2%; }
+.padrao-baixo { left: -8%; bottom: -3%; }
 
-.cabecalho, main, .rodape { position: relative; z-index: 1; }
+.cabecalho, .seccoes, main, .rodape { position: relative; z-index: 1; }
 
-/* --- cabecalho --- */
+/* --- cabeçalho: faixa roxa profunda com o wordmark em imagem ------------------- */
 .cabecalho {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 20px 18px 8px;
+  gap: var(--cdb-e3);
+  padding: calc(var(--cdb-e4) + env(safe-area-inset-top)) var(--cdb-e4) var(--cdb-e3);
+  background: var(--cdb-barra);
+  border-bottom: 3px solid var(--cdb-acento);
 }
-.cabecalho .logo { height: 44px; }
-.wordmark img { display: block; height: 30px; }
+.logo { height: 52px; width: auto; }
+.wordmark { display: flex; flex-direction: column; gap: 2px; }
+.wordmark img { height: 30px; width: auto; }
 .wordmark span {
-  display: block;
-  color: var(--amarelo);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .42em;
-  margin-top: 2px;
+  color: var(--cdb-acento);
+  font-size: var(--cdb-t-labelSmall);
+  font-weight: var(--cdb-peso-bold);
+  letter-spacing: 0.28em;
+  padding-left: 2px;
 }
 
-/* --- seccoes --- */
-.seccao { padding: 18px 18px 0; }
+/* --- separadores de secção: saltam para o bloco; o activo leva a régua -------- */
+.seccoes {
+  position: sticky;
+  top: env(safe-area-inset-top);
+  display: flex;
+  gap: var(--cdb-e4);
+  padding: var(--cdb-e3) var(--cdb-e4) 0;
+  /* Faixa sólida, sem backdrop-filter: o desfoque por cima da grelha é o que mais
+     encrava o scroll no iPhone, e a marca pede faixas sólidas de qualquer modo. */
+  background: var(--cdb-fundo);
+}
+.seccoes a {
+  color: var(--cdb-tintaFraca);
+  text-decoration: none;
+  font-size: var(--cdb-t-label);
+  font-weight: var(--cdb-peso-bold);
+  letter-spacing: var(--cdb-tracking-caixa-alta);
+  text-transform: uppercase;
+  padding-bottom: var(--cdb-e2);
+  border-bottom: 3px solid transparent;
+}
+.seccoes a.activa { color: var(--cdb-acento); border-bottom-color: var(--cdb-acento); }
+
+/* --- secções e grelha ---------------------------------------------------------- */
+main { padding: var(--cdb-e3) var(--cdb-e4) var(--cdb-e5); }
+.seccao { scroll-margin-top: calc(56px + env(safe-area-inset-top)); margin-bottom: var(--cdb-e5); }
 .seccao h2 {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 0 0 10px;
-  color: var(--amarelo);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .22em;
+  gap: var(--cdb-e2);
+  margin: var(--cdb-e3) 0 var(--cdb-e3);
+  color: var(--cdb-acento);
+  font-size: var(--cdb-t-label);
+  font-weight: var(--cdb-peso-bold);
+  letter-spacing: var(--cdb-tracking-caixa-alta);
   text-transform: uppercase;
 }
-.seccao h2::before {
-  content: "";
-  width: 20px;
-  height: 3px;
-  background: var(--amarelo);
-  flex: none;
+.seccao h2::before { content: ""; width: 22px; height: 3px; background: var(--cdb-acento); }
+.seccao h2 small {
+  margin-left: auto;
+  color: var(--cdb-tintaFraca);
+  font-weight: var(--cdb-peso-medium);
+  letter-spacing: 0;
+  text-transform: none;
 }
 
-.grelha {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--espaco);
-}
-@media (min-width: 560px) { .grelha { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 860px) { .grelha { grid-template-columns: repeat(4, 1fr); } }
-@media (min-width: 1200px) {
-  .grelha { grid-template-columns: repeat(5, 1fr); }
-  .seccao, .cabecalho, .rodape { max-width: 1200px; margin-inline: auto; }
-}
+/* Duas colunas num iPhone: 430px de largura dá cartões de ~187px, a foto ao dobro
+   da que a TV mostra. Três colunas em ecrãs largos. */
+.grelha { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--cdb-e3); }
+@media (min-width: 640px) { .grelha { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 960px) { .grelha { grid-template-columns: repeat(4, 1fr); } }
 
-/* --- cartao de produto: so tipografia sobre a foto, como na TV --- */
+/* Cartão de produto: a fotografia enche, a faixa fina com o nome por baixo. Sem
+   cantos, sem sombra em escuro, sem degradé por cima da foto. */
 .cartao {
   position: relative;
-  display: block;
-  width: 100%;
-  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
   padding: 0;
   border: 0;
-  background: var(--roxo);
+  border-radius: var(--cdb-raio);
+  background: var(--cdb-barra);
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
   overflow: hidden;
-  transition: transform .18s ease;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--cdb-transicao-foco);
 }
-.cartao:active { transform: scale(.97); }
-@media (hover: hover) {
-  .cartao:hover { transform: scale(1.03); }
-  .cartao:hover img { filter: none; }
-}
-.cartao:focus-visible { outline: 3px solid var(--amarelo); outline-offset: 2px; }
-
-.cartao img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  filter: brightness(.78);
-  transition: filter .18s ease;
-}
-.cartao .sem-foto {
-  width: 100%;
-  height: 100%;
-  background: var(--roxo-claro);
-}
-
+.cartao:active { transform: scale(0.98); }
+.cartao:focus-visible { outline: var(--cdb-borda-foco); outline-offset: -3px; }
+.cartao img, .cartao .sem-foto { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--cdb-barra); }
 .cartao .nome {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(30, 20, 51, .9);
-  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: var(--cdb-e2);
+  min-height: 50px;
+  padding: var(--cdb-e2) var(--cdb-e3);
+  background: var(--cdb-barra);
 }
 .cartao .nome strong {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .13em;
+  font-size: var(--cdb-t-label);
+  line-height: var(--cdb-lh-label);
+  font-weight: var(--cdb-peso-bold);
+  letter-spacing: var(--cdb-tracking-caixa-alta);
   text-transform: uppercase;
-  line-height: 1.25;
 }
+.cartao .mini-perfil { display: flex; height: 4px; width: 100%; }
+.cartao .mini-perfil i { background: var(--cdb-acento); }
+.cartao .mini-perfil b { background: var(--cdb-sucesso); }
 .cartao .breve {
-  display: block;
-  margin-top: 2px;
-  color: var(--amarelo);
+  margin-left: auto;
+  padding: 2px var(--cdb-e2);
+  background: var(--cdb-acento);
+  color: var(--cdb-sobreAcento);
   font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .16em;
+  font-weight: var(--cdb-peso-bold);
+  letter-spacing: var(--cdb-tracking-caixa-alta);
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-/* --- ficha do produto --- */
-.ficha {
-  width: min(560px, 94vw);
-  max-height: 92dvh;
-  padding: 0;
-  border: 0;
-  background: var(--roxo-fundo);
-  color: var(--creme);
-  overflow: auto;
-  overscroll-behavior: contain;
+/* Ponto de cultivo no canto da fotografia; o contorno na cor da faixa garante que
+   se lê tanto sobre o fundo escuro como sobre uma flor clara. */
+.cultivo {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--cdb-barra);
+  background: var(--cdb-tintaFraca);
 }
-.ficha::backdrop { background: rgba(0, 0, 0, .78); }
+.cartao .cultivo { position: absolute; top: var(--cdb-e2); right: var(--cdb-e2); }
+.cultivo-indoor { background: var(--cdb-amarelo); }
+.cultivo-greenhouse { background: var(--cdb-verdeClaro); }
+.cultivo-glasshouse { background: var(--cdb-creme); }
 
-.fechar {
-  position: sticky;
-  top: 0;
-  float: right;
-  margin: 8px 8px 0;
-  width: 40px;
-  height: 40px;
-  border: 0;
-  background: rgba(30, 20, 51, .9);
-  color: var(--creme);
-  font-size: 17px;
-  cursor: pointer;
-  z-index: 2;
-}
-
-.ficha video, .ficha .cartaz {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  display: block;
-  background: var(--roxo-profundo);
-}
-.ficha-texto { padding: 18px; }
-.ficha-linha {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--amarelo);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .22em;
+/* Legenda no fundo da grelha, só nas secções onde há flores com cultivo, numa
+   caixa cinzenta translúcida. */
+.legenda {
+  display: inline-flex; flex-wrap: wrap; align-items: center;
+  gap: var(--cdb-e2) var(--cdb-e4);
+  margin: var(--cdb-e3) 0 0;
+  padding: var(--cdb-e2) var(--cdb-e3);
+  background: color-mix(in srgb, var(--cdb-creme) 12%, transparent);
+  color: var(--cdb-tintaFraca);
+  font-size: var(--cdb-t-labelSmall);
+  font-weight: var(--cdb-peso-bold);
+  letter-spacing: var(--cdb-tracking-caixa-alta);
   text-transform: uppercase;
 }
-.ficha-linha::before {
-  content: "";
-  width: 20px;
-  height: 3px;
-  background: var(--amarelo);
-  flex: none;
-}
-.ficha h3 {
-  margin: 8px 0 4px;
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1.1;
-}
-.ficha .resumo { margin: 0; color: var(--creme-fraco); font-size: 14px; }
+.legenda span { display: inline-flex; align-items: center; gap: var(--cdb-e2); }
 
-.dados { margin-top: 18px; display: grid; gap: 8px; }
-.dado {
+/* --- rodapé ----------------------------------------------------------------- */
+.rodape {
+  padding: var(--cdb-e4) var(--cdb-e4) var(--cdb-e5);
+  background: var(--cdb-barra);
+  border-top: 3px solid var(--cdb-acento);
+}
+.rodape p { margin: 0 0 var(--cdb-e2); }
+.assinatura { font-size: var(--cdb-t-titleMedium); font-weight: var(--cdb-peso-semibold); font-style: italic; }
+.assinatura em { color: var(--cdb-laranja); font-style: italic; }
+.legal { color: var(--cdb-tintaFraca); font-size: var(--cdb-t-labelSmall); line-height: var(--cdb-lh-labelSmall); }
+
+/* --- ficha do produto (folha de baixo) --------------------------------------- */
+.ficha {
+  display: flex; flex-direction: column;
+  width: 100%; height: 100dvh; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0;
+  border-radius: var(--cdb-raio);
+  background: var(--cdb-fundo);
+  color: var(--cdb-tinta);
+  overflow: hidden;
+}
+.ficha::backdrop { background: color-mix(in srgb, var(--cdb-barra) 75%, transparent); }
+@media (min-width: 640px) { .ficha { width: 560px; height: 94dvh; margin: auto; } }
+
+/* topo: fita de miniaturas da secção e o fechar */
+.ficha-topo {
+  display: flex; align-items: center; gap: var(--cdb-e2);
+  padding: calc(var(--cdb-e2) + env(safe-area-inset-top)) var(--cdb-e3) var(--cdb-e2) var(--cdb-e3);
+  background: var(--cdb-barra);
+  border-bottom: 3px solid var(--cdb-acento);
+}
+.miniaturas {
+  flex: 1; min-width: 0;
+  display: flex; gap: var(--cdb-e2);
+  overflow-x: auto; scroll-snap-type: x proximity;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  padding: 2px;
+}
+.miniaturas::-webkit-scrollbar { display: none; }
+.miniaturas button {
+  flex: none; width: 52px; height: 52px; padding: 0;
+  border: 2px solid transparent; border-radius: var(--cdb-raio);
+  background: var(--cdb-roxoFundo);
+  scroll-snap-align: center;
+  opacity: .55;
+  transition: opacity var(--cdb-transicao-foco), border-color var(--cdb-transicao-foco);
+  -webkit-tap-highlight-color: transparent;
+}
+.miniaturas button img, .miniaturas button .sem-foto { display: block; width: 100%; height: 100%; object-fit: cover; }
+.miniaturas button.activa { border-color: var(--cdb-acento); opacity: 1; }
+.miniaturas button:focus-visible { outline: var(--cdb-borda-foco); outline-offset: 1px; }
+.fechar {
+  flex: none;
+  width: 44px; height: 44px;
+  border: 0;
+  border-radius: var(--cdb-raio);
+  background: var(--cdb-superficie);
+  color: var(--cdb-tinta);
+  font-size: 18px;
+}
+
+/* pista: uma página por referência, snap ao deslizar */
+.pista {
+  flex: 1; min-height: 0;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--roxo);
-  padding: 12px;
+  overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.pista::-webkit-scrollbar { display: none; }
+.pista:focus-visible { outline: none; }
+.pagina {
+  flex: 0 0 100%; width: 100%; height: 100%;
+  scroll-snap-align: start; scroll-snap-stop: always;
+  overflow-y: auto; overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.pagina .media { position: relative; }
+.pagina video, .pagina .cartaz { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--cdb-barra); }
+.ficha-texto { padding: var(--cdb-e4) var(--cdb-e4) var(--cdb-e4); }
+.ficha-linha {
+  display: flex; align-items: center; gap: var(--cdb-e2);
+  margin: 0 0 var(--cdb-e2);
+  color: var(--cdb-acento);
+  font-size: var(--cdb-t-labelSmall);
+  font-weight: var(--cdb-peso-bold);
+  letter-spacing: var(--cdb-tracking-caixa-alta);
+  text-transform: uppercase;
+}
+.ficha-linha::before { content: ""; width: 22px; height: 3px; background: var(--cdb-acento); }
+.ficha-cultivo { display: inline-flex; align-items: center; gap: var(--cdb-e2); margin-left: auto; color: var(--cdb-tintaFraca); }
+.ficha h3 {
+  margin: 0;
+  font-size: var(--cdb-t-displayMedium);
+  line-height: var(--cdb-lh-displayMedium);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.resumo { margin: var(--cdb-e1) 0 var(--cdb-e4); color: var(--cdb-tintaFraca); font-size: var(--cdb-t-titleSmall); }
+.dados { margin: 0; display: grid; gap: var(--cdb-e2); }
+.dado {
+  display: flex; align-items: center; gap: var(--cdb-e3);
+  padding: var(--cdb-e3);
+  background: var(--cdb-superficie);
 }
 .dado .icone {
-  width: 34px;
-  height: 34px;
-  flex: none;
-  display: grid;
-  place-items: center;
-  background: var(--roxo-profundo);
-  color: var(--verde);
-  font-size: 15px;
+  flex: none; width: 38px; height: 38px;
+  display: grid; place-items: center;
+  background: var(--cdb-barra);
+  color: var(--cdb-sucesso);
+  font-size: 18px;
 }
 .dado dt {
-  color: var(--amarelo);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .18em;
+  color: var(--cdb-acento);
+  font-size: var(--cdb-t-labelSmall);
+  font-weight: var(--cdb-peso-bold);
+  letter-spacing: var(--cdb-tracking-caixa-alta);
   text-transform: uppercase;
 }
-.dado dd { margin: 2px 0 0; font-size: 15px; }
+.dado dd { margin: 2px 0 0; font-size: var(--cdb-t-body); line-height: var(--cdb-lh-body); }
+.aviso { margin: var(--cdb-e4) 0 0; color: var(--cdb-acento); font-size: var(--cdb-t-label); font-weight: var(--cdb-peso-bold); letter-spacing: var(--cdb-tracking-caixa-alta); text-transform: uppercase; }
 
-.aviso {
-  margin-top: 16px;
-  padding: 12px;
-  background: var(--roxo);
-  color: var(--amarelo);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .12em;
+/* rótulos de secção dentro da ficha */
+.rotulo {
+  margin: 0;
+  color: var(--cdb-acento);
+  font-size: var(--cdb-t-labelSmall);
+  font-weight: var(--cdb-peso-bold);
+  letter-spacing: var(--cdb-tracking-caixa-alta);
   text-transform: uppercase;
 }
 
-/* --- rodape --- */
-.rodape {
-  padding: 28px 18px calc(28px + env(safe-area-inset-bottom));
-  color: var(--creme-fraco);
-  font-size: 12px;
-  line-height: 1.6;
-}
-.rodape p { margin: 0; }
-.rodape a { color: var(--amarelo); }
+/* perfil índica/sativa: as duas pontas com o número, a barra por baixo */
+.perfil { margin: 0 0 var(--cdb-e4); padding: var(--cdb-e3); background: var(--cdb-superficie); }
+.perfil-topo { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 var(--cdb-e2); }
+.perfil-topo .tipo { color: var(--cdb-tinta); font-size: var(--cdb-t-label); font-weight: var(--cdb-peso-bold); letter-spacing: var(--cdb-tracking-caixa-alta); text-transform: uppercase; }
+.perfil-pontas { display: flex; justify-content: space-between; margin-bottom: var(--cdb-e1); font-size: var(--cdb-t-label); color: var(--cdb-tintaFraca); font-variant-numeric: var(--cdb-numeros); }
+.perfil-pontas strong { color: var(--cdb-tinta); font-size: var(--cdb-t-titleMedium); font-weight: 800; }
+.perfil-barra { display: flex; height: 10px; gap: 2px; }
+.perfil-barra i { background: var(--cdb-acento); }
+.perfil-barra b { background: var(--cdb-sucesso); }
 
-@media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; }
+/* terpenos dominantes em etiquetas */
+.terpenos { margin: 0 0 var(--cdb-e4); }
+.etiquetas { display: flex; flex-wrap: wrap; gap: var(--cdb-e2); margin: var(--cdb-e2) 0; }
+.etiquetas span {
+  padding: var(--cdb-e1) var(--cdb-e3);
+  border: 2px solid var(--cdb-superficie);
+  font-size: var(--cdb-t-label);
+  font-weight: var(--cdb-peso-semibold);
 }
+.terpenos .nota { margin: 0; color: var(--cdb-tintaFraca); font-size: var(--cdb-t-labelSmall); line-height: var(--cdb-lh-labelSmall); }
 
-/* --- perfil indica/sativa --- */
-.perfil { margin-top: 16px; }
-.perfil-topo {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  color: var(--amarelo);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .18em;
-  text-transform: uppercase;
+/* anterior / seguinte no fundo de cada página */
+.pagina-nav {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+  padding: 0 var(--cdb-e4) calc(var(--cdb-e4) + env(safe-area-inset-bottom));
 }
-.perfil-topo .perfil-valor {
-  color: var(--creme-fraco);
-  letter-spacing: .06em;
-  text-transform: none;
-  font-weight: 400;
+.pagina-nav button {
+  display: flex; flex-direction: column; gap: 2px;
+  min-height: 56px;
+  padding: var(--cdb-e2) var(--cdb-e3);
+  border: 0;
+  border-radius: var(--cdb-raio);
+  background: var(--cdb-barra);
+  color: var(--cdb-tinta);
+  font: inherit;
+  font-weight: var(--cdb-peso-bold);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
 }
-.perfil-barra { display: flex; height: 8px; margin-top: 8px; }
-.perfil-barra i { background: var(--amarelo); }
-.perfil-barra b { background: var(--verde); }
+.pagina-nav button.seguinte { text-align: right; align-items: flex-end; }
+.pagina-nav button small { color: var(--cdb-acento); font-size: var(--cdb-t-labelSmall); font-weight: var(--cdb-peso-bold); letter-spacing: var(--cdb-tracking-caixa-alta); text-transform: uppercase; }
+.pagina-nav button:active { background: var(--cdb-superficie); }
+.pagina-nav button:focus-visible { outline: var(--cdb-borda-foco); outline-offset: -3px; }
+
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }

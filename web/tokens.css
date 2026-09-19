@@ -1,0 +1,160 @@
+/* Caramelo do Brasil · tokens.css · v0.1.0 · 2026-09-14
+   Gerado a partir de tokens.json. Não editar à mão: mudar o JSON e regenerar.
+   Origem de cada valor (F medido, A derivado, NOVA decisão nova) está no JSON.
+   Modo claro por omissão (loja, email, PDF, embalagem); modo escuro por
+   [data-theme="dark"] ou prefers-color-scheme (app, TV, backoffice à noite). */
+
+:root {
+  /* cores da marca (F) */
+  --cdb-roxo: #573B89;
+  --cdb-amarelo: #FFBE00;
+  --cdb-laranja: #FF9100;
+  --cdb-laranjaEscuro: #FE7F02;
+  --cdb-creme: #F5EED1;
+  --cdb-marinho: #002448;
+  --cdb-verde: #0E8F35;
+
+  /* tons de ecrã derivados pela app de TV (F) */
+  --cdb-roxoSuperficie: #6A4D99;
+  --cdb-roxoSuperficieFoco: #7D5DB2;
+  --cdb-roxoFundo: #3F2D5F;
+  --cdb-roxoProfundo: #2C2044;
+  --cdb-cremeFraco: #BFB49A;
+  --cdb-verdeClaro: #46C47A;
+  --cdb-lilas: #C9B6E8;
+
+  /* mascote e lettering: só dentro das ilustrações (F) */
+  --cdb-mascote-pelo: #EB923C;
+  --cdb-mascote-camisola: #F9E44D;
+  --cdb-mascote-calcoes: #469D4A;
+  --cdb-mascote-marco: #E3382B;
+  --cdb-lettering-laranja: #F06301;
+  --cdb-lettering-laranjaClaro: #E3974C;
+  --cdb-lettering-lima: #ADC300;
+  --cdb-lettering-sombra: #A94000;
+
+  /* estados (A / NOVA) */
+  --cdb-sucesso: #0E8F35;
+  --cdb-aviso: #FF9100;
+  --cdb-erro: #E3382B;
+  --cdb-info: #573B89;
+
+  /* papéis semânticos, modo claro (NOVA: fundo creme e tinta marinho vêm do logo) */
+  --cdb-fundo: #F5EED1;
+  --cdb-superficie: #FFFFFF;
+  --cdb-superficieFoco: #FBF7E8;
+  --cdb-barra: #573B89;
+  --cdb-tinta: #002448;
+  --cdb-tintaFraca: rgba(0, 36, 72, 0.64);
+  --cdb-acento: #FFBE00;
+  --cdb-sobreAcento: #002448;
+  --cdb-linha: rgba(0, 36, 72, 0.16);
+
+  /* tipografia (A: Poppins por medição do wordmark) */
+  --cdb-fonte: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cdb-peso-regular: 400;
+  --cdb-peso-medium: 500;
+  --cdb-peso-semibold: 600;
+  --cdb-peso-bold: 700;
+  --cdb-tracking-caixa-alta: 0.06em;
+  --cdb-numeros: tabular-nums;
+
+  /* escala web: tamanho / altura de linha / peso (A) */
+  --cdb-t-display: 40px; --cdb-lh-display: 46px; --cdb-w-display: 700;
+  --cdb-t-displayMedium: 32px; --cdb-lh-displayMedium: 38px; --cdb-w-displayMedium: 700;
+  --cdb-t-h1: 28px; --cdb-lh-h1: 34px; --cdb-w-h1: 600;
+  --cdb-t-h2: 24px; --cdb-lh-h2: 30px; --cdb-w-h2: 600;
+  --cdb-t-titleLarge: 20px; --cdb-lh-titleLarge: 26px; --cdb-w-titleLarge: 600;
+  --cdb-t-titleMedium: 18px; --cdb-lh-titleMedium: 24px; --cdb-w-titleMedium: 600;
+  --cdb-t-titleSmall: 16px; --cdb-lh-titleSmall: 22px; --cdb-w-titleSmall: 500;
+  --cdb-t-bodyLarge: 18px; --cdb-lh-bodyLarge: 28px; --cdb-w-bodyLarge: 400;
+  --cdb-t-body: 16px; --cdb-lh-body: 24px; --cdb-w-body: 400;
+  --cdb-t-bodySmall: 14px; --cdb-lh-bodySmall: 20px; --cdb-w-bodySmall: 400;
+  --cdb-t-labelLarge: 14px; --cdb-lh-labelLarge: 18px; --cdb-w-labelLarge: 500;
+  --cdb-t-label: 13px; --cdb-lh-label: 16px; --cdb-w-label: 500;
+  --cdb-t-labelSmall: 12px; --cdb-lh-labelSmall: 16px; --cdb-w-labelSmall: 500;
+
+  /* espaço (F até 32; 48 e 64 NOVA) */
+  --cdb-e1: 4px; /* minimo */
+  --cdb-e2: 8px; /* curto */
+  --cdb-e3: 12px; /* medio */
+  --cdb-e4: 20px; /* largo */
+  --cdb-e5: 32px; /* seccao */
+  --cdb-e6: 48px; /* bloco */
+  --cdb-e7: 64px; /* capitulo */
+  --cdb-largura-conteudo: 1200px;
+  --cdb-largura-email: 600px;
+
+  /* forma (F: sem cantos redondos) */
+  --cdb-raio: 0;
+  --cdb-borda-foco: 3px solid #FFBE00;
+  --cdb-borda-linha: 1px solid rgba(0, 36, 72, 0.16);
+  --cdb-sombra: 0 1px 2px rgba(0, 36, 72, 0.08), 0 4px 12px rgba(0, 36, 72, 0.06);
+
+  /* movimento (A: aproximação web da mola da TV) */
+  --cdb-escala-foco: 1.04;
+  --cdb-transicao-foco: 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --cdb-transicao-entrada: 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* modo escuro: a paleta da app de TV (F) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cdb-fundo: #3F2D5F;
+    --cdb-superficie: #6A4D99;
+    --cdb-superficieFoco: #7D5DB2;
+    --cdb-barra: #2C2044;
+    --cdb-tinta: #F5EED1;
+    --cdb-tintaFraca: #BFB49A;
+    --cdb-acento: #FFBE00;
+    --cdb-sobreAcento: #002448;
+    --cdb-linha: rgba(245, 238, 209, 0.16);
+    --cdb-sucesso: #46C47A;
+    --cdb-aviso: #FFBE00;
+    --cdb-erro: #E3382B;
+    --cdb-info: #C9B6E8;
+    --cdb-borda-linha: 1px solid rgba(245, 238, 209, 0.16);
+    --cdb-sombra: none;
+  }
+}
+:root[data-theme="dark"] {
+  --cdb-fundo: #3F2D5F;
+  --cdb-superficie: #6A4D99;
+  --cdb-superficieFoco: #7D5DB2;
+  --cdb-barra: #2C2044;
+  --cdb-tinta: #F5EED1;
+  --cdb-tintaFraca: #BFB49A;
+  --cdb-acento: #FFBE00;
+  --cdb-sobreAcento: #002448;
+  --cdb-linha: rgba(245, 238, 209, 0.16);
+  --cdb-sucesso: #46C47A;
+  --cdb-aviso: #FFBE00;
+  --cdb-erro: #E3382B;
+  --cdb-info: #C9B6E8;
+  --cdb-borda-linha: 1px solid rgba(245, 238, 209, 0.16);
+  --cdb-sombra: none;
+}
+
+/* base mínima: o que qualquer superfície da marca herda */
+.cdb, .cdb body {
+  background: var(--cdb-fundo);
+  color: var(--cdb-tinta);
+  font-family: var(--cdb-fonte);
+  font-size: var(--cdb-t-body);
+  line-height: var(--cdb-lh-body);
+  font-variant-numeric: var(--cdb-numeros);
+}
+.cdb :focus-visible { outline: var(--cdb-borda-foco); outline-offset: 0; border-radius: 0; }
+.cdb h1 { font-size: var(--cdb-t-h1); line-height: var(--cdb-lh-h1); font-weight: var(--cdb-w-h1); margin: 0 0 var(--cdb-e3); }
+.cdb h2 { font-size: var(--cdb-t-h2); line-height: var(--cdb-lh-h2); font-weight: var(--cdb-w-h2); margin: 0 0 var(--cdb-e2); }
+.cdb .rotulo { font-size: var(--cdb-t-label); line-height: var(--cdb-lh-label); font-weight: var(--cdb-w-label); text-transform: uppercase; letter-spacing: var(--cdb-tracking-caixa-alta); }
+.cdb .faixa { background: var(--cdb-roxo); color: var(--cdb-creme); padding: var(--cdb-e2) var(--cdb-e3); }
+.cdb .botao { display: inline-block; min-height: 44px; padding: 0 var(--cdb-e4); background: var(--cdb-acento); color: var(--cdb-sobreAcento); font-weight: var(--cdb-peso-semibold); border: 0; border-radius: 0; line-height: 44px; text-decoration: none; }
+.cdb .botao--secundario { background: transparent; color: currentColor; border: 2px solid currentColor; line-height: 40px; }
+.cdb .etiqueta { display: inline-block; background: var(--cdb-acento); color: var(--cdb-sobreAcento); font-size: var(--cdb-t-labelSmall); font-weight: var(--cdb-w-labelSmall); text-transform: uppercase; letter-spacing: var(--cdb-tracking-caixa-alta); padding: 2px 6px; }
+.cdb .cartao { background: var(--cdb-superficie); box-shadow: var(--cdb-sombra); border-radius: 0; }
+.cdb .cartao:hover, .cdb .cartao:focus-within { background: var(--cdb-superficieFoco); transform: scale(var(--cdb-escala-foco)); transition: transform var(--cdb-transicao-foco), background var(--cdb-transicao-foco); }
+.cdb img, .cdb video { border-radius: 0; max-width: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .cdb *, .cdb *::before, .cdb *::after { transition: none !important; animation: none !important; transform: none !important; }
+}
