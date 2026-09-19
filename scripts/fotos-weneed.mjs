@@ -38,6 +38,10 @@ const CATALOGO = {
   'blueberry-small': ['bluberry', 'blueberry'],
   'bubba-kush': ['bubba kush', 'bubba'],
   'critical-berry': ['critical berry'],
+  // As duas Critical Berry, a infundida e a de CBD, sao a mesma flor em linhas
+  // diferentes. Partilham a foto de estudio para nao ficarem com dois aspectos
+  // na mesma prateleira — o clipe e que e distinto.
+  'critical-berry-cbd': ['critical berry'],
   'smash-cali': ['smash cali'],
   'sour-lifter': ['sour lifter'],
   static: ['static mango', 'static'],

@@ -24,22 +24,43 @@ class CatalogRepository(private val context: Context) {
         encodeDefaults = true
     }
 
-    val catalog: Flow<Catalog> = context.dataStore.data.map { prefs ->
-        val raw = prefs[KEY]
-        if (raw.isNullOrBlank()) {
-            DefaultCatalog.build()
+    /**
+     * A pasta interna da app, que e o alojamento por omissao dos media.
+     *
+     * O caminho nao pode ser constante: depende do utilizador do Android. Sai
+     * daqui porque o [PanelSettings] e um data class serializavel e nao ve o
+     * Context.
+     */
+    private val baseLocal: String get() = "file://" + context.filesDir.absolutePath
+
+    /** Base vazia = os ficheiros da propria TV. */
+    private fun Catalog.comBase(): Catalog =
+        if (settings.mediaBaseUrl.isBlank()) {
+            copy(settings = settings.copy(mediaBaseUrl = baseLocal))
         } else {
-            runCatching { json.decodeFromString(Catalog.serializer(), raw) }
-                .getOrElse { DefaultCatalog.build() }
+            this
         }
+
+    /**
+     * O que esta guardado, com os itens do codigo por cima quando o codigo mudou.
+     * Os produtos sao dados de fabrica (DefaultCatalog); o que a TV guarda de seu
+     * sao as definicoes, as posicoes e o ultimo visto. Sem isto, a primeira
+     * gravacao congelava os produtos tal como estavam nesse dia, e uma instalacao
+     * com terpenos novos nao mostrava nada de novo.
+     */
+    private fun guardado(raw: String?): Catalog {
+        val fabrica = DefaultCatalog.build()
+        if (raw.isNullOrBlank()) return fabrica
+        val lido = runCatching { json.decodeFromString(Catalog.serializer(), raw) }.getOrNull() ?: return fabrica
+        return if (lido.defaultsFingerprint == fabrica.defaultsFingerprint) lido
+        else lido.copy(items = fabrica.items, defaultsFingerprint = fabrica.defaultsFingerprint)
     }
+
+    val catalog: Flow<Catalog> = context.dataStore.data.map { prefs -> guardado(prefs[KEY]).comBase() }
 
     suspend fun update(transform: (Catalog) -> Catalog) {
         context.dataStore.edit { prefs ->
-            val current = prefs[KEY]?.let {
-                runCatching { json.decodeFromString(Catalog.serializer(), it) }.getOrNull()
-            } ?: DefaultCatalog.build()
-            prefs[KEY] = json.encodeToString(Catalog.serializer(), transform(current))
+            prefs[KEY] = json.encodeToString(Catalog.serializer(), transform(guardado(prefs[KEY])))
         }
     }
 

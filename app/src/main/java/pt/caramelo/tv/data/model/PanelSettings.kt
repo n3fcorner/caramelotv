@@ -17,7 +17,13 @@ data class PanelSettings(
     val attractSeconds: Int = 60,
     /**
      * Prefixo dos caminhos relativos dos itens. Muda-se aqui uma vez em vez de reescrever
-     * o URL de cada um dos quinze slots quando o alojamento muda.
+     * o URL de cada um dos dezoito slots quando o alojamento muda.
+     *
+     * **Vazio quer dizer "os ficheiros da propria TV"**, e o [CatalogRepository]
+     * preenche-o com a pasta interna da app. Esteve aqui um IP fixo do Mac de
+     * quem a fez: bastava uma instalacao limpa ou um `caramelotv://reset` para a
+     * montra da loja voltar a depender de um portatil ligado na mesma rede — e
+     * ficar sem videos quando ele nao estava.
      */
-    val mediaBaseUrl: String = "http://192.168.1.216:8000",
+    val mediaBaseUrl: String = "",
 )

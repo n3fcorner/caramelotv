@@ -8,9 +8,9 @@ import kotlinx.serialization.Serializable
  * verdes, e no meio de oito flores passavam despercebidos.
  */
 enum class Section(val label: String, val columns: Int, val slots: Int) {
-    INFUSAO("Infusão", 3, 9),
-    CBD("CBD", 3, 6),
-    HASH("Hash", 3, 3),
+    INFUSAO("Infusão", 4, 12),
+    CBD("CBD", 4, 6),
+    HASH("Hash", 4, 6),
 }
 
 /**
