@@ -25,6 +25,7 @@ import pt.caramelo.tv.data.model.Catalog
 import pt.caramelo.tv.data.model.ItemState
 import pt.caramelo.tv.data.model.MenuItem
 import pt.caramelo.tv.data.model.PanelSettings
+import pt.caramelo.tv.ui.animation.heroBounds
 import pt.caramelo.tv.ui.components.SectionHeader
 import pt.caramelo.tv.ui.components.SelectableRow
 import pt.caramelo.tv.ui.components.ToggleRow
@@ -62,7 +63,12 @@ fun SettingsScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("Definições", style = MaterialTheme.typography.headlineMedium)
+            Text(
+                "Definições",
+                style = MaterialTheme.typography.headlineMedium,
+                // A mesma caixa que o botao do menu: e' ele que cresce ate aqui.
+                modifier = Modifier.heroBounds("ecra-definicoes"),
+            )
             TvButton(text = "Voltar", onClick = onBack)
         }
 

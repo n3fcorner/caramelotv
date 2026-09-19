@@ -2,6 +2,7 @@ package pt.caramelo.tv
 
 import android.net.Uri
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 import pt.caramelo.tv.data.CatalogRepository
 import pt.caramelo.tv.data.model.Catalog
 import pt.caramelo.tv.data.model.MenuItem
+import pt.caramelo.tv.data.model.Section
 import pt.caramelo.tv.data.model.PanelSettings
 import pt.caramelo.tv.nav.Screen
 
@@ -60,6 +62,13 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
                 // Ja esta a andar sozinha: nada a fazer.
                 val ecra = current
                 if (ecra is Screen.Player && ecra.atrator) continue
+
+                // **Ha ecras onde silencio nao e' inactividade.** Quem esta a ler
+                // um boletim de analise ou a mexer nas definicoes fica minutos sem
+                // carregar em nada, e a montra arrancava-lhe por cima. Nas
+                // definicoes era pior do que incomodo: expulsava a pessoa antes de
+                // ela chegar ao interruptor que desliga a propria montra.
+                if (ecra is Screen.Coa || ecra is Screen.Settings || ecra is Screen.EditItem) continue
                 if (System.currentTimeMillis() - ultimaInteracao <= segundos * 1_000L) continue
 
                 // O comando esta parado. Onde quer que a app tenha ficado — num
@@ -90,6 +99,7 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
         val i = lista.indexOfFirst { it.id == actual.id }
         val proximo = lista[(i + 1).mod(lista.size)]
         focusedId = proximo.id
+        sentidoProduto = 1
         replaceTop(Screen.Player(proximo.id, 0L, atrator = true))
     }
 
@@ -102,7 +112,31 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
         }
     }
 
+    // --- Sentido do movimento -----------------------------------------------
+    //
+    // As transicoes sao direccionais: entrar num ecra empurra para a esquerda,
+    // voltar puxa para a direita; no leitor, o produto seguinte sobe e o
+    // anterior desce. A raiz e o leitor leem estes dois valores para saber para
+    // que lado animar. Sao +1 ou -1 e nada mais.
+
+    /** +1 quando se entra num ecra (push), -1 quando se volta (pop). */
+    var sentidoNav by mutableIntStateOf(1)
+        private set
+
+    /** +1 quando o leitor passa ao produto seguinte, -1 ao anterior. */
+    var sentidoProduto by mutableIntStateOf(1)
+        private set
+
+    /**
+     * O menu ja apareceu uma vez nesta sessao. A cascata dos mosaicos so corre na
+     * primeira: ao voltar de um produto, a foto que vem a voar tem de encontrar o
+     * mosaico parado no sitio, e nao a meio de uma entrada.
+     */
+    var menuJaMostrado by mutableStateOf(false)
+
+
     fun push(screen: Screen) {
+        sentidoNav = 1
         stack.add(screen)
         registarInteracao()
     }
@@ -110,12 +144,14 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
     /** Devolve false quando ja estamos na raiz e nao ha para onde recuar. */
     fun pop(): Boolean {
         if (stack.size <= 1) return false
+        sentidoNav = -1
         stack.removeAt(stack.lastIndex)
         registarInteracao()
         return true
     }
 
     fun popTo(screen: Screen) {
+        if (stack.size > 1 && stack.last() != screen) sentidoNav = -1
         while (stack.size > 1 && stack.last() != screen) stack.removeAt(stack.lastIndex)
     }
 
@@ -147,6 +183,7 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
         if (indice < 0) return
         val proximo = lista[(indice + delta + lista.size) % lista.size]
         focusedId = proximo.id
+        sentidoProduto = if (delta >= 0) 1 else -1
         replaceTop(Screen.Player(proximo.id, 0L))
     }
 
@@ -191,12 +228,19 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
      * caramelotv://play?id=cbd-0
      * caramelotv://base?url=http://172.20.10.6:8000
      * caramelotv://reset
+     * caramelotv://coa
      *
-     * `id` e o identificador do slot: thcp-0..8, cbd-0..5, hash-0..2.
+     * `id` e o identificador do slot: thcp-0..11, cbd-0..5, hash-0..5.
      */
     fun handleDeepLink(uri: Uri) {
         when (uri.host) {
             "reset" -> resetCatalog()
+
+            // Abre o boletim de analise sem ter de o procurar no cabecalho.
+            "coa" -> {
+                popTo(Screen.Home)
+                push(Screen.Coa)
+            }
 
             // caramelotv://base?url=http://192.168.1.216:8000
             "base" -> {

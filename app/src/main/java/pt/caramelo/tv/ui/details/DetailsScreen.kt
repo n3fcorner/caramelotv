@@ -3,8 +3,6 @@ package pt.caramelo.tv.ui.details
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,7 +36,11 @@ import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import pt.caramelo.tv.data.model.ItemState
 import pt.caramelo.tv.data.model.MenuItem
+import pt.caramelo.tv.ui.animation.Entrada
+import pt.caramelo.tv.ui.components.PerfilIndicaSativa
+import pt.caramelo.tv.ui.components.TerpenosDominantes
 import pt.caramelo.tv.ui.animation.hero
+import pt.caramelo.tv.ui.animation.heroBounds
 import pt.caramelo.tv.ui.components.FundoDaMarca
 import pt.caramelo.tv.ui.components.TvButton
 import pt.caramelo.tv.ui.components.formatarTempo
@@ -120,7 +124,11 @@ fun DetailsScreen(
                 color = Creme,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = Espaco.curto),
+                modifier = Modifier
+                    .padding(top = Espaco.curto)
+                    // A mesma caixa que o nome tem no leitor: ao carregar em
+                    // Reproduzir, o nome fica e o resto troca a volta dele.
+                    .heroBounds("titulo-${item.id}"),
             )
 
             val ficheiro = listOfNotNull(
@@ -137,20 +145,22 @@ fun DetailsScreen(
                 )
             }
 
+            // Cada campo entra um pouco depois do anterior, por cima do deslize da
+            // coluna inteira: le-se como a ficha a compor-se, nao a cair de uma vez.
             if (item.strain.aroma.isNotBlank()) {
-                Campo("Aroma", item.strain.aroma)
+                Entrada(ordem = 1) { Campo("Aroma", item.strain.aroma) }
             }
 
             if (item.strain.genetics.isNotBlank()) {
-                Campo("Genética", item.strain.genetics)
+                Entrada(ordem = 2) { Campo("Genética", item.strain.genetics) }
             }
 
             if (item.strain.terpenes.isNotEmpty()) {
-                Campo("Terpenos dominantes", item.strain.terpenes.joinToString(" · "))
+                Entrada(ordem = 3) { TerpenosDominantes(item.strain.terpenes, Modifier.padding(top = Espaco.medio)) }
             }
 
             if (item.strain.temPerfil) {
-                BarraIndicaSativa(item.strain.indica, item.strain.type)
+                Entrada(ordem = 4) { PerfilIndicaSativa(item.strain, Modifier.padding(top = Espaco.medio)) }
             }
 
             Row(
@@ -191,7 +201,7 @@ fun DetailsScreen(
 /** Rotulo em amarelo mais o valor, o par que se repete por toda a ficha. */
 @Composable
 private fun Campo(rotulo: String, valor: String) {
-    Column(Modifier.padding(top = Espaco.largo)) {
+    Column(Modifier.padding(top = Espaco.medio)) {
         Text(
             text = rotulo.uppercase(),
             style = MaterialTheme.typography.labelSmall,
@@ -204,47 +214,6 @@ private fun Campo(rotulo: String, valor: String) {
             color = Creme,
             modifier = Modifier.padding(top = Espaco.minimo),
         )
-    }
-}
-
-/**
- * Peso da indica contra o da sativa. So aparece quando a genetica esta
- * documentada — uma barra a meio para toda a gente seria decoracao, nao dado.
- */
-@Composable
-private fun BarraIndicaSativa(indica: Int, tipo: String) {
-    val peso = indica.coerceIn(0, 100)
-    Column(Modifier.padding(top = Espaco.largo)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = if (tipo.isBlank()) "PERFIL" else tipo.uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = Amarelo,
-                letterSpacing = 2.sp,
-            )
-            Text(
-                text = "Índica $peso · Sativa ${100 - peso}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        Row(
-            modifier = Modifier
-                .padding(top = Espaco.curto)
-                .fillMaxWidth()
-                .height(8.dp),
-        ) {
-            Box(Modifier.weight(peso.coerceAtLeast(1).toFloat()).fillMaxHeight().background(Amarelo))
-            Box(
-                Modifier
-                    .weight((100 - peso).coerceAtLeast(1).toFloat())
-                    .fillMaxHeight()
-                    .background(VerdeClaro),
-            )
-        }
     }
 }
 

@@ -3,8 +3,10 @@ package pt.caramelo.tv.ui.home
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -39,6 +42,7 @@ import coil.compose.AsyncImage
 import pt.caramelo.tv.data.model.ItemState
 import pt.caramelo.tv.data.model.MenuItem
 import pt.caramelo.tv.ui.animation.hero
+import pt.caramelo.tv.ui.components.BarraIndicaSativa
 import pt.caramelo.tv.ui.theme.Amarelo
 import pt.caramelo.tv.ui.theme.Creme
 import pt.caramelo.tv.ui.theme.Espaco
@@ -106,14 +110,38 @@ fun ProductTile(
         Box(Modifier.fillMaxSize().clipToBounds()) {
             Fotografia(item = item, posterUrl = posterUrl, realce = p)
 
-            // Faixa solida, nao degrade. Sem ela o creme perde-se nas fotos claras;
-            // com degrade voltava-se ao esfumado preto que ja tinhamos posto de lado.
+            if (item.state == ItemState.EM_BREVE) {
+                Text(
+                    text = "EM BREVE",
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.5.sp, lineHeight = 12.sp),
+                    color = RoxoProfundo,
+                    letterSpacing = 1.sp,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(Espaco.minimo)
+                        .background(Amarelo)
+                        .padding(horizontal = 5.dp, vertical = 2.dp),
+                )
+            }
+
+            // O cultivo no canto de cima, fora da faixa e longe do EM BREVE.
+            Cultivo.de(item)?.let { cultivo ->
+                PontoDeCultivo(
+                    cultivo = cultivo,
+                    modifier = Modifier.align(Alignment.TopEnd).padding(Espaco.curto),
+                )
+            }
+
+            // A faixa assenta no terco de baixo do mosaico, que nos cartazes e'
+            // margem roxa: o produto e' composto alto (CENTRO 0,33 no
+            // recortar-flores.py) precisamente para nada lhe ficar por cima.
+            // Faixa solida, nao degrade: sem ela o creme perde-se nas fotos claras.
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
                     .background(RoxoProfundo.copy(alpha = 0.90f))
-                    .padding(horizontal = Espaco.curto, vertical = 6.dp),
+                    .padding(horizontal = Espaco.curto, vertical = 4.dp),
             ) {
                 // A regua abre da esquerda a medida que o foco entra.
                 Box(
@@ -123,15 +151,14 @@ fun ProductTile(
                         .height(3.dp * p)
                         .background(Amarelo),
                 )
-
                 Text(
                     text = item.displayTitle.uppercase(),
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = lerp(12.5.sp, 17.sp, p),
-                        lineHeight = lerp(15.sp, 20.sp, p),
-                        letterSpacing = lerp(2.2.sp, 0.6.sp, p),
+                        fontSize = lerp(11.sp, 13.sp, p),
+                        lineHeight = lerp(13.5.sp, 16.sp, p),
+                        letterSpacing = lerp(1.4.sp, 0.3.sp, p),
                     ),
-                    color = Creme.copy(alpha = 0.72f + 0.28f * p),
+                    color = Creme.copy(alpha = 0.80f + 0.20f * p),
                     // Duas linhas sempre reservadas: com nomes de uma e de duas
                     // linhas misturados, as faixas ficavam com alturas aos saltos.
                     minLines = 2,
@@ -139,17 +166,15 @@ fun ProductTile(
                     overflow = TextOverflow.Ellipsis,
                 )
 
-                if (item.state == ItemState.EM_BREVE) {
-                    Text(
-                        text = "EM BREVE",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize = 11.sp,
-                            lineHeight = 14.sp,
-                        ),
-                        color = Amarelo,
-                        letterSpacing = 1.6.sp,
-                    )
-                }
+            }
+
+            // Indica e sativa numa barra fina no fundo, como nos cartoes do telemovel.
+            if (item.strain.temPerfil) {
+                BarraIndicaSativa(
+                    peso = item.strain.indica,
+                    altura = 4.dp,
+                    modifier = Modifier.align(Alignment.BottomStart),
+                )
             }
         }
     }
@@ -162,7 +187,9 @@ private fun Fotografia(item: MenuItem, posterUrl: String, realce: Float) {
             AsyncImage(
                 model = posterUrl,
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
+                // Fit e nao Crop: o cartaz e' quadrado e a caixa tambem, mas se um
+                // dia nao forem, corta-se margem roxa e nunca produto.
+                contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize().hero(item.id),
             )
         } else {

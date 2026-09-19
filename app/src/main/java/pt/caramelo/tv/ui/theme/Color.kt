@@ -9,10 +9,13 @@ import androidx.compose.ui.graphics.Color
  * numa sala escura, por isso serve de superficie e nao de fundo: o fundo usa dois
  * tons mais fundos da mesma familia.
  */
-val Roxo = Color(0xFF573B89)          // roxo da marca, superficie dos mosaicos
-val RoxoClaro = Color(0xFF6B4BA5)     // superficie em foco
-val RoxoFundo = Color(0xFF2E1F4C)     // fundo do ecra
-val RoxoProfundo = Color(0xFF1E1433)  // barras, letterbox, sombras
+val Roxo = Color(0xFF6A4D99)          // roxo da marca, superficie dos mosaicos
+// Os quatro roxos subiram um degrau (gama 0,82) em Setembro de 2026, com o fundo
+// novo: a arte assenta num roxo mais escuro que o antigo, e a paleta de cima tinha
+// de subir com ele para os mosaicos nao afundarem no fundo.
+val RoxoClaro = Color(0xFF7D5DB2)     // superficie em foco
+val RoxoFundo = Color(0xFF3F2D5F)     // fundo do ecra
+val RoxoProfundo = Color(0xFF2C2044)  // barras, letterbox, sombras
 
 val Amarelo = Color(0xFFFFBE00)       // amarelo do logo
 val Laranja = Color(0xFFFF9100)

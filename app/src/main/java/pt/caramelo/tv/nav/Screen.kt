@@ -9,6 +9,8 @@ sealed interface Screen {
         /** Verdadeiro quando a montra se poe a andar sozinha, sem ninguem no comando. */
         val atrator: Boolean = false,
     ) : Screen
+    /** O boletim de analise, em imagem: a TV nao abre PDF. */
+    data object Coa : Screen
     data object Settings : Screen
     data class EditItem(val id: String) : Screen
 }
