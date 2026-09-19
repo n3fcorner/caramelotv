@@ -1,0 +1,129 @@
+TEXTOS DA MONTRA DA TV, PARA CONFIRMAR
+
+Leo, seguem os textos que estão na TV, artigo a artigo. O que está marcado
+[confirmado] veio da faixa do vídeo ou do site do fornecedor. O que está
+marcado [por confirmar] fui eu que escrevi como texto de teste e precisa da
+tua correcção. Responde na própria linha.
+
+== INFUSÃO ==
+Berry Pie
+  formato: Flor
+  cultivo: Glasshouse [confirmado]
+  aroma:   Frutos vermelhos e doce de forno [por confirmar]
+
+Blueberry Small
+  formato: Flor
+  cultivo: Indoor [confirmado]
+  aroma:   Mirtilo e frutos silvestres [por confirmar]
+
+Bubba Kush
+  formato: Flor
+  cultivo: Greenhouse [confirmado]
+  aroma:   Terroso e café, fundo doce [por confirmar]
+
+Critical Berry
+  formato: Flor
+  cultivo: sem cultivo [por confirmar]
+  aroma:   Frutos vermelhos sobre fundo terroso [por confirmar]
+
+Gorilla Mandarini
+  formato: Flor
+  cultivo: Glasshouse [confirmado]
+  aroma:   Tangerina sobre fundo resinoso [por confirmar]
+
+MAC
+  formato: Flor
+  cultivo: sem cultivo [por confirmar]
+  aroma:   Cítrico e cremoso, fundo a diesel [por confirmar]
+
+Peanut Butter
+  formato: Flor
+  cultivo: Greenhouse [confirmado]
+  aroma:   Amendoim torrado, fundo doce [por confirmar]
+
+Pulsar
+  formato: Flor
+  cultivo: Indoor [confirmado]
+  aroma:   Doce e resinoso, fundo terroso [por confirmar]
+
+Sky
+  formato: Flor
+  cultivo: Indoor [confirmado]
+  aroma:   Fresco e floral [por confirmar]
+
+Smash Cali
+  formato: Flor
+  cultivo: Glasshouse [confirmado]
+  aroma:   Cítrico e doce [por confirmar]
+
+Sour Lifter
+  formato: Flor
+  cultivo: Glasshouse [confirmado]
+  aroma:   Ácido e cítrico, fundo a diesel [por confirmar]
+
+White Banger
+  formato: Flor
+  cultivo: Indoor [confirmado]
+  aroma:   Terroso e a pinho, fundo resinoso [por confirmar]
+
+== CBD ==
+Critical Berry
+  formato: Flor
+  cultivo: Greenhouse [confirmado]
+  aroma:   Frutos vermelhos sobre fundo terroso [por confirmar]
+
+Grape Cali
+  formato: Flor
+  cultivo: Glasshouse [confirmado]
+  aroma:   Uva e frutos escuros, fundo doce [por confirmar]
+
+Lemon Trip
+  formato: Flor
+  cultivo: Greenhouse [confirmado]
+  aroma:   Limão e casca fresca, fundo herbáceo [por confirmar]
+
+Mela Sour
+  formato: Flor
+  cultivo: sem cultivo [por confirmar]
+  aroma:   Maçã verde e ácido, fundo doce [por confirmar]
+
+Solero Cream
+  formato: Flor
+  cultivo: Indoor [confirmado]
+  aroma:   Cremoso e doce, baunilha e citrinos [por confirmar]
+
+Uranium
+  formato: Flor
+  cultivo: sem cultivo [por confirmar]
+  aroma:   Intenso e resinoso [por confirmar]
+
+== HASH ==
+La Mousse
+  formato: Hash
+  cultivo: sem cultivo [por confirmar]
+  aroma:   Doce e cremoso, fundo terroso [por confirmar]
+
+Mango Melt
+  formato: Hash piattella
+  cultivo: sem cultivo [por confirmar]
+  aroma:   Manga madura e resina [por confirmar]
+
+OG Ivory Dry
+  formato: Hash
+  cultivo: sem cultivo [por confirmar]
+  aroma:   Seco e especiado, fundo a pinho [por confirmar]
+
+Papaya OG
+  formato: Hash
+  cultivo: sem cultivo [por confirmar]
+  aroma:   Papaia madura, fundo resinoso [por confirmar]
+
+Static
+  formato: Hash
+  cultivo: sem cultivo [por confirmar]
+  aroma:   Concentrado e terroso [por confirmar]
+
+Sticky Peach
+  formato: Hash piattella
+  cultivo: sem cultivo [por confirmar]
+  aroma:   Pêssego doce [por confirmar]
