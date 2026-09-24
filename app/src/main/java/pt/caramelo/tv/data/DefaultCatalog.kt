@@ -79,12 +79,6 @@ object DefaultCatalog {
             terpenos = listOf("Limoneno", "Cariofileno", "Pineno"),
         ),
         produto(
-            Section.INFUSAO, 6, "Gorilla Mandarini", "gorilla-mandarini",
-            LINHA_INFUSAO, "Flor", "Glasshouse", "Tangerina sobre fundo resinoso", infundido = true,
-            genetica = "Gorilla Glue × Mandarine (atribuída)", tipo = "Híbrida", indica = 55,
-            terpenos = listOf("Cariofileno", "Limoneno", "Mirceno"),
-        ),
-        produto(
             Section.INFUSAO, 7, "Berry Pie", "berry-pie",
             LINHA_INFUSAO, "Flor", "Glasshouse", "Frutos vermelhos e doce de forno", infundido = true,
             genetica = "Cookies × Blueberry (atribuída)", tipo = "Híbrida", indica = 60,

@@ -108,23 +108,6 @@
           "video": false
         },
         {
-          "slug": "gorilla-mandarini",
-          "nome": "Gorilla Mandarini",
-          "formato": "Flor",
-          "cultivo": "Glasshouse",
-          "infundido": true,
-          "aroma": "Tangerina sobre fundo resinoso",
-          "genetica": "Gorilla Glue × Mandarine (atribuída)",
-          "tipo": "Híbrida",
-          "indica": 55,
-          "terpenos": [
-            "Cariofileno",
-            "Limoneno",
-            "Mirceno"
-          ],
-          "video": true
-        },
-        {
           "slug": "berry-pie",
           "nome": "Berry Pie",
           "formato": "Flor",
