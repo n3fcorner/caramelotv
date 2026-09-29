@@ -2,7 +2,7 @@ package pt.caramelo.tv.ui.home
 
 import androidx.compose.animation.AnimatedContent
 import pt.caramelo.tv.ui.theme.Laranja
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.mutableStateOf
@@ -89,12 +89,14 @@ import pt.caramelo.tv.ui.theme.VerdeClaro
  */
 private val ORDEM_SECCOES = listOf(Section.CBD, Section.INFUSAO, Section.HASH)
 
-/** A cor de cada categoria: a barra do cabecalho e o separador fazem par. */
-private fun corDe(s: Section): Color = when (s) {
-    Section.CBD -> VerdeClaro
-    Section.INFUSAO -> Amarelo
-    Section.HASH -> Laranja
+/** O par de cores de cada pagina: as duas barras do cabecalho. A primeira e' tambem a do separador. */
+private fun parDe(s: Section): Pair<Color, Color> = when (s) {
+    Section.CBD -> VerdeClaro to Amarelo
+    Section.INFUSAO -> Amarelo to Laranja
+    Section.HASH -> Laranja to VerdeClaro
 }
+
+private fun corDe(s: Section): Color = parDe(s).first
 
 @Composable
 fun HomeScreen(
@@ -166,13 +168,15 @@ fun HomeScreen(
             onIdioma = onIdioma,
         )
 
-        // Tres barras por baixo do cabecalho, uma por categoria na cor dela (pedido do Leo e do Francisco,
-        // 29/9/2026): cada barra faz par com o seu separador. A da categoria aberta engrossa.
+        // Duas barras por baixo do cabecalho, com o par de cores da pagina aberta (Francisco, 29/9/2026:
+        // "duas barras por baixo do header, de cores diferentes de pagina para pagina"). A cor de cima e'
+        // a do separador; mudar de separador funde as cores, sem saltos.
+        val (corCima, corBaixo) = parDe(seccao)
+        val cima by animateColorAsState(corCima, tween(260), label = "barra-cima")
+        val baixo by animateColorAsState(corBaixo, tween(260), label = "barra-baixo")
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            ORDEM_SECCOES.forEach { s ->
-                val grossura by animateDpAsState(if (s == seccao) 7.dp else 3.dp, tween(220), label = "barra")
-                Box(Modifier.fillMaxWidth().height(grossura).background(corDe(s)))
-            }
+            Box(Modifier.fillMaxWidth().height(6.dp).background(cima))
+            Box(Modifier.fillMaxWidth().height(6.dp).background(baixo))
         }
 
         // Os tres submenus a esquerda e a legenda dos pontos a direita, na mesma linha:
