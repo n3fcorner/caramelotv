@@ -16,7 +16,8 @@ import java.net.URL
  * O CRM (caramelodobrasil.eu/api/tv/catalogo) manda em que flores existem, o nome, a
  * ordem, a foto, o video e o lote. A ficha rica — genetica, perfil indica/sativa,
  * terpenos, aroma em duas linguas — continua a ser a do [DefaultCatalog] quando a
- * flor e' conhecida; uma flor nova, criada no painel, entra com a ficha curta do CRM.
+ * flor e' conhecida, com o que se escreveu na ficha do produto no painel por cima
+ * (campo a campo); uma flor nova entra com a ficha que o painel tiver.
  *
  * Sem rede, ou com o CRM em baixo, fica o ultimo catalogo recebido; sem nenhum, o de
  * fabrica. Nunca um ecra vazio.
@@ -25,6 +26,20 @@ object Sincronizacao {
 
     @Serializable
     data class LoteCrm(val codigo: String = "", val url: String = "")
+
+    @Serializable
+    data class TerpenoCrm(val nome: String = "", val pct: Double? = null)
+
+    /** O que foi escrito na ficha do produto no painel do CRM: ganha a ficha de fabrica, campo a campo (29/9/2026). */
+    @Serializable
+    data class PainelCrm(
+        val tipo: String = "",
+        val cultivo: String = "",
+        val genetica: String = "",
+        val indica: Int? = null,
+        val aromas: List<String> = emptyList(),
+        val terpenos: List<TerpenoCrm> = emptyList(),
+    )
 
     @Serializable
     data class ItemCrm(
@@ -40,6 +55,10 @@ object Sincronizacao {
         val tipo: String = "",
         val cultivo: String = "",
         val aromas: List<String> = emptyList(),
+        val genetica: String = "",
+        val indica: Int? = null,
+        val terpenos: List<TerpenoCrm> = emptyList(),
+        val painel: PainelCrm? = null,
     )
 
     @Serializable
@@ -105,6 +124,29 @@ object Sincronizacao {
         }
     }
 
+    private fun aromaDe(l: List<String>) = l.joinToString(", ").replaceFirstChar { it.uppercase() }
+
+    /** "mirceno" passa a "Mirceno": o dicionario de traducoes da TV conhece os nomes com maiuscula. */
+    private fun nomeTerpeno(s: String) = s.trim().replaceFirstChar { it.uppercase() }
+
+    /** As percentagens so contam quando todos os terpenos as tem; senao fica so a ordem de dominancia. */
+    private fun pcts(l: List<TerpenoCrm>): List<Int> =
+        if (l.isNotEmpty() && l.all { it.pct != null }) l.map { Math.round(it.pct!!).toInt() } else emptyList()
+
+    /** A ficha de fabrica com o que o painel preencheu por cima. */
+    private fun comPainel(s: Strain, p: PainelCrm?): Strain {
+        if (p == null) return s
+        return s.copy(
+            type = p.tipo.ifBlank { s.type },
+            cultivation = cultivoDe(p.cultivo).ifBlank { s.cultivation },
+            genetics = p.genetica.ifBlank { s.genetics },
+            indica = p.indica?.takeIf { it in 0..100 } ?: s.indica,
+            aroma = if (p.aromas.isNotEmpty()) aromaDe(p.aromas) else s.aroma,
+            terpenes = if (p.terpenos.isNotEmpty()) p.terpenos.map { nomeTerpeno(it.nome) } else s.terpenes,
+            terpenesPct = if (p.terpenos.isNotEmpty()) pcts(p.terpenos) else s.terpenesPct,
+        )
+    }
+
     /** Os itens da TV a partir do CRM, com a ficha de fabrica por cima quando a flor e' conhecida. */
     fun juntar(crm: CatalogoCrm, fabrica: List<MenuItem>): List<MenuItem> {
         val porSlug = fabrica.mapNotNull { f -> slugDe(f)?.let { it to f } }.toMap()
@@ -126,13 +168,17 @@ object Sincronizacao {
                 videoUrl = base?.videoUrl?.takeIf { it.isNotBlank() } ?: c.video.orEmpty(),
                 imageUrl = base?.imageUrl?.takeIf { it.isNotBlank() } ?: c.imagem.orEmpty(),
                 orientation = base?.orientation ?: MediaOrientation.SQUARE,
-                strain = base?.strain ?: Strain(
+                strain = base?.strain?.let { comPainel(it, c.painel) } ?: Strain(
                     line = if (seccao == Section.INFUSAO || c.infundido) "Infusão" else "CBD",
                     format = if (seccao == Section.HASH) "Hash" else "Flor",
                     cultivation = cultivoDe(c.cultivo),
-                    aroma = c.aromas.joinToString(", ").replaceFirstChar { it.uppercase() },
+                    aroma = aromaDe(c.aromas),
                     infused = seccao == Section.INFUSAO || c.infundido,
+                    genetics = c.genetica,
                     type = c.tipo,
+                    indica = c.indica?.takeIf { it in 0..100 } ?: -1,
+                    terpenes = c.terpenos.map { nomeTerpeno(it.nome) },
+                    terpenesPct = pcts(c.terpenos),
                 ),
             )
         }
