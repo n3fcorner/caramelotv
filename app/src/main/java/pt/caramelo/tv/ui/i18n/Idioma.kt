@@ -56,9 +56,9 @@ object Termos {
         "Fresco e floral" to "Fresh and floral",
         "Frutos vermelhos e doce de forno" to "Red berries and baked sweets",
         "Frutos vermelhos sobre fundo terroso" to "Red berries over an earthy base",
-        "Intenso e resinoso" to "Intense and resinous",
+        "Resinoso" to "Resinous",
         "Limão e casca fresca, fundo herbáceo" to "Lemon and fresh peel, herbal base",
-        "Manga fresca, intenso" to "Fresh mango, intense",
+        "Manga fresca" to "Fresh mango",
         "Manga madura e resina" to "Ripe mango and resin",
         "Maçã verde e ácido, fundo doce" to "Green apple and sour, sweet base",
         "Mirtilo e frutos silvestres" to "Blueberry and wild berries",
@@ -76,5 +76,11 @@ object Termos {
         "Descendente de Tangie (selecção Doweedo)" to "Tangie descendant (Doweedo selection)",
     )
 
-    fun en(pt: String): String = EN[pt] ?: pt.replace("(atribuída)", "(attributed)")
+    /** As partes que se repetem nas fichas curtas do CRM ("Híbrida, índica-dominante"). */
+    private val PARTES = listOf(
+        "(atribuída)" to "(attributed)", "índica-dominante" to "indica-dominant", "sativa-dominante" to "sativa-dominant",
+        "Sativa-dominante" to "Sativa-dominant", "Índica-dominante" to "Indica-dominant", "Híbrida" to "Hybrid", "Índica" to "Indica",
+    )
+
+    fun en(pt: String): String = EN[pt] ?: PARTES.fold(pt) { t, (a, b) -> t.replace(a, b) }
 }

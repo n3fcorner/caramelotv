@@ -147,7 +147,7 @@ object DefaultCatalog {
         ),
         produto(
             Section.CBD, 5, "Uranium", "uranium",
-            LINHA_CBD, "Flor", "", "Intenso e resinoso",
+            LINHA_CBD, "Flor", "", "Resinoso",
             tipo = "Híbrida", indica = 55,
             terpenos = listOf("Mirceno", "Cariofileno", "Humuleno"),
         ),
@@ -157,7 +157,7 @@ object DefaultCatalog {
         produto(
             Section.HASH, 0, "Static", "static",
             // Na WeNeed chama-se Static Mango: o aroma e' manga, nao terra.
-            LINHA_INFUSAO, "Hash", "", "Manga fresca, intenso", infundido = true,
+            LINHA_INFUSAO, "Hash", "", "Manga fresca", infundido = true,
             tipo = "Híbrida", indica = 50,
             terpenos = listOf("Mirceno", "Ocimeno", "Limoneno"),
         ),

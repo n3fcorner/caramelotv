@@ -28,4 +28,9 @@ data class PanelSettings(
     val mediaBaseUrl: String = "",
     /** Lingua da interface e das fichas: "pt" ou "en" (29/9/2026). */
     val idioma: String = "pt",
+    /**
+     * De onde vem o catalogo (29/9/2026): o CRM da loja. Vazio desliga a sincronizacao e
+     * a TV fica com os produtos de fabrica.
+     */
+    val crmUrl: String = "https://caramelodobrasil.eu/api/tv/catalogo",
 )

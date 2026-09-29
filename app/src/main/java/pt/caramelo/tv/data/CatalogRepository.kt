@@ -56,7 +56,28 @@ class CatalogRepository(private val context: Context) {
         else lido.copy(items = fabrica.items, defaultsFingerprint = fabrica.defaultsFingerprint)
     }
 
-    val catalog: Flow<Catalog> = context.dataStore.data.map { prefs -> guardado(prefs[KEY]).comBase() }
+    /**
+     * Com catalogo do CRM guardado, os itens sao os dele, com a ficha de fabrica por cima
+     * (ver [Sincronizacao]). As definicoes, as posicoes e o ultimo visto continuam a ser
+     * da TV. Sem CRM, tudo como antes.
+     */
+    private fun Catalog.comCrm(raw: String?): Catalog {
+        val crm = Sincronizacao.ler(raw) ?: return this
+        if (settings.crmUrl.isBlank()) return this
+        val itens = Sincronizacao.juntar(crm, fabrica)
+        return if (itens.isEmpty()) this else copy(items = itens)
+    }
+
+    private val fabrica by lazy { DefaultCatalog.build().items }
+
+    val catalog: Flow<Catalog> = context.dataStore.data.map { prefs -> guardado(prefs[KEY]).comCrm(prefs[KEY_CRM]).comBase() }
+
+    /** Grava o catalogo do CRM so se mudou; devolve se mudou. */
+    suspend fun gravarCrm(canonico: String): Boolean {
+        var mudou = false
+        context.dataStore.edit { prefs -> if (prefs[KEY_CRM] != canonico) { prefs[KEY_CRM] = canonico; mudou = true } }
+        return mudou
+    }
 
     suspend fun update(transform: (Catalog) -> Catalog) {
         context.dataStore.edit { prefs ->
@@ -65,10 +86,11 @@ class CatalogRepository(private val context: Context) {
     }
 
     suspend fun reset() {
-        context.dataStore.edit { it.remove(KEY) }
+        context.dataStore.edit { it.remove(KEY); it.remove(KEY_CRM) }
     }
 
     private companion object {
         val KEY = stringPreferencesKey("catalog_json")
+        val KEY_CRM = stringPreferencesKey("crm_json")
     }
 }
