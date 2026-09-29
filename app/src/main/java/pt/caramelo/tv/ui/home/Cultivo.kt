@@ -1,10 +1,15 @@
 package pt.caramelo.tv.ui.home
 
 import pt.caramelo.tv.ui.i18n.termo
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,11 +31,10 @@ import pt.caramelo.tv.ui.theme.CremeFraco
 import pt.caramelo.tv.ui.theme.Espaco
 import pt.caramelo.tv.ui.theme.RoxoProfundo
 import pt.caramelo.tv.ui.theme.VerdeClaro
-import androidx.compose.foundation.shape.CircleShape
 
 /**
- * Os tres cultivos que a Caramelo trabalha, cada um com a sua cor no canto do
- * mosaico. As cores sao as da marca: amarelo (luz artificial) para indoor, verde
+ * Os tres cultivos que a Caramelo trabalha, cada um com o seu desenho e a sua cor
+ * no canto do mosaico. As cores sao as da marca: amarelo (luz artificial) para indoor, verde
  * (a estufa) para greenhouse e creme (o vidro) para glasshouse. Um cultivo fora
  * desta lista, ou vazio, nao leva ponto: melhor sem marca do que com marca errada.
  */
@@ -47,15 +51,44 @@ enum class Cultivo(val nome: String, val cor: Color) {
     }
 }
 
-/** O ponto em si. O contorno na cor da faixa garante que se le sobre uma flor clara. */
+/**
+ * O desenho do cultivo (29/9/2026, Francisco: "desenhinhos pequenos também no tipo de
+ * cultivo"), no mesmo traco dos aromas: linhas simples na cor do cultivo, sobre um
+ * disco roxo escuro para se ler por cima de uma flor clara. Indoor e' a lampada
+ * pendurada com a luz, greenhouse o tunel de estufa, glasshouse a casa de vidro com
+ * as vidracas. Canvas, sem imagens: nitido em qualquer TV e sem memoria a mais.
+ */
 @Composable
-fun PontoDeCultivo(cultivo: Cultivo, modifier: Modifier = Modifier, tamanho: Dp = 12.dp) {
-    Box(
-        modifier
-            .size(tamanho)
-            .background(cultivo.cor, CircleShape)
-            .border(2.dp, RoxoProfundo, CircleShape),
-    )
+fun PontoDeCultivo(cultivo: Cultivo, modifier: Modifier = Modifier, tamanho: Dp = 24.dp, comFundo: Boolean = true) {
+    Canvas(modifier.size(tamanho)) {
+        val w = size.minDimension
+        if (comFundo) drawCircle(RoxoProfundo, radius = w / 2f)
+        val m = if (comFundo) w * 0.2f else w * 0.06f // margem dentro do disco
+        val a = w - 2 * m // lado da area do desenho
+        fun p(x: Float, y: Float) = Offset(m + x * a, m + y * a)
+        val traco = Stroke(width = w * if (comFundo) 0.085f else 0.1f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        val cor = cultivo.cor
+        when (cultivo) {
+            Cultivo.INDOOR -> {
+                drawLine(cor, p(0.5f, 0f), p(0.5f, 0.2f), traco.width, StrokeCap.Round)
+                drawPath(Path().apply { moveTo(p(0.28f, 0.52f).x, p(0.28f, 0.52f).y); lineTo(p(0.38f, 0.2f).x, p(0.38f, 0.2f).y); lineTo(p(0.62f, 0.2f).x, p(0.62f, 0.2f).y); lineTo(p(0.72f, 0.52f).x, p(0.72f, 0.52f).y); close() }, cor, style = traco)
+                listOf(Triple(0.5f, 0.66f, 0.92f), Triple(0.3f, 0.64f, 0.84f), Triple(0.7f, 0.64f, 0.84f)).forEach { (x, y0, y1) ->
+                    val dx = (x - 0.5f) * 0.5f
+                    drawLine(cor, p(x, y0), p(x + dx, y1), traco.width, StrokeCap.Round)
+                }
+            }
+            Cultivo.GREENHOUSE -> {
+                drawArc(cor, 180f, 180f, false, topLeft = p(0.02f, 0.2f), size = Size(a * 0.96f, a * 1.3f), style = traco)
+                drawArc(cor, 180f, 180f, false, topLeft = p(0.3f, 0.36f), size = Size(a * 0.4f, a * 0.9f), style = traco)
+                drawLine(cor, p(0f, 0.86f), p(1f, 0.86f), traco.width, StrokeCap.Round)
+            }
+            Cultivo.GLASSHOUSE -> {
+                drawPath(Path().apply { moveTo(p(0.06f, 0.92f).x, p(0.06f, 0.92f).y); lineTo(p(0.06f, 0.42f).x, p(0.06f, 0.42f).y); lineTo(p(0.5f, 0.06f).x, p(0.5f, 0.06f).y); lineTo(p(0.94f, 0.42f).x, p(0.94f, 0.42f).y); lineTo(p(0.94f, 0.92f).x, p(0.94f, 0.92f).y); close() }, cor, style = traco)
+                drawLine(cor, p(0.5f, 0.06f), p(0.5f, 0.92f), traco.width * 0.7f, StrokeCap.Round)
+                drawLine(cor, p(0.06f, 0.66f), p(0.94f, 0.66f), traco.width * 0.7f, StrokeCap.Round)
+            }
+        }
+    }
 }
 
 /** Legenda dos pontos, para o fundo da grelha, numa caixa cinzenta translucida. */
@@ -70,7 +103,7 @@ fun LegendaDeCultivo(modifier: Modifier = Modifier) {
     ) {
         Cultivo.entries.forEach { cultivo ->
             Row(verticalAlignment = Alignment.CenterVertically) {
-                PontoDeCultivo(cultivo, tamanho = 11.dp)
+                PontoDeCultivo(cultivo, tamanho = 20.dp, comFundo = false)
                 Text(
                     text = cultivo.nome.uppercase(),
                     style = MaterialTheme.typography.labelSmall,

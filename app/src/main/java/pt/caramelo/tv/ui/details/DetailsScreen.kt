@@ -1,5 +1,7 @@
 package pt.caramelo.tv.ui.details
 
+import pt.caramelo.tv.ui.home.PontoDeCultivo
+import pt.caramelo.tv.ui.home.Cultivo
 import pt.caramelo.tv.ui.components.AromasIlustrados
 import pt.caramelo.tv.ui.i18n.termo
 import pt.caramelo.tv.ui.i18n.tr
@@ -141,12 +143,15 @@ fun DetailsScreen(
                 infundidoTxt.takeIf { item.strain.infused },
             )
             if (ficheiro.isNotEmpty()) {
-                Text(
-                    text = ficheiro.joinToString(" · "),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = Espaco.minimo),
-                )
+                // O desenho do cultivo antes da linha, o mesmo do canto do mosaico (29/9/2026).
+                Row(Modifier.padding(top = Espaco.minimo), verticalAlignment = Alignment.CenterVertically) {
+                    Cultivo.de(item)?.let { PontoDeCultivo(it, Modifier.padding(end = Espaco.curto), tamanho = 22.dp, comFundo = false) }
+                    Text(
+                        text = ficheiro.joinToString(" · "),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
 
             // Cada campo entra um pouco depois do anterior, por cima do deslize da
