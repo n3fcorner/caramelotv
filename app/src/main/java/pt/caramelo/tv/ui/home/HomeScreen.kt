@@ -1,6 +1,8 @@
 package pt.caramelo.tv.ui.home
 
 import androidx.compose.animation.AnimatedContent
+import pt.caramelo.tv.ui.theme.Laranja
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.mutableStateOf
@@ -87,6 +89,13 @@ import pt.caramelo.tv.ui.theme.VerdeClaro
  */
 private val ORDEM_SECCOES = listOf(Section.CBD, Section.INFUSAO, Section.HASH)
 
+/** A cor de cada categoria: a barra do cabecalho e o separador fazem par. */
+private fun corDe(s: Section): Color = when (s) {
+    Section.CBD -> VerdeClaro
+    Section.INFUSAO -> Amarelo
+    Section.HASH -> Laranja
+}
+
 @Composable
 fun HomeScreen(
     catalog: Catalog,
@@ -157,10 +166,13 @@ fun HomeScreen(
             onIdioma = onIdioma,
         )
 
-        // Duas barras da marca por baixo do cabecalho, amarelo e verde (pedido do Leo, 29/9/2026).
+        // Tres barras por baixo do cabecalho, uma por categoria na cor dela (pedido do Leo e do Francisco,
+        // 29/9/2026): cada barra faz par com o seu separador. A da categoria aberta engrossa.
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Box(Modifier.fillMaxWidth().height(4.dp).background(Amarelo))
-            Box(Modifier.fillMaxWidth().height(4.dp).background(VerdeClaro))
+            ORDEM_SECCOES.forEach { s ->
+                val grossura by animateDpAsState(if (s == seccao) 7.dp else 3.dp, tween(220), label = "barra")
+                Box(Modifier.fillMaxWidth().height(grossura).background(corDe(s)))
+            }
         }
 
         // Os tres submenus a esquerda e a legenda dos pontos a direita, na mesma linha:
@@ -178,6 +190,7 @@ fun HomeScreen(
                         activo = s == seccao,
                         onFoco = { seccao = s },
                         focusRequester = separadores.getValue(s),
+                        cor = corDe(s),
                     )
                 }
             }
@@ -231,11 +244,11 @@ private fun Grelha(
 
 /** Um separador do submenu: o nome e quantos artigos tem. Muda ao ganhar foco. */
 @Composable
-private fun Separador(titulo: String, total: Int, activo: Boolean, onFoco: () -> Unit, focusRequester: FocusRequester) {
+private fun Separador(titulo: String, total: Int, activo: Boolean, onFoco: () -> Unit, focusRequester: FocusRequester, cor: Color) {
     var focado by remember { mutableStateOf(false) }
     val fundo = when {
-        focado -> Amarelo
-        activo -> RoxoProfundo
+        focado -> cor
+        activo -> cor.copy(alpha = 0.22f)
         else -> Color.Transparent
     }
     Row(
@@ -250,7 +263,7 @@ private fun Separador(titulo: String, total: Int, activo: Boolean, onFoco: () ->
         Text(
             text = titulo.uppercase(),
             style = MaterialTheme.typography.titleSmall,
-            color = if (focado) RoxoProfundo else if (activo) Amarelo else CremeFraco,
+            color = if (focado) RoxoProfundo else if (activo) cor else CremeFraco,
             letterSpacing = 2.sp,
         )
         Text(
