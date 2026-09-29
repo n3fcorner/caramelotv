@@ -52,6 +52,9 @@ import pt.caramelo.tv.ui.player.PlayerScreen
 import pt.caramelo.tv.ui.settings.EditItemScreen
 import pt.caramelo.tv.ui.settings.SettingsScreen
 import pt.caramelo.tv.ui.theme.CarameloTheme
+import pt.caramelo.tv.ui.i18n.Idioma
+import pt.caramelo.tv.ui.i18n.LocalIdioma
+import pt.caramelo.tv.ui.i18n.tr
 
 /**
  * Activity unica. Toda a app vive em Compose; a navegacao e a pilha de ecras
@@ -114,6 +117,8 @@ private fun CarameloRoot(viewModel: MainViewModel) {
     // definicao) esbatia a app INTEIRA numa copia nova: dois leitores a descodificar
     // ao mesmo tempo em cada mudanca de erva, e a arvore velha ficava retida pelo
     // observador das transicoes partilhadas. Era isso que punha a TV de rastos.
+    // A lingua desce por um CompositionLocal: todos os ecras a leem sem a receber por parametro.
+    CompositionLocalProvider(LocalIdioma provides Idioma.de(catalog?.settings?.idioma)) {
     Crossfade(
         targetState = catalog != null,
         animationSpec = tween(400),
@@ -126,6 +131,7 @@ private fun CarameloRoot(viewModel: MainViewModel) {
         } else {
             Navegacao(viewModel = viewModel, catalog = actual)
         }
+    }
     }
 }
 
@@ -199,6 +205,7 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
             onMontra = viewModel::iniciarAtrator,
             onCoa = { viewModel.push(Screen.Coa) },
             onInteracao = viewModel::registarInteracao,
+            onIdioma = { viewModel.updateSettings { it.copy(idioma = if (it.idioma == "en") "pt" else "en") } },
             cascata = !viewModel.menuJaMostrado,
             onMostrado = { viewModel.menuJaMostrado = true },
         )
@@ -283,6 +290,6 @@ private fun LoadingScreen() {
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center,
     ) {
-        Text("A carregar...", style = MaterialTheme.typography.titleMedium)
+        Text(tr("A carregar...", "Loading..."), style = MaterialTheme.typography.titleMedium)
     }
 }

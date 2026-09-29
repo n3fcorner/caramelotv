@@ -1,5 +1,7 @@
 package pt.caramelo.tv.ui.components
 
+import pt.caramelo.tv.ui.i18n.termo
+import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -53,16 +55,17 @@ fun PerfilIndicaSativa(strain: Strain, modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            val indicaTxt = termo("Índica"); val sativaTxt = termo("Sativa")
             Text(
                 buildAnnotatedString {
-                    append("Índica ")
+                    append("$indicaTxt ")
                     withStyle(SpanStyle(color = Creme, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)) { append("$peso") }
                 },
                 style = MaterialTheme.typography.labelMedium,
                 color = CremeFraco,
             )
             Text(
-                text = strain.type.ifBlank { "Perfil" }.uppercase(),
+                text = (if (strain.type.isBlank()) tr("Perfil", "Profile") else termo(strain.type)).uppercase(),
                 style = MaterialTheme.typography.labelSmall,
                 color = Amarelo,
                 letterSpacing = 2.sp,
@@ -70,7 +73,7 @@ fun PerfilIndicaSativa(strain: Strain, modifier: Modifier = Modifier) {
             Text(
                 buildAnnotatedString {
                     withStyle(SpanStyle(color = Creme, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)) { append("${100 - peso}") }
-                    append(" Sativa")
+                    append(" $sativaTxt")
                 },
                 style = MaterialTheme.typography.labelMedium,
                 color = CremeFraco,
@@ -98,14 +101,14 @@ fun TerpenosDominantes(terpenos: List<String>, modifier: Modifier = Modifier) {
     val lista = terpenos.filter { it.isNotBlank() }
     if (lista.isEmpty()) return
     Column(modifier) {
-        Text("TERPENOS DOMINANTES", style = MaterialTheme.typography.labelSmall, color = Amarelo, letterSpacing = 2.sp)
+        Text(tr("TERPENOS DOMINANTES", "DOMINANT TERPENES"), style = MaterialTheme.typography.labelSmall, color = Amarelo, letterSpacing = 2.sp)
         Row(
             modifier = Modifier.padding(top = Espaco.curto),
             horizontalArrangement = Arrangement.spacedBy(Espaco.curto),
         ) {
             lista.forEach { nome ->
                 Text(
-                    text = nome,
+                    text = termo(nome),
                     style = MaterialTheme.typography.labelMedium,
                     color = Creme,
                     modifier = Modifier
@@ -115,7 +118,7 @@ fun TerpenosDominantes(terpenos: List<String>, modifier: Modifier = Modifier) {
             }
         }
         Text(
-            text = "Segundo o produtor ou a genética.",
+            text = tr("Segundo o produtor ou a genética.", "According to the grower or the genetics."),
             style = MaterialTheme.typography.labelSmall,
             color = CremeFraco,
             maxLines = 1,

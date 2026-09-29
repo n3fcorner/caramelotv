@@ -1,5 +1,7 @@
 package pt.caramelo.tv.ui.details
 
+import pt.caramelo.tv.ui.i18n.termo
+import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -110,7 +112,7 @@ fun DetailsScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.width(22.dp).height(3.dp).background(Amarelo))
                 Text(
-                    text = item.section.label.uppercase(),
+                    text = termo(item.section.label).uppercase(),
                     style = MaterialTheme.typography.labelSmall,
                     color = Amarelo,
                     letterSpacing = 3.sp,
@@ -131,10 +133,11 @@ fun DetailsScreen(
                     .heroBounds("titulo-${item.id}"),
             )
 
+            val infundidoTxt = tr("Infundido", "Infused")
             val ficheiro = listOfNotNull(
-                item.strain.format.takeIf { it.isNotBlank() },
-                item.strain.cultivation.takeIf { it.isNotBlank() },
-                "Infundido".takeIf { item.strain.infused },
+                item.strain.format.takeIf { it.isNotBlank() }?.let { termo(it) },
+                item.strain.cultivation.takeIf { it.isNotBlank() }?.let { termo(it) },
+                infundidoTxt.takeIf { item.strain.infused },
             )
             if (ficheiro.isNotEmpty()) {
                 Text(
@@ -148,11 +151,11 @@ fun DetailsScreen(
             // Cada campo entra um pouco depois do anterior, por cima do deslize da
             // coluna inteira: le-se como a ficha a compor-se, nao a cair de uma vez.
             if (item.strain.aroma.isNotBlank()) {
-                Entrada(ordem = 1) { Campo("Aroma", item.strain.aroma) }
+                Entrada(ordem = 1) { Campo(tr("Aroma", "Aroma"), termo(item.strain.aroma)) }
             }
 
             if (item.strain.genetics.isNotBlank()) {
-                Entrada(ordem = 2) { Campo("Genética", item.strain.genetics) }
+                Entrada(ordem = 2) { Campo(tr("Genética", "Genetics"), termo(item.strain.genetics)) }
             }
 
             if (item.strain.terpenes.isNotEmpty()) {
@@ -171,27 +174,27 @@ fun DetailsScreen(
                 val podeVer = item.hasVideo
                 if (podeVer && resumePositionMs > 0) {
                     TvButton(
-                        text = "Retomar em ${formatarTempo(resumePositionMs)}",
+                        text = tr("Retomar em ", "Resume at ") + formatarTempo(resumePositionMs),
                         onClick = { onPlay(true) },
                         primary = true,
                         focusRequester = primeiroBotao,
                     )
-                    TvButton(text = "Do início", onClick = { onPlay(false) })
+                    TvButton(text = tr("Do início", "From the start"), onClick = { onPlay(false) })
                 } else if (podeVer) {
                     TvButton(
-                        text = "Reproduzir",
+                        text = tr("Reproduzir", "Play"),
                         onClick = { onPlay(false) },
                         primary = true,
                         focusRequester = primeiroBotao,
                     )
                 }
                 TvButton(
-                    text = "Editar",
+                    text = tr("Editar", "Edit"),
                     onClick = onEdit,
                     primary = !podeVer,
                     focusRequester = if (podeVer) null else primeiroBotao,
                 )
-                TvButton(text = "Voltar", onClick = onBack)
+                TvButton(text = tr("Voltar", "Back"), onClick = onBack)
             }
         }
     }
@@ -232,8 +235,8 @@ private fun Cartaz(item: MenuItem, posterUrl: String, modifier: Modifier = Modif
             ) {
                 Text(
                     text = when (item.state) {
-                        ItemState.EM_BREVE -> "EM BREVE"
-                        else -> "SLOT LIVRE"
+                        ItemState.EM_BREVE -> tr("EM BREVE", "COMING SOON")
+                        else -> tr("SLOT LIVRE", "EMPTY SLOT")
                     },
                     style = MaterialTheme.typography.titleMedium,
                     color = Amarelo.copy(alpha = 0.5f),

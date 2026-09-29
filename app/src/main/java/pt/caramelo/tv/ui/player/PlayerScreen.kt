@@ -2,6 +2,8 @@
 
 package pt.caramelo.tv.ui.player
 
+import pt.caramelo.tv.ui.i18n.termo
+import pt.caramelo.tv.ui.i18n.tr
 import android.view.LayoutInflater
 import android.view.TextureView
 import androidx.annotation.OptIn
@@ -492,7 +494,7 @@ private fun PainelDeVideo(
         ) {
             Box(Modifier.width(18.dp).height(3.dp).background(Amarelo))
             Text(
-                text = item.section.label.uppercase(),
+                text = termo(item.section.label).uppercase(),
                 style = MaterialTheme.typography.labelSmall,
                 color = Amarelo,
                 letterSpacing = 3.sp,
@@ -560,7 +562,7 @@ private fun FichaDoProduto(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.width(22.dp).height(3.dp).background(Amarelo))
             Text(
-                text = item.section.label.uppercase(),
+                text = termo(item.section.label).uppercase(),
                 style = MaterialTheme.typography.labelSmall,
                 color = Amarelo,
                 letterSpacing = 3.sp,
@@ -580,10 +582,11 @@ private fun FichaDoProduto(
                 .heroBounds("titulo-${item.id}"),
         )
 
+        val infundidoTxt = tr("Infundido", "Infused")
         val resumo = listOfNotNull(
-            item.strain.format.takeIf { it.isNotBlank() },
-            item.strain.cultivation.takeIf { it.isNotBlank() },
-            "Infundido".takeIf { item.strain.infused },
+            item.strain.format.takeIf { it.isNotBlank() }?.let { termo(it) },
+            item.strain.cultivation.takeIf { it.isNotBlank() }?.let { termo(it) },
+            infundidoTxt.takeIf { item.strain.infused },
         )
         if (resumo.isNotEmpty()) {
             Text(
@@ -603,7 +606,7 @@ private fun FichaDoProduto(
             // O cultivo ja vai na linha de resumo e no ponto do mosaico: aqui o
             // espaco e' para o aroma, o perfil e os terpenos, como no telemovel.
             if (item.strain.aroma.isNotBlank()) {
-                Entrada(ordem = 1) { CartaoDeFicha(Icons.Outlined.Air, "Aroma", item.strain.aroma) }
+                Entrada(ordem = 1) { CartaoDeFicha(Icons.Outlined.Air, tr("Aroma", "Aroma"), termo(item.strain.aroma)) }
             }
             Entrada(ordem = 2) { PerfilIndicaSativa(item.strain) }
             Entrada(ordem = 3) { TerpenosDominantes(item.strain.terpenes, Modifier.padding(top = Espaco.minimo)) }
@@ -613,9 +616,9 @@ private fun FichaDoProduto(
 
         Text(
             text = when {
-                atrator -> "Montra automática · carrega numa tecla"
-                aReproduzir -> "● A reproduzir"
-                else -> "❚❚ Em pausa"
+                atrator -> tr("Montra automática · carrega numa tecla", "Automatic showcase · press any key")
+                aReproduzir -> tr("● A reproduzir", "● Playing")
+                else -> tr("❚❚ Em pausa", "❚❚ Paused")
             },
             style = MaterialTheme.typography.labelMedium,
             color = if (aReproduzir && !atrator) Amarelo else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -638,8 +641,9 @@ private fun FichaDoProduto(
  */
 @Composable
 private fun Assinatura(modifier: Modifier = Modifier) {
+    val inicio = tr("Afinal, somos todos ", "After all, we're all ")
     val frase = buildAnnotatedString {
-        withStyle(SpanStyle(color = Creme)) { append("Afinal, somos todos ") }
+        withStyle(SpanStyle(color = Creme)) { append(inicio) }
         withStyle(SpanStyle(color = Laranja)) { append("Caramelos.") }
     }
     Column(modifier) {
@@ -701,7 +705,7 @@ private fun ErroDeLeitura(codigo: String, url: String, modifier: Modifier = Modi
             .padding(Espaco.largo),
     ) {
         Text(
-            text = "Não foi possível reproduzir",
+            text = tr("Não foi possível reproduzir", "Could not play"),
             style = MaterialTheme.typography.titleMedium,
             color = Creme,
         )

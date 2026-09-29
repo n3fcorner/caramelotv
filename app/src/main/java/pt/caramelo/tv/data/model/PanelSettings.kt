@@ -26,4 +26,6 @@ data class PanelSettings(
      * ficar sem videos quando ele nao estava.
      */
     val mediaBaseUrl: String = "",
+    /** Lingua da interface e das fichas: "pt" ou "en" (29/9/2026). */
+    val idioma: String = "pt",
 )

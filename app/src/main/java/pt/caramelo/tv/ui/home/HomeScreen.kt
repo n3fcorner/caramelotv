@@ -1,6 +1,16 @@
 package pt.caramelo.tv.ui.home
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.focusable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import pt.caramelo.tv.ui.i18n.termo
+import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -57,18 +67,25 @@ import pt.caramelo.tv.ui.theme.Overscan
 import pt.caramelo.tv.ui.theme.RoxoProfundo
 
 /**
- * Ecra inicial: as duas linhas comerciais mais o hash.
+ * Ecra inicial: tres submenus, CBD, Infusao e Hash (Francisco, 29/9/2026: "tens que
+ * conseguir encaixar os artigos todos no ecra da TV, mesmo que separes 3 submenus").
  *
- *   +--------------------------+-----------------+
- *   |  INFUSÃO                 |  CBD            |
- *   |  3x3                     |  3x2            |
- *   |                          +-----------------+
- *   |                          |  HASH  3x1      |
- *   +--------------------------+-----------------+
+ *   +--------------------------------------------------+
+ *   |  logo            [CBD] [INFUSAO] [HASH]   botoes  |
+ *   |  +--------------------------------------------+  |
+ *   |  |  todos os artigos do submenu, sem rolar    |  |
+ *   |  +--------------------------------------------+  |
+ *   +--------------------------------------------------+
  *
- * Nada de painel de definicoes sempre a vista: a ficha do produto vive no submenu, e
- * as definicoes chegam-se pela roda dentada do cabecalho ou pela tecla MENU.
+ * Com as tres seccoes lado a lado cabiam 24 mosaicos pequenos e nada mais; o catalogo
+ * cresce. Um submenu de cada vez da o ecra inteiro a uma linha, e a grelha escolhe o
+ * numero de colunas que da o maior mosaico onde cabem todos (TileGrid, colunas 0).
+ * O separador muda ao ganhar foco, como nas apps de TV: esquerda e direita trocam de
+ * linha, baixo entra nos produtos. A troca e' um esbatimento curto, sem escala: numa
+ * TCL cada camada a mais conta.
  */
+private val ORDEM_SECCOES = listOf(Section.CBD, Section.INFUSAO, Section.HASH)
+
 @Composable
 fun HomeScreen(
     catalog: Catalog,
@@ -81,24 +98,29 @@ fun HomeScreen(
     onMontra: () -> Unit,
     onCoa: () -> Unit,
     onInteracao: () -> Unit,
+    onIdioma: () -> Unit = {},
     /** Verdadeiro na primeira vez que o menu aparece: os mosaicos entram em cascata. */
     cascata: Boolean = false,
     onMostrado: () -> Unit = {},
 ) {
-    val infusao = catalog.section(Section.INFUSAO)
-    val cbd = catalog.section(Section.CBD)
-    val hash = catalog.section(Section.HASH)
+    // O submenu volta a ser o do ultimo produto visto: ao sair dos detalhes nao se
+    // cai noutra linha.
+    val inicial = catalog.items.firstOrNull { it.id == focusedId }?.section ?: ORDEM_SECCOES.first()
+    var seccao by rememberSaveable { mutableStateOf(inicial) }
+    val itens = remember(catalog.items, seccao) { catalog.section(seccao) }
 
     // Um FocusRequester por mosaico: e o que devolve o foco ao sitio certo ao voltar
     // dos detalhes ou do leitor.
     val requesters = remember(catalog.items.size) {
         catalog.items.associate { it.id to FocusRequester() }
     }
+    val separadores = remember { ORDEM_SECCOES.associateWith { FocusRequester() } }
 
     LaunchedEffect(Unit) {
         // Esperar pelo primeiro frame: o FocusRequester so responde depois do no colocado.
         withFrameNanos { }
-        val alvo = focusedId?.let { requesters[it] } ?: requesters[infusao.firstOrNull()?.id]
+        val alvo = focusedId?.takeIf { id -> itens.any { it.id == id } }?.let { requesters[it] }
+            ?: requesters[itens.firstOrNull()?.id] ?: separadores[seccao]
         runCatching { alvo?.requestFocus() }
     }
 
@@ -131,37 +153,42 @@ fun HomeScreen(
             onSettings = onSettings,
             onMontra = onMontra,
             onCoa = onCoa,
+            onIdioma = onIdioma,
         )
 
+        // Os tres submenus a esquerda e a legenda dos pontos a direita, na mesma linha:
+        // a grelha fica com a altura toda que sobra.
         Row(
-            modifier = Modifier.fillMaxWidth().weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(Espaco.largo),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Tres seccoes lado a lado, todas a vista. A infusao (12) em 4x3, o
-            // CBD e o hash (6) em 2x3: as tres com tres linhas, o mesmo mosaico e as
-            // filas alinhadas. Os pesos saem da largura que cada uma precisa.
-            Seccao(
-                titulo = Section.INFUSAO.label,
-                modifier = Modifier.weight(0.505f).fillMaxHeight(),
-            ) {
-                Grelha(infusao, catalog, requesters, onFocusItem, onOpenItem, onEditItem, colunas = 4, cascata = cascata)
+            Row(Modifier.focusGroup(), horizontalArrangement = Arrangement.spacedBy(Espaco.curto)) {
+                ORDEM_SECCOES.forEach { s ->
+                    Separador(
+                        titulo = termo(s.label),
+                        total = catalog.section(s).size,
+                        activo = s == seccao,
+                        onFoco = { seccao = s },
+                        focusRequester = separadores.getValue(s),
+                    )
+                }
             }
-            Seccao(
-                titulo = Section.CBD.label,
-                modifier = Modifier.weight(0.2475f).fillMaxHeight(),
-            ) {
-                Grelha(cbd, catalog, requesters, onFocusItem, onOpenItem, onEditItem, colunas = 2, cascata = cascata)
-            }
-            Seccao(
-                titulo = Section.HASH.label,
-                modifier = Modifier.weight(0.2475f).fillMaxHeight(),
-            ) {
-                Grelha(hash, catalog, requesters, onFocusItem, onOpenItem, onEditItem, colunas = 2, cascata = cascata)
-            }
+            LegendaDeCultivo()
         }
 
-        // Os pontos de cultivo dos mosaicos, explicados no fundo da grelha.
-        LegendaDeCultivo()
+        // So a grelha troca; o cabecalho fica parado. contentKey pela seccao: gravar a
+        // posicao de um video nao volta a animar a grelha.
+        AnimatedContent(
+            targetState = seccao,
+            transitionSpec = { fadeIn(tween(180)).togetherWith(fadeOut(tween(120))) },
+            label = "submenu",
+            modifier = Modifier.fillMaxWidth().weight(1f),
+        ) { s ->
+            val daSeccao = if (s == seccao) itens else catalog.section(s)
+            Grelha(daSeccao, catalog, requesters, onFocusItem, onOpenItem, onEditItem, cascata = cascata)
+        }
+
     }
     }
 }
@@ -174,14 +201,14 @@ private fun Grelha(
     onFocusItem: (MenuItem) -> Unit,
     onOpenItem: (MenuItem) -> Unit,
     onEditItem: (MenuItem) -> Unit,
-    colunas: Int,
     cascata: Boolean = false,
 ) {
-    TileGrid(items = itens, columns = colunas, modifier = Modifier.fillMaxSize()) { item, mod ->
+    // colunas = 0: a grelha escolhe quantas, para os artigos todos caberem no ecra.
+    TileGrid(items = itens, columns = 0, modifier = Modifier.fillMaxSize()) { item, mod ->
         // Na primeira vez que o menu aparece os mosaicos entram em cascata, por
         // ordem. Nas vezes seguintes — ao voltar de um produto — ja estao la: a
         // foto que vem a voar precisa de encontrar o mosaico parado no sitio.
-        Entrada(ordem = itens.indexOf(item) % colunas + itens.indexOf(item) / colunas, modifier = mod, activa = cascata) {
+        Entrada(ordem = itens.indexOf(item).let { it % 4 + it / 4 }, modifier = mod, activa = cascata) {
         ProductTile(
             item = item,
             posterUrl = catalog.imageUrlOf(item),
@@ -192,6 +219,38 @@ private fun Grelha(
             modifier = Modifier.fillMaxSize(),
         )
         }
+    }
+}
+
+/** Um separador do submenu: o nome e quantos artigos tem. Muda ao ganhar foco. */
+@Composable
+private fun Separador(titulo: String, total: Int, activo: Boolean, onFoco: () -> Unit, focusRequester: FocusRequester) {
+    var focado by remember { mutableStateOf(false) }
+    val fundo = when {
+        focado -> Amarelo
+        activo -> RoxoProfundo
+        else -> Color.Transparent
+    }
+    Row(
+        modifier = Modifier
+            .focusRequester(focusRequester)
+            .onFocusChanged { f -> focado = f.isFocused; if (f.isFocused) onFoco() }
+            .focusable()
+            .background(fundo)
+            .padding(horizontal = Espaco.largo, vertical = Espaco.curto),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = titulo.uppercase(),
+            style = MaterialTheme.typography.titleSmall,
+            color = if (focado) RoxoProfundo else if (activo) Amarelo else CremeFraco,
+            letterSpacing = 2.sp,
+        )
+        Text(
+            text = " $total",
+            style = MaterialTheme.typography.labelSmall,
+            color = if (focado) RoxoProfundo else CremeFraco,
+        )
     }
 }
 
@@ -232,6 +291,7 @@ private fun Cabecalho(
     onSettings: () -> Unit,
     onMontra: () -> Unit,
     onCoa: () -> Unit,
+    onIdioma: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -271,19 +331,21 @@ private fun Cabecalho(
         Row(horizontalArrangement = Arrangement.spacedBy(Espaco.curto)) {
             // Arranca a passagem automatica ja, em vez de esperar pelo tempo de
             // inactividade. E o botao que se carrega ao abrir a loja.
-            TvButton(text = "Montra", onClick = onMontra, primary = true)
+            TvButton(text = tr("Montra", "Showcase"), onClick = onMontra, primary = true)
             if (temContinuar) {
-                TvButton(text = "Continuar", onClick = onContinue, discreto = true)
+                TvButton(text = tr("Continuar", "Continue"), onClick = onContinue, discreto = true)
             }
             // Cada botao e' a mesma caixa que o titulo do ecra que abre: carregar em
             // Definicoes faz o botao crescer ate ser o cabecalho das Definicoes, e
             // voltar faz o cabecalho encolher outra vez ate ao botao.
             Box(Modifier.heroBounds("ecra-analises")) {
-                TvButton(text = "Análises", onClick = onCoa, discreto = true)
+                TvButton(text = tr("Análises", "Lab reports"), onClick = onCoa, discreto = true)
             }
             Box(Modifier.heroBounds("ecra-definicoes")) {
-                TvButton(text = "Definições", onClick = onSettings, discreto = true)
+                TvButton(text = tr("Definições", "Settings"), onClick = onSettings, discreto = true)
             }
+            // A outra lingua, escrita na propria lingua: quem nao le portugues reconhece "EN".
+            TvButton(text = tr("EN", "PT"), onClick = onIdioma, discreto = true)
         }
     }
 }

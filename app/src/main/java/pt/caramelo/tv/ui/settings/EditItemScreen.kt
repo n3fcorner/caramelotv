@@ -1,5 +1,7 @@
 package pt.caramelo.tv.ui.settings
 
+import pt.caramelo.tv.ui.i18n.termo
+import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,14 +58,14 @@ fun EditItemScreen(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        SectionHeader(item.section.label)
-        Text("Editar slot", style = MaterialTheme.typography.headlineMedium)
+        SectionHeader(termo(item.section.label))
+        Text(tr("Editar produto", "Edit product"), style = MaterialTheme.typography.headlineMedium)
 
         M3Theme(colorScheme = editorColors()) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Field("Título", title) { title = it }
-                Field("URL do vídeo (mp4 ou m3u8)", videoUrl) { videoUrl = it }
-                Field("URL da imagem", imageUrl) { imageUrl = it }
+                Field(tr("Título", "Title"), title) { title = it }
+                Field(tr("URL do vídeo (mp4 ou m3u8)", "Video URL (mp4 or m3u8)"), videoUrl) { videoUrl = it }
+                Field(tr("URL da imagem", "Image URL"), imageUrl) { imageUrl = it }
             }
         }
 
@@ -72,7 +74,7 @@ fun EditItemScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             TvButton(
-                text = "Guardar",
+                text = tr("Guardar", "Save"),
                 primary = true,
                 onClick = {
                     onSave(
@@ -84,7 +86,7 @@ fun EditItemScreen(
                     )
                 },
             )
-            TvButton(text = "Cancelar", onClick = onCancel)
+            TvButton(text = tr("Cancelar", "Cancel"), onClick = onCancel)
         }
     }
 }

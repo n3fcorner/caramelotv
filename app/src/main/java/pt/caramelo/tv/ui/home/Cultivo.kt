@@ -1,5 +1,6 @@
 package pt.caramelo.tv.ui.home
 
+import pt.caramelo.tv.ui.i18n.termo
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -80,7 +81,7 @@ fun LegendaDeCultivo(modifier: Modifier = Modifier) {
             }
         }
         // A barra do fundo dos mosaicos: amarelo indica, verde sativa.
-        listOf("Índica" to Amarelo, "Sativa" to VerdeClaro).forEach { (nome, cor) ->
+        listOf(termo("Índica") to Amarelo, termo("Sativa") to VerdeClaro).forEach { (nome, cor) ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AmostraDeCor(cor, Modifier.width(18.dp))
                 Text(

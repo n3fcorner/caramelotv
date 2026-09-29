@@ -1,5 +1,6 @@
 package pt.caramelo.tv.ui.coa
 
+import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -183,7 +184,7 @@ fun CoaScreen(
         // O rotulo do ecra, no canto: e' a mesma caixa que o botao "Analises" do
         // menu, que cresce ate aqui.
         Text(
-            text = "ANÁLISES",
+            text = tr("ANÁLISES", "LAB REPORTS"),
             style = MaterialTheme.typography.labelMedium,
             color = Amarelo,
             letterSpacing = 3.sp,
