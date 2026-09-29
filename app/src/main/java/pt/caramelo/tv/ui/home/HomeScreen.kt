@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class) // focusProperties { enter }: o separador aberto recebe o foco ao subir da grelha
+
 package pt.caramelo.tv.ui.home
 
 import androidx.compose.ui.focus.focusProperties
