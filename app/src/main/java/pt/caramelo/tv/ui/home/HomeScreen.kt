@@ -1,5 +1,7 @@
 package pt.caramelo.tv.ui.home
 
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.animation.AnimatedContent
 import pt.caramelo.tv.ui.theme.Laranja
 import androidx.compose.animation.animateColorAsState
@@ -123,7 +125,9 @@ fun HomeScreen(
 
     // Um FocusRequester por mosaico: e o que devolve o foco ao sitio certo ao voltar
     // dos detalhes ou do leitor.
-    val requesters = remember(catalog.items.size) {
+    // Pela lista de ids e nao pelo tamanho: uma sincronizacao que troca um artigo por outro
+    // mantem o tamanho e deixava o novo sem FocusRequester (o foco saltava para o primeiro).
+    val requesters = remember(catalog.items.map { it.id }) {
         catalog.items.associate { it.id to FocusRequester() }
     }
     val separadores = remember { ORDEM_SECCOES.associateWith { FocusRequester() } }
@@ -174,9 +178,10 @@ fun HomeScreen(
         val (corCima, corBaixo) = parDe(seccao)
         val cima by animateColorAsState(corCima, tween(260), label = "barra-cima")
         val baixo by animateColorAsState(corBaixo, tween(260), label = "barra-baixo")
+        // As cores leem-se so no desenho (drawBehind): a animacao nao recompoe o ecra inteiro a cada fotograma.
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Box(Modifier.fillMaxWidth().height(6.dp).background(cima))
-            Box(Modifier.fillMaxWidth().height(6.dp).background(baixo))
+            Box(Modifier.fillMaxWidth().height(6.dp).drawBehind { drawRect(cima) })
+            Box(Modifier.fillMaxWidth().height(6.dp).drawBehind { drawRect(baixo) })
         }
 
         // Os tres submenus a esquerda e a legenda dos pontos a direita, na mesma linha:
@@ -186,7 +191,9 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(Modifier.focusGroup(), horizontalArrangement = Arrangement.spacedBy(Espaco.curto)) {
+            // Ao subir da grelha o foco entra no separador aberto, e nao no que calhar mais perto
+            // (que mudava de secao sem querer).
+            Row(Modifier.focusProperties { enter = { separadores.getValue(seccao) } }.focusGroup(), horizontalArrangement = Arrangement.spacedBy(Espaco.curto)) {
                 ORDEM_SECCOES.forEach { s ->
                     Separador(
                         titulo = termo(s.label),

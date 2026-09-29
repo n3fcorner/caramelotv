@@ -107,19 +107,22 @@ object Sincronizacao {
         Section.HASH -> "hash"
     }
 
+    private val SLUG_CARTAZ = Regex("""posters/([a-z0-9-]+)\.""")
+    private val NAO_ALFANUM = Regex("[^a-z0-9]")
+
     /** O slug que o [DefaultCatalog] guarda no caminho do cartaz ("posters/<slug>.jpg"). */
-    private fun slugDe(item: MenuItem): String? =
-        Regex("""posters/([a-z0-9-]+)\.""").find(item.imageUrl)?.groupValues?.get(1)
+    private fun slugDe(item: MenuItem): String? = SLUG_CARTAZ.find(item.imageUrl)?.groupValues?.get(1)
 
-    private fun normal(s: String) = s.lowercase().replace(Regex("[^a-z0-9]"), "")
+    private fun normal(s: String) = s.lowercase().replace(NAO_ALFANUM, "")
 
-    /** "Estufa (greenhouse)" passa a "Greenhouse": o ponto de cultivo so conhece os tres nomes. */
+    /** "Estufa (greenhouse)" passa a "Greenhouse": o desenho do cultivo conhece estes quatro nomes. */
     private fun cultivoDe(s: String): String {
         val t = s.lowercase()
         return when {
             "glass" in t -> "Glasshouse"
             "indoor" in t || "interior" in t -> "Indoor"
             "greenhouse" in t || "estufa" in t -> "Greenhouse"
+            "outdoor" in t || "exterior" in t -> "Outdoor"
             else -> ""
         }
     }
@@ -129,18 +132,28 @@ object Sincronizacao {
     /** "mirceno" passa a "Mirceno": o dicionario de traducoes da TV conhece os nomes com maiuscula. */
     private fun nomeTerpeno(s: String) = s.trim().replaceFirstChar { it.uppercase() }
 
-    /** As percentagens so contam quando todos os terpenos as tem; senao fica so a ordem de dominancia. */
-    private fun pcts(l: List<TerpenoCrm>): List<Int> =
-        if (l.isNotEmpty() && l.all { it.pct != null }) l.map { Math.round(it.pct!!).toInt() } else emptyList()
+    /**
+     * As percentagens so contam quando todos os terpenos as tem; senao fica so a ordem de dominancia.
+     * Mostram-se como parte do perfil (a soma e' 100), que e' o que o grafico diz ("% dos terpenos"):
+     * assim tanto faz o painel ter recebido 35/20 ou os 0,8/0,4 da massa do boletim, e um 0,4 nao
+     * arredonda para 0 e desfaz o grafico.
+     */
+    private fun pcts(l: List<TerpenoCrm>): List<Int> {
+        if (l.isEmpty() || l.any { it.pct == null || it.pct <= 0.0 }) return emptyList()
+        val soma = l.sumOf { it.pct!! }
+        return l.map { maxOf(1, Math.round(it.pct!! / soma * 100).toInt()) }
+    }
 
     /** A ficha de fabrica com o que o painel preencheu por cima. */
     private fun comPainel(s: Strain, p: PainelCrm?): Strain {
         if (p == null) return s
         return s.copy(
             type = p.tipo.ifBlank { s.type },
-            cultivation = cultivoDe(p.cultivo).ifBlank { s.cultivation },
+            cultivation = if (p.cultivo.isNotBlank()) cultivoDe(p.cultivo) else s.cultivation,
             genetics = p.genetica.ifBlank { s.genetics },
-            indica = p.indica?.takeIf { it in 0..100 } ?: s.indica,
+            // Um tipo novo no painel sem indica escrita deixa de valer o numero de fabrica (que era do
+            // tipo antigo): passa a estimado pelo tipo, e o ecra diz que e' estimado.
+            indica = p.indica?.takeIf { it in 0..100 } ?: if (p.tipo.isNotBlank()) -1 else s.indica,
             aroma = if (p.aromas.isNotEmpty()) aromaDe(p.aromas) else s.aroma,
             terpenes = if (p.terpenos.isNotEmpty()) p.terpenos.map { nomeTerpeno(it.nome) } else s.terpenes,
             terpenesPct = if (p.terpenos.isNotEmpty()) pcts(p.terpenos) else s.terpenesPct,
@@ -168,7 +181,9 @@ object Sincronizacao {
                 videoUrl = base?.videoUrl?.takeIf { it.isNotBlank() } ?: c.video.orEmpty(),
                 imageUrl = base?.imageUrl?.takeIf { it.isNotBlank() } ?: c.imagem.orEmpty(),
                 orientation = base?.orientation ?: MediaOrientation.SQUARE,
-                strain = base?.strain?.let { comPainel(it, c.painel) } ?: Strain(
+                // A linha (CBD ou infundida) vem sempre do CRM, nunca da ficha de fabrica: e' o que manda
+                // na zona de venda, e uma etiqueta errada e' o erro mais caro (CLAUDE.md §1).
+                strain = base?.strain?.let { comPainel(it, c.painel).copy(infused = seccao == Section.INFUSAO || c.infundido, line = if (seccao == Section.INFUSAO || c.infundido) "Infusão" else "CBD") } ?: Strain(
                     line = if (seccao == Section.INFUSAO || c.infundido) "Infusão" else "CBD",
                     format = if (seccao == Section.HASH) "Hash" else "Flor",
                     cultivation = cultivoDe(c.cultivo),

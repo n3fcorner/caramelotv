@@ -78,6 +78,7 @@ object Termos {
 
     /** As partes que se repetem nas fichas curtas do CRM ("Híbrida, índica-dominante"). */
     private val PARTES = listOf(
+        "com infusão aromática" to "with aromatic infusion", "Outdoor" to "Outdoor",
         "(atribuída)" to "(attributed)", "índica-dominante" to "indica-dominant", "sativa-dominante" to "sativa-dominant",
         "Sativa-dominante" to "Sativa-dominant", "Índica-dominante" to "Indica-dominant", "Híbrida" to "Hybrid", "Índica" to "Indica",
     )

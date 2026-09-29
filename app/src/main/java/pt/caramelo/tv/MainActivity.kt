@@ -248,7 +248,9 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
         Screen.Settings -> SettingsScreen(
             catalog = catalog,
             onEditItem = { viewModel.push(Screen.EditItem(it.id)) },
-            onSettingsChange = { updated -> viewModel.updateSettings { updated } },
+            // A base dos ficheiros que o ecra mostra e' a resolvida (a pasta da propria TV quando esta
+            // vazia); guarda-se a que estava gravada, para "vazio" continuar a querer dizer "da TV".
+            onSettingsChange = { updated -> viewModel.updateSettings { atual -> updated.copy(mediaBaseUrl = if (updated.mediaBaseUrl == viewModel.catalog.value?.settings?.mediaBaseUrl) atual.mediaBaseUrl else updated.mediaBaseUrl) } },
             onClearProgress = viewModel::clearProgress,
             onResetCatalog = viewModel::resetCatalog,
             onBack = { viewModel.pop() },

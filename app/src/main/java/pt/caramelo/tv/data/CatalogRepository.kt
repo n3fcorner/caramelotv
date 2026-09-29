@@ -1,5 +1,7 @@
 package pt.caramelo.tv.data
 
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.Dispatchers
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -65,12 +67,19 @@ class CatalogRepository(private val context: Context) {
         val crm = Sincronizacao.ler(raw) ?: return this
         if (settings.crmUrl.isBlank()) return this
         val itens = Sincronizacao.juntar(crm, fabrica)
-        return if (itens.isEmpty()) this else copy(items = itens)
+        if (itens.isEmpty()) return this
+        // O que se editou na propria TV (titulo, video, imagem em Definicoes > Editar) continua por
+        // cima do CRM: sem isto o Guardar nao fazia nada assim que havia catalogo do CRM (auditoria 29/9).
+        val porId = fabrica.associateBy { it.id }
+        val editados = items.filter { s -> porId[s.id]?.let { f -> f.title != s.title || f.videoUrl != s.videoUrl || f.imageUrl != s.imageUrl } ?: true }.associateBy { it.id }
+        return copy(items = itens.map { i -> editados[i.id]?.let { e -> i.copy(title = e.title, videoUrl = e.videoUrl, imageUrl = e.imageUrl) } ?: i })
     }
 
     private val fabrica by lazy { DefaultCatalog.build().items }
 
-    val catalog: Flow<Catalog> = context.dataStore.data.map { prefs -> guardado(prefs[KEY]).comCrm(prefs[KEY_CRM]).comBase() }
+    // Fora da linha principal: juntar o CRM com a fabrica descodifica JSON e percorre o catalogo, e
+    // corre a cada escrita (a posicao do video ao sair do leitor, cada sincronizacao que mudou algo).
+    val catalog: Flow<Catalog> = context.dataStore.data.map { prefs -> guardado(prefs[KEY]).comCrm(prefs[KEY_CRM]).comBase() }.flowOn(Dispatchers.Default)
 
     /** Grava o catalogo do CRM so se mudou; devolve se mudou. */
     suspend fun gravarCrm(canonico: String): Boolean {

@@ -47,7 +47,7 @@ import pt.caramelo.tv.ui.theme.VerdeClaro
  * quatro familias; sem nenhuma reconhecida, fica o texto.
  */
 enum class Aroma(val pt: String, val en: String, val cor: Color, private val chaves: List<String>) {
-    CITRINO("Cítrico", "Citrus", Amarelo, listOf("lim", "cítric", "citric", "citrin", "casca", "tanger")),
+    CITRINO("Cítrico", "Citrus", Amarelo, listOf("limão", "lima", "limon", "cítric", "citric", "citrin", "casca", "tanger")),
     FRUTOS_VERMELHOS("Frutos vermelhos", "Red berries", Color(0xFFE13831), listOf("frutos vermelhos", "silvestre", "mirtilo", "baga", "berry", "morango", "cereja")),
     UVA("Uva", "Grape", Lilas, listOf("uva", "frutos escuros")),
     MANGA("Manga", "Mango", Laranja, listOf("manga")),
@@ -80,7 +80,20 @@ enum class Aroma(val pt: String, val en: String, val cor: Color, private val cha
         }
     }
 
-    private fun chavesPos(t: String): Int? = chaves.mapNotNull { k -> t.indexOf(k).takeIf { it >= 0 } }.minOrNull()
+    /**
+     * Onde aparece a primeira chave, so no inicio de uma palavra (e, nas chaves curtas, a palavra
+     * inteira): "lim" nao apanha "resina limpa" nem "mel" apanha "melão" (auditoria de 29/9/2026).
+     */
+    private fun chavesPos(t: String): Int? = chaves.mapNotNull { k ->
+        var i = t.indexOf(k)
+        while (i >= 0) {
+            val inicio = i == 0 || !t[i - 1].isLetter()
+            val fim = k.length > 3 || i + k.length >= t.length || !t[i + k.length].isLetter()
+            if (inicio && fim) return@mapNotNull i
+            i = t.indexOf(k, i + 1)
+        }
+        null
+    }.minOrNull()
 }
 
 /** A fila de desenhos com o nome por baixo. Sem nenhuma familia reconhecida, o texto tal como esta. */

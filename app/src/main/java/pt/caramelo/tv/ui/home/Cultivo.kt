@@ -29,11 +29,12 @@ import pt.caramelo.tv.ui.theme.Amarelo
 import pt.caramelo.tv.ui.theme.Creme
 import pt.caramelo.tv.ui.theme.CremeFraco
 import pt.caramelo.tv.ui.theme.Espaco
+import pt.caramelo.tv.ui.theme.Laranja
 import pt.caramelo.tv.ui.theme.RoxoProfundo
 import pt.caramelo.tv.ui.theme.VerdeClaro
 
 /**
- * Os tres cultivos que a Caramelo trabalha, cada um com o seu desenho e a sua cor
+ * Os cultivos (os tres que a Caramelo trabalha e o outdoor que o painel aceita), cada um com o seu desenho e a sua cor
  * no canto do mosaico. As cores sao as da marca: amarelo (luz artificial) para indoor, verde
  * (a estufa) para greenhouse e creme (o vidro) para glasshouse. Um cultivo fora
  * desta lista, ou vazio, nao leva ponto: melhor sem marca do que com marca errada.
@@ -41,7 +42,8 @@ import pt.caramelo.tv.ui.theme.VerdeClaro
 enum class Cultivo(val nome: String, val cor: Color) {
     INDOOR("Indoor", Amarelo),
     GREENHOUSE("Greenhouse", VerdeClaro),
-    GLASSHOUSE("Glasshouse", Creme);
+    GLASSHOUSE("Glasshouse", Creme),
+    OUTDOOR("Outdoor", Laranja);
 
     companion object {
         fun de(item: MenuItem): Cultivo? {
@@ -81,6 +83,15 @@ fun PontoDeCultivo(cultivo: Cultivo, modifier: Modifier = Modifier, tamanho: Dp 
                 drawArc(cor, 180f, 180f, false, topLeft = p(0.02f, 0.2f), size = Size(a * 0.96f, a * 1.3f), style = traco)
                 drawArc(cor, 180f, 180f, false, topLeft = p(0.3f, 0.36f), size = Size(a * 0.4f, a * 0.9f), style = traco)
                 drawLine(cor, p(0f, 0.86f), p(1f, 0.86f), traco.width, StrokeCap.Round)
+            }
+            Cultivo.OUTDOOR -> {
+                // O sol: o disco e os oito raios
+                drawCircle(cor, radius = a * 0.2f, center = p(0.5f, 0.5f), style = traco)
+                for (k in 0 until 8) {
+                    val ang = Math.toRadians(k * 45.0)
+                    val cx = kotlin.math.cos(ang).toFloat(); val cy = kotlin.math.sin(ang).toFloat()
+                    drawLine(cor, p(0.5f + cx * 0.33f, 0.5f + cy * 0.33f), p(0.5f + cx * 0.47f, 0.5f + cy * 0.47f), traco.width, StrokeCap.Round)
+                }
             }
             Cultivo.GLASSHOUSE -> {
                 drawPath(Path().apply { moveTo(p(0.06f, 0.92f).x, p(0.06f, 0.92f).y); lineTo(p(0.06f, 0.42f).x, p(0.06f, 0.42f).y); lineTo(p(0.5f, 0.06f).x, p(0.5f, 0.06f).y); lineTo(p(0.94f, 0.42f).x, p(0.94f, 0.42f).y); lineTo(p(0.94f, 0.92f).x, p(0.94f, 0.92f).y); close() }, cor, style = traco)
