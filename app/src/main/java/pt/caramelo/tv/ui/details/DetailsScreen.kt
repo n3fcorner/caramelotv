@@ -1,5 +1,6 @@
 package pt.caramelo.tv.ui.details
 
+import pt.caramelo.tv.ui.components.AromasIlustrados
 import pt.caramelo.tv.ui.i18n.termo
 import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.animation.core.animateFloatAsState
@@ -151,7 +152,7 @@ fun DetailsScreen(
             // Cada campo entra um pouco depois do anterior, por cima do deslize da
             // coluna inteira: le-se como a ficha a compor-se, nao a cair de uma vez.
             if (item.strain.aroma.isNotBlank()) {
-                Entrada(ordem = 1) { Campo(tr("Aroma", "Aroma"), termo(item.strain.aroma)) }
+                Entrada(ordem = 1) { AromasIlustrados(item.strain.aroma, termo(item.strain.aroma), Modifier.padding(top = Espaco.medio)) }
             }
 
             if (item.strain.genetics.isNotBlank()) {
@@ -159,7 +160,7 @@ fun DetailsScreen(
             }
 
             if (item.strain.terpenes.isNotEmpty()) {
-                Entrada(ordem = 3) { TerpenosDominantes(item.strain.terpenes, Modifier.padding(top = Espaco.medio)) }
+                Entrada(ordem = 3) { TerpenosDominantes(item.strain.terpenes, item.strain.terpenesPct, Modifier.padding(top = Espaco.medio)) }
             }
 
             if (item.strain.temPerfil) {

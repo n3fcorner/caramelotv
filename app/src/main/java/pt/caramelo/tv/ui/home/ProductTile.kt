@@ -172,7 +172,7 @@ fun ProductTile(
             // Indica e sativa numa barra fina no fundo, como nos cartoes do telemovel.
             if (item.strain.temPerfil) {
                 BarraIndicaSativa(
-                    peso = item.strain.indica,
+                    peso = item.strain.indicaEfectiva,
                     altura = 4.dp,
                     modifier = Modifier.align(Alignment.BottomStart),
                 )

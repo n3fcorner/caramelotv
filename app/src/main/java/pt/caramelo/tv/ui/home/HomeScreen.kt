@@ -65,6 +65,7 @@ import pt.caramelo.tv.ui.theme.Espaco
 import pt.caramelo.tv.ui.theme.Movimento
 import pt.caramelo.tv.ui.theme.Overscan
 import pt.caramelo.tv.ui.theme.RoxoProfundo
+import pt.caramelo.tv.ui.theme.VerdeClaro
 
 /**
  * Ecra inicial: tres submenus, CBD, Infusao e Hash (Francisco, 29/9/2026: "tens que
@@ -155,6 +156,12 @@ fun HomeScreen(
             onCoa = onCoa,
             onIdioma = onIdioma,
         )
+
+        // Duas barras da marca por baixo do cabecalho, amarelo e verde (pedido do Leo, 29/9/2026).
+        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Box(Modifier.fillMaxWidth().height(4.dp).background(Amarelo))
+            Box(Modifier.fillMaxWidth().height(4.dp).background(VerdeClaro))
+        }
 
         // Os tres submenus a esquerda e a legenda dos pontos a direita, na mesma linha:
         // a grelha fica com a altura toda que sobra.

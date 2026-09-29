@@ -2,6 +2,7 @@
 
 package pt.caramelo.tv.ui.player
 
+import pt.caramelo.tv.ui.components.AromasIlustrados
 import pt.caramelo.tv.ui.i18n.termo
 import pt.caramelo.tv.ui.i18n.tr
 import android.view.LayoutInflater
@@ -606,10 +607,18 @@ private fun FichaDoProduto(
             // O cultivo ja vai na linha de resumo e no ponto do mosaico: aqui o
             // espaco e' para o aroma, o perfil e os terpenos, como no telemovel.
             if (item.strain.aroma.isNotBlank()) {
-                Entrada(ordem = 1) { CartaoDeFicha(Icons.Outlined.Air, tr("Aroma", "Aroma"), termo(item.strain.aroma)) }
+                Entrada(ordem = 1) {
+                    // Os aromas em desenhos de traco (pedido do Leo, 29/9/2026), no mesmo cartao que a ficha.
+                    AromasIlustrados(
+                        item.strain.aroma,
+                        termo(item.strain.aroma),
+                        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(Espaco.medio),
+                        tamanho = 38.dp,
+                    )
+                }
             }
             Entrada(ordem = 2) { PerfilIndicaSativa(item.strain) }
-            Entrada(ordem = 3) { TerpenosDominantes(item.strain.terpenes, Modifier.padding(top = Espaco.minimo)) }
+            Entrada(ordem = 3) { TerpenosDominantes(item.strain.terpenes, item.strain.terpenesPct, Modifier.padding(top = Espaco.minimo)) }
         }
 
     }
