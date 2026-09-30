@@ -30,7 +30,6 @@ import pt.caramelo.tv.ui.theme.Creme
 import pt.caramelo.tv.ui.theme.CremeFraco
 import pt.caramelo.tv.ui.theme.Espaco
 import pt.caramelo.tv.ui.theme.Laranja
-import pt.caramelo.tv.ui.theme.RoxoProfundo
 import pt.caramelo.tv.ui.theme.VerdeClaro
 
 /**
@@ -55,20 +54,19 @@ enum class Cultivo(val nome: String, val cor: Color) {
 
 /**
  * O desenho do cultivo (29/9/2026, Francisco: "desenhinhos pequenos também no tipo de
- * cultivo"), no mesmo traco dos aromas: linhas simples na cor do cultivo, sobre um
- * disco roxo escuro para se ler por cima de uma flor clara. Indoor e' a lampada
+ * cultivo"), no mesmo traco dos aromas: linhas simples na cor do cultivo, so o tracado,
+ * sem disco nem fundo (Francisco, 30/9/2026: "todos os desenhos sao so o tracado"). Indoor e' a lampada
  * pendurada com a luz, greenhouse o tunel de estufa, glasshouse a casa de vidro com
  * as vidracas. Canvas, sem imagens: nitido em qualquer TV e sem memoria a mais.
  */
 @Composable
-fun PontoDeCultivo(cultivo: Cultivo, modifier: Modifier = Modifier, tamanho: Dp = 24.dp, comFundo: Boolean = true) {
+fun PontoDeCultivo(cultivo: Cultivo, modifier: Modifier = Modifier, tamanho: Dp = 24.dp) {
     Canvas(modifier.size(tamanho)) {
         val w = size.minDimension
-        if (comFundo) drawCircle(RoxoProfundo, radius = w / 2f)
-        val m = if (comFundo) w * 0.2f else w * 0.06f // margem dentro do disco
+        val m = w * 0.06f // margem
         val a = w - 2 * m // lado da area do desenho
         fun p(x: Float, y: Float) = Offset(m + x * a, m + y * a)
-        val traco = Stroke(width = w * if (comFundo) 0.085f else 0.1f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        val traco = Stroke(width = w * 0.1f, cap = StrokeCap.Round, join = StrokeJoin.Round)
         val cor = cultivo.cor
         when (cultivo) {
             Cultivo.INDOOR -> {
@@ -114,7 +112,7 @@ fun LegendaDeCultivo(modifier: Modifier = Modifier) {
     ) {
         Cultivo.entries.forEach { cultivo ->
             Row(verticalAlignment = Alignment.CenterVertically) {
-                PontoDeCultivo(cultivo, tamanho = 20.dp, comFundo = false)
+                PontoDeCultivo(cultivo, tamanho = 20.dp)
                 Text(
                     text = cultivo.nome.uppercase(),
                     style = MaterialTheme.typography.labelSmall,

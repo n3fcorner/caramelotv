@@ -182,7 +182,7 @@ private fun DrawScope.desenhar(a: Aroma, u: Float, s: Stroke, c: Color) {
         // Meia papaia: a forma de pera com as sementes.
         Aroma.PAPAIA -> {
             caminho { m(12f, 3f); q(19f, 6f, 18.5f, 14f); q(18f, 21f, 12f, 21f); q(6f, 21f, 5.5f, 14f); q(5f, 6f, 12f, 3f) }
-            listOf(12f to 12f, 10.5f to 15f, 13.5f to 15f, 12f to 18f).forEach { (x, y) -> drawCircle(c, 1.1f * u, p(u, x, y)) }
+            listOf(12f to 12f, 10.5f to 15f, 13.5f to 15f, 12f to 18f).forEach { (x, y) -> circulo(x, y, 0.9f) } // sementes em traco, sem enchimento
         }
         // Terra: tres camadas onduladas e duas pedras.
         Aroma.TERRA -> {

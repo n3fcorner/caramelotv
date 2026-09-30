@@ -145,7 +145,7 @@ fun DetailsScreen(
             if (ficheiro.isNotEmpty()) {
                 // O desenho do cultivo antes da linha, o mesmo do canto do mosaico (29/9/2026).
                 Row(Modifier.padding(top = Espaco.minimo), verticalAlignment = Alignment.CenterVertically) {
-                    Cultivo.de(item)?.let { PontoDeCultivo(it, Modifier.padding(end = Espaco.curto), tamanho = 22.dp, comFundo = false) }
+                    Cultivo.de(item)?.let { PontoDeCultivo(it, Modifier.padding(end = Espaco.curto), tamanho = 22.dp) }
                     Text(
                         text = ficheiro.joinToString(" · "),
                         style = MaterialTheme.typography.titleSmall,
