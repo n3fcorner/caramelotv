@@ -17,7 +17,7 @@ import pt.caramelo.tv.R
  *
  * Era montado aqui em duas camadas — um padrao desenhado em codigo mais a mascote
  * em PNG. Passou a ser **uma arte unica**, feita de proposito para a montra: o roxo
- * com textura, o padrao geometrico a ouro nos cantos oposto a oposto, e a mascote
+ * azul escuro do manual com os azulejos do simbolo em linhas (sem folha) em filigrana, e a mascote
  * encostada a direita. Desenhar isto em codigo nunca ia chegar la, e com a arte
  * pronta as duas camadas so serviam para poder divergir dela.
  *
