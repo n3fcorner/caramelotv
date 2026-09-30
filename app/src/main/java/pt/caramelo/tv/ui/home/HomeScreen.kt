@@ -344,21 +344,14 @@ private fun Cabecalho(
                 contentDescription = "Caramelo do Brasil",
                 modifier = Modifier.height(58.dp),
             )
-            Column(Modifier.padding(start = Espaco.medio)) {
-                // O lettering original da marca em vez do nome composto em Poppins:
-                // e desenho proprio e diz mais da marca do que qualquer tipo de letra.
-                Image(
-                    painter = painterResource(R.drawable.lettering_caramelo),
-                    contentDescription = "Caramelo",
-                    modifier = Modifier.height(36.dp),
-                )
-                Text(
-                    text = "DO BRASIL",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Amarelo,
-                    letterSpacing = 5.sp,
-                )
-            }
+            // O nome da marca como o manual o compõe (30/9/2026): CARAMELO em Carbona ExtraBold bege sobre DO BRASIL
+            // em amarelo espaçado, recortado da logomarca oficial (uma imagem, não a fonte embutida; a licença da
+            // Carbona que existe é a web). Substitui o lettering em grafíti e o "DO BRASIL" em Poppins.
+            Image(
+                painter = painterResource(R.drawable.lettering_caramelo),
+                contentDescription = "Caramelo do Brasil",
+                modifier = Modifier.padding(start = Espaco.medio).height(46.dp),
+            )
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(Espaco.curto)) {
