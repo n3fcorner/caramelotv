@@ -1,5 +1,6 @@
 package pt.caramelo.tv.ui.coa
 
+import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -171,7 +172,7 @@ fun CoaScreen(
                         .size(Size.ORIGINAL)
                         .crossfade(true)
                         .build(),
-                    contentDescription = "Boletim de análise · ${boletins[indice].titulo}",
+                    contentDescription = "${tr("Boletim de análise", "Certificate of analysis")} · ${boletins[indice].titulo}",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .fillMaxSize()
@@ -183,7 +184,7 @@ fun CoaScreen(
         // O rotulo do ecra, no canto: e' a mesma caixa que o botao "Analises" do
         // menu, que cresce ate aqui.
         Text(
-            text = "ANÁLISES",
+            text = tr("ANÁLISES", "LAB REPORTS"),
             style = MaterialTheme.typography.labelMedium,
             color = Amarelo,
             letterSpacing = 3.sp,
@@ -221,9 +222,9 @@ fun CoaScreen(
             )
             Text(
                 text = if (ampliacao > 1f) {
-                    "${boletins[pagina].laboratorio}  ·  ${"%.1f".format(ampliacao).trimEnd('0').trimEnd('.')}×  ·  setas deslocam  ·  OK amplia  ·  Voltar reduz"
+                    "${boletins[pagina].laboratorio}  ·  ${"%.1f".format(ampliacao).trimEnd('0').trimEnd('.')}×  ·  ${tr("setas deslocam  ·  OK amplia  ·  Voltar reduz", "arrows move  ·  OK zooms in  ·  Back zooms out")}"
                 } else {
-                    "${boletins[pagina].laboratorio}  ·  ${pagina + 1} de ${boletins.size}  ·  ◀ ▶ muda de boletim  ·  OK amplia"
+                    "${boletins[pagina].laboratorio}  ·  ${pagina + 1} ${tr("de", "of")} ${boletins.size}  ·  ${tr("◀ ▶ muda de boletim  ·  OK amplia", "◀ ▶ next certificate  ·  OK zooms in")}"
                 },
                 style = MaterialTheme.typography.labelMedium,
                 color = Creme.copy(alpha = 0.72f),

@@ -1,5 +1,7 @@
 package pt.caramelo.tv
 
+import pt.caramelo.tv.data.Sincronizacao
+import kotlinx.coroutines.Dispatchers
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -51,6 +53,18 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
     /** Qualquer toque no comando adia a montra automatica. */
     fun registarInteracao() {
         ultimaInteracao = System.currentTimeMillis()
+    }
+
+    init {
+        // O catalogo do CRM: ao arrancar e de 5 em 5 minutos, fora da linha principal.
+        // So grava (e so redesenha) quando alguma coisa mudou no painel.
+        viewModelScope.launch(Dispatchers.IO) {
+            while (true) {
+                val endereco = catalog.value?.settings?.crmUrl ?: PanelSettings().crmUrl
+                runCatching { Sincronizacao.buscar(endereco)?.let { repo.gravarCrm(it) } }
+                delay(5 * 60_000L)
+            }
+        }
     }
 
     init {

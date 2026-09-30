@@ -39,8 +39,9 @@ data class Catalog(
 
     fun byId(id: String): MenuItem? = items.firstOrNull { it.id == id }
 
+    /** Troca o item com o mesmo id; um item que so existe pelo CRM entra na lista para a edicao ficar guardada. */
     fun replace(item: MenuItem): Catalog =
-        copy(items = items.map { if (it.id == item.id) item else it })
+        if (items.any { it.id == item.id }) copy(items = items.map { if (it.id == item.id) item else it }) else copy(items = items + item)
 
     fun positionOf(id: String): Long = if (settings.resumePlayback) progress[id] ?: 0L else 0L
 

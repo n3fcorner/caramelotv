@@ -1,5 +1,9 @@
 package pt.caramelo.tv.ui.settings
 
+import pt.caramelo.tv.ui.i18n.Idioma
+import pt.caramelo.tv.ui.i18n.LocalIdioma
+import pt.caramelo.tv.ui.i18n.termo
+import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
@@ -64,12 +68,12 @@ fun SettingsScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                "Definições",
+                tr("Definições", "Settings"),
                 style = MaterialTheme.typography.headlineMedium,
                 // A mesma caixa que o botao do menu: e' ele que cresce ate aqui.
                 modifier = Modifier.heroBounds("ecra-definicoes"),
             )
-            TvButton(text = "Voltar", onClick = onBack)
+            TvButton(text = tr("Voltar", "Back"), onClick = onBack)
         }
 
         Row(
@@ -80,15 +84,15 @@ fun SettingsScreen(
                 modifier = Modifier.weight(0.55f).fillMaxHeight().focusGroup(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                SectionHeader("Produtos")
+                SectionHeader(tr("Produtos", "Products"))
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(catalog.items, key = { it.id }) { item ->
                         SelectableRow(
-                            label = "${item.section.label} · ${item.displayTitle}",
+                            label = "${termo(item.section.label)} · ${item.displayTitle}",
                             value = when (item.state) {
-                                ItemState.PRONTO -> "com vídeo"
-                                ItemState.EM_BREVE -> "em breve"
-                                ItemState.LIVRE -> "livre"
+                                ItemState.PRONTO -> tr("com vídeo", "with video")
+                                ItemState.EM_BREVE -> tr("em breve", "coming soon")
+                                ItemState.LIVRE -> tr("livre", "empty")
                             },
                             onClick = { onEditItem(item) },
                             focusRequester = if (item.id == catalog.items.firstOrNull()?.id) firstRow else null,
@@ -101,20 +105,25 @@ fun SettingsScreen(
                 modifier = Modifier.weight(0.45f).focusGroup(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                SectionHeader("Comportamento")
+                SectionHeader(tr("Comportamento", "Behaviour"))
+                SelectableRow(
+                    label = tr("Língua", "Language"),
+                    value = tr("Português", "English"),
+                    onClick = { onSettingsChange(catalog.settings.copy(idioma = if (catalog.settings.idioma == "en") "pt" else "en")) },
+                )
                 ToggleRow(
-                    label = "Reprodução automática",
+                    label = tr("Reprodução automática", "Autoplay"),
                     checked = catalog.settings.autoplay,
                     onToggle = { onSettingsChange(catalog.settings.copy(autoplay = it)) },
                 )
                 ToggleRow(
-                    label = "Retomar vídeos",
+                    label = tr("Retomar vídeos", "Resume videos"),
                     checked = catalog.settings.resumePlayback,
                     onToggle = { onSettingsChange(catalog.settings.copy(resumePlayback = it)) },
                 )
                 SelectableRow(
-                    label = "Montra automática",
-                    value = rotuloDaEspera(catalog.settings.attractSeconds),
+                    label = tr("Montra automática", "Automatic showcase"),
+                    value = rotuloDaEspera(catalog.settings.attractSeconds, LocalIdioma.current),
                     onClick = {
                         onSettingsChange(
                             catalog.settings.copy(
@@ -124,37 +133,37 @@ fun SettingsScreen(
                     },
                 )
                 ToggleRow(
-                    label = "Repetir o clipe",
+                    label = tr("Repetir o clipe", "Loop the clip"),
                     checked = catalog.settings.loopPlayback,
                     onToggle = { onSettingsChange(catalog.settings.copy(loopPlayback = it)) },
                 )
 
-                SectionHeader(text = "Servidor de media", modifier = Modifier.padding(top = 16.dp))
+                SectionHeader(text = tr("Servidor de media", "Media server"), modifier = Modifier.padding(top = 16.dp))
                 Text(
                     text = catalog.settings.mediaBaseUrl,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = "Prefixo dos caminhos relativos dos itens. Muda-se por ADB: " +
+                    text = tr("Prefixo dos caminhos relativos dos itens. Muda-se por ADB: ", "Prefix for the items' relative paths. Change it over ADB: ") +
                         "caramelotv://base?url=http://...",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
-                SectionHeader(text = "Manutenção", modifier = Modifier.padding(top = 16.dp))
+                SectionHeader(text = tr("Manutenção", "Maintenance"), modifier = Modifier.padding(top = 16.dp))
                 TvButton(
-                    text = "Limpar progresso",
+                    text = tr("Limpar progresso", "Clear progress"),
                     onClick = onClearProgress,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 TvButton(
-                    text = "Repor catálogo",
+                    text = tr("Repor catálogo", "Reset catalogue"),
                     onClick = onResetCatalog,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Text(
-                    text = "Repor apaga todas as edições e volta aos 15 slots iniciais.",
+                    text = tr("Repor apaga todas as edições e volta aos produtos de origem.", "Reset removes every edit and goes back to the original products."),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -171,9 +180,11 @@ private fun proximaEspera(actual: Int): Int {
     return ESPERAS[if (i < 0) 0 else (i + 1) % ESPERAS.size]
 }
 
-private fun rotuloDaEspera(segundos: Int): String = when {
-    segundos <= 0 -> "Desligada"
-    segundos < 60 -> "$segundos s parado"
-    segundos == 60 -> "1 min parado"
-    else -> "${segundos / 60} min parado"
+private fun rotuloDaEspera(segundos: Int, idioma: Idioma): String {
+    val en = idioma == Idioma.EN
+    return when {
+        segundos <= 0 -> if (en) "Off" else "Desligada"
+        segundos < 60 -> if (en) "$segundos s idle" else "$segundos s parado"
+        else -> if (en) "${segundos / 60} min idle" else "${segundos / 60} min parado"
+    }
 }

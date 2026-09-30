@@ -116,7 +116,8 @@ object DefaultCatalog {
             LINHA_CBD, "Flor", "Glasshouse", "Uva e frutos escuros, fundo doce",
             tipo = "Híbrida", indica = 60,
             // Perfil publicado pela WeNeed: mirceno 30, limoneno 28, cariofileno 20, linalol 17, pineno 5.
-            terpenos = listOf("Mirceno", "Limoneno", "Cariofileno"),
+            terpenos = listOf("Mirceno", "Limoneno", "Cariofileno", "Linalol", "Pineno"),
+            terpenosPct = listOf(30, 28, 20, 17, 5),
         ),
         produto(
             Section.CBD, 1, "Lemon Trip", "lemon-trip",
@@ -130,14 +131,16 @@ object DefaultCatalog {
             // WeNeed: selecção Doweedo com mãe Tangie, cultivo RDWC indoor; perfil
             // publicado: mirceno 65, limoneno 14, pineno 11, linalol 5, cariofileno 5.
             genetica = "Descendente de Tangie (selecção Doweedo)", tipo = "Sativa", indica = 35,
-            terpenos = listOf("Mirceno", "Limoneno", "Pineno"),
+            terpenos = listOf("Mirceno", "Limoneno", "Pineno", "Linalol", "Cariofileno"),
+            terpenosPct = listOf(65, 14, 11, 5, 5),
         ),
         produto(
             Section.CBD, 3, "Solero Cream", "solero-cream",
             LINHA_CBD, "Flor", "Indoor", "Cremoso e doce, baunilha e citrinos",
             // Perfil publicado pela WeNeed: mirceno 39, cariofileno 24, pineno 17, linalol 10, limoneno 9.
             tipo = "Híbrida", indica = 50,
-            terpenos = listOf("Mirceno", "Cariofileno", "Pineno"),
+            terpenos = listOf("Mirceno", "Cariofileno", "Pineno", "Linalol", "Limoneno"),
+            terpenosPct = listOf(39, 24, 17, 10, 9),
         ),
         produto(
             Section.CBD, 4, "Critical Berry", "critical-berry-cbd",
@@ -147,7 +150,7 @@ object DefaultCatalog {
         ),
         produto(
             Section.CBD, 5, "Uranium", "uranium",
-            LINHA_CBD, "Flor", "", "Intenso e resinoso",
+            LINHA_CBD, "Flor", "", "Resinoso",
             tipo = "Híbrida", indica = 55,
             terpenos = listOf("Mirceno", "Cariofileno", "Humuleno"),
         ),
@@ -157,7 +160,7 @@ object DefaultCatalog {
         produto(
             Section.HASH, 0, "Static", "static",
             // Na WeNeed chama-se Static Mango: o aroma e' manga, nao terra.
-            LINHA_INFUSAO, "Hash", "", "Manga fresca, intenso", infundido = true,
+            LINHA_INFUSAO, "Hash", "", "Manga fresca", infundido = true,
             tipo = "Híbrida", indica = 50,
             terpenos = listOf("Mirceno", "Ocimeno", "Limoneno"),
         ),
@@ -209,6 +212,7 @@ object DefaultCatalog {
         tipo: String = "",
         indica: Int = -1,
         terpenos: List<String> = emptyList(),
+        terpenosPct: List<Int> = emptyList(),
     ) = MenuItem(
         id = id(section, slot),
         slot = slot,
@@ -216,7 +220,7 @@ object DefaultCatalog {
         title = titulo,
         videoUrl = if (temVideo(slug)) "media/$slug.mp4" else "",
         imageUrl = "posters/$slug.jpg",
-        strain = Strain(linha, formato, cultivo, aroma, infundido, genetica, tipo, indica, terpenos),
+        strain = Strain(linha, formato, cultivo, aroma, infundido, genetica, tipo, indica, terpenos, terpenosPct),
     )
 
     /** Nem todos os produtos com foto ja tem clipe filmado. */

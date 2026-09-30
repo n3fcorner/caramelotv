@@ -42,7 +42,10 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            if (chave.isNotEmpty()) signingConfig = signingConfigs.getByName("release")
+            // Sem chave propria, a release assina com a de debug: continua a instalar-se
+            // por ADB, mas com o R8 e sem as verificacoes de debug do Compose, que numa
+            // TCL fazem a diferenca entre fluido e aos solavancos (29/9/2026).
+            signingConfig = if (chave.isNotEmpty()) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
         }
     }
 

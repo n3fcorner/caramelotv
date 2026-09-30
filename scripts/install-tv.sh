@@ -16,8 +16,10 @@ export PATH="$ANDROID_HOME/platform-tools:$PATH"
 cd "$(dirname "$0")/.."
 
 echo "==> Compilar"
-./gradlew --quiet assembleDebug
-APK="app/build/outputs/apk/debug/app-debug.apk"
+# Release e nao debug: no Compose a versao debug e varias vezes mais lenta, e numa TCL
+# nota-se em cada movimento do foco.
+./gradlew --quiet assembleRelease
+APK="app/build/outputs/apk/release/app-release.apk"
 
 echo "==> Ligar a $TV"
 if ! adb connect "$TV" | grep -qE "connected to"; then

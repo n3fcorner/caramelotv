@@ -1,0 +1,43 @@
+# Compila a app da TV em cada push e deixa o APK para descarregar (29/9/2026): a
+# sessao na nuvem nao chega ao repositorio Maven da Google, e assim a compilacao
+# prova-se aqui e o Francisco instala sem compilar no Mac.
+name: apk
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      # A chave de assinatura tem de ser sempre a mesma (29/9/2026): sem keystore proprio o Gradle
+      # cria uma chave de debug nova em cada maquina do GitHub, e a TV recusa por cima um APK com
+      # outra assinatura (INSTALL_FAILED_UPDATE_INCOMPATIBLE). Fica guardada na cache do GitHub, fora
+      # do repositorio; se a cache se perder (7 dias sem compilacoes), a instalacao seguinte pede
+      # para desinstalar a antiga uma vez.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: assinatura-tv-v1
+      - name: Compilar a release
+        run: chmod +x gradlew && ./gradlew --no-daemon assembleRelease
+      - name: Lint (informativo, nao bloqueia)
+        continue-on-error: true
+        run: ./gradlew --no-daemon lintRelease
+      - uses: actions/upload-artifact@v4
+        with:
+          name: caramelotv-apk
+          path: app/build/outputs/apk/release/app-release.apk
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: relatorio-lint
+          path: app/build/reports/lint-results-release.html
+          retention-days: 14

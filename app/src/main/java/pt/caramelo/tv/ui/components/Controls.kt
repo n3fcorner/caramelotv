@@ -1,5 +1,6 @@
 package pt.caramelo.tv.ui.components
 
+import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -147,7 +148,7 @@ fun ToggleRow(
 ) {
     SelectableRow(
         label = label,
-        value = if (checked) "Ligado" else "Desligado",
+        value = if (checked) tr("Ligado", "On") else tr("Desligado", "Off"),
         onClick = { onToggle(!checked) },
         modifier = modifier,
         focusRequester = focusRequester,

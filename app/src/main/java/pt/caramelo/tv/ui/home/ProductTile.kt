@@ -1,5 +1,6 @@
 package pt.caramelo.tv.ui.home
 
+import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -112,7 +113,7 @@ fun ProductTile(
 
             if (item.state == ItemState.EM_BREVE) {
                 Text(
-                    text = "EM BREVE",
+                    text = tr("EM BREVE", "COMING SOON"),
                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.5.sp, lineHeight = 12.sp),
                     color = RoxoProfundo,
                     letterSpacing = 1.sp,
@@ -171,7 +172,7 @@ fun ProductTile(
             // Indica e sativa numa barra fina no fundo, como nos cartoes do telemovel.
             if (item.strain.temPerfil) {
                 BarraIndicaSativa(
-                    peso = item.strain.indica,
+                    peso = item.strain.indicaEfectiva,
                     altura = 4.dp,
                     modifier = Modifier.align(Alignment.BottomStart),
                 )
