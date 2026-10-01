@@ -19,14 +19,24 @@ jobs:
       # A chave de assinatura tem de ser sempre a mesma (29/9/2026): sem keystore proprio o Gradle
       # cria uma chave de debug nova em cada maquina do GitHub, e a TV recusa por cima um APK com
       # outra assinatura (INSTALL_FAILED_UPDATE_INCOMPATIBLE). Fica guardada na cache do GitHub, fora
-      # do repositorio; se a cache se perder (7 dias sem compilacoes), a instalacao seguinte pede
-      # para desinstalar a antiga uma vez.
-      - uses: actions/cache@v4
+      # do repositorio. 1/10/2026: a cache e' por ramo, e o ramo de trabalho e o main tinham cada um a
+      # sua chave, por isso cada APK pedia para desinstalar o anterior. Agora so o main guarda a chave;
+      # os outros ramos leem a do main (o GitHub deixa ler a cache do ramo principal).
+      - uses: actions/cache/restore@v4
+        id: chave
         with:
           path: ~/.android/debug.keystore
-          key: assinatura-tv-v1
+          key: assinatura-tv-main
+      - name: Chave nova so no main
+        if: steps.chave.outputs.cache-hit != 'true' && github.ref != 'refs/heads/main'
+        run: echo "::warning::Sem chave do main na cache; este APK sai com uma chave provisoria."
       - name: Compilar a release
         run: chmod +x gradlew && ./gradlew --no-daemon assembleRelease
+      - uses: actions/cache/save@v4
+        if: steps.chave.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+        with:
+          path: ~/.android/debug.keystore
+          key: assinatura-tv-main
       - name: Lint (informativo, nao bloqueia)
         continue-on-error: true
         run: ./gradlew --no-daemon lintRelease
