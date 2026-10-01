@@ -57,6 +57,14 @@ import androidx.compose.ui.unit.sp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import pt.caramelo.tv.R
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.shape.RoundedCornerShape
+import pt.caramelo.tv.ui.components.FundoDePapel
+import pt.caramelo.tv.ui.theme.Tinta
+import pt.caramelo.tv.ui.theme.PapelTheme
+import pt.caramelo.tv.ui.theme.TintaFraca
 import pt.caramelo.tv.data.model.Catalog
 import pt.caramelo.tv.data.model.MenuItem
 import pt.caramelo.tv.data.model.Section
@@ -142,8 +150,9 @@ fun HomeScreen(
         runCatching { alvo?.requestFocus() }
     }
 
+    PapelTheme {
     Box(Modifier.fillMaxSize()) {
-    FundoDaMarca()
+    FundoDePapel()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -199,7 +208,6 @@ fun HomeScreen(
                 ORDEM_SECCOES.forEach { s ->
                     Separador(
                         titulo = termo(s.label),
-                        total = catalog.section(s).size,
                         activo = s == seccao,
                         onFoco = { seccao = s },
                         focusRequester = separadores.getValue(s),
@@ -224,8 +232,15 @@ fun HomeScreen(
 
     }
     }
+    }
 }
 
+/**
+ * A fila lateral de uma seccao (1/10/2026, Francisco: "quero que a lista de produtos seja navegavel lateralmente"):
+ * os mosaicos todos do mesmo tamanho, grandes, numa linha que o D-pad percorre; o foco puxa o mosaico para dentro do
+ * ecra (bringIntoView do horizontalScroll). Row e nao LazyRow: todos compostos, por isso o FocusRequester de cada um
+ * existe sempre e o foco volta ao sitio certo ao sair de uma ficha.
+ */
 @Composable
 private fun Grelha(
     itens: List<MenuItem>,
@@ -236,28 +251,36 @@ private fun Grelha(
     onEditItem: (MenuItem) -> Unit,
     cascata: Boolean = false,
 ) {
-    // colunas = 0: a grelha escolhe quantas, para os artigos todos caberem no ecra.
-    TileGrid(items = itens, columns = 0, modifier = Modifier.fillMaxSize()) { item, mod ->
-        // Na primeira vez que o menu aparece os mosaicos entram em cascata, por
-        // ordem. Nas vezes seguintes — ao voltar de um produto — ja estao la: a
-        // foto que vem a voar precisa de encontrar o mosaico parado no sitio.
-        Entrada(ordem = itens.indexOf(item).let { it % 4 + it / 4 }, modifier = mod, activa = cascata) {
-        ProductTile(
-            item = item,
-            posterUrl = catalog.imageUrlOf(item),
-            onClick = { onOpenItem(item) },
-            onLongClick = { onEditItem(item) },
-            onFocus = { onFocusItem(item) },
-            focusRequester = requesters[item.id],
-            modifier = Modifier.fillMaxSize(),
-        )
+    BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterStart) {
+        val alto = maxHeight * 0.92f
+        val largo = alto * 0.72f
+        Row(
+            modifier = Modifier.fillMaxWidth().focusGroup().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(Espaco.largo),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            itens.forEachIndexed { i, item ->
+                // Na primeira vez que o menu aparece os mosaicos entram em cascata; nas seguintes ja estao parados,
+                // para a foto que volta da ficha encontrar o seu mosaico no sitio.
+                Entrada(ordem = i, modifier = Modifier.width(largo).height(alto), activa = cascata) {
+                    ProductTile(
+                        item = item,
+                        posterUrl = catalog.imageUrlOf(item),
+                        onClick = { onOpenItem(item) },
+                        onLongClick = { onEditItem(item) },
+                        onFocus = { onFocusItem(item) },
+                        focusRequester = requesters[item.id],
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+            }
         }
     }
 }
 
-/** Um separador do submenu: o nome e quantos artigos tem. Muda ao ganhar foco. */
+/** Um separador do submenu: so o nome, sem contagens (1/10/2026). Muda ao ganhar foco. */
 @Composable
-private fun Separador(titulo: String, total: Int, activo: Boolean, onFoco: () -> Unit, focusRequester: FocusRequester, cor: Color) {
+private fun Separador(titulo: String, activo: Boolean, onFoco: () -> Unit, focusRequester: FocusRequester, cor: Color) {
     var focado by remember { mutableStateOf(false) }
     val fundo = when {
         focado -> cor
@@ -269,20 +292,15 @@ private fun Separador(titulo: String, total: Int, activo: Boolean, onFoco: () ->
             .focusRequester(focusRequester)
             .onFocusChanged { f -> focado = f.isFocused; if (f.isFocused) onFoco() }
             .focusable()
-            .background(fundo)
+            .background(fundo, RoundedCornerShape(8.dp))
             .padding(horizontal = Espaco.largo, vertical = Espaco.curto),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = titulo.uppercase(),
             style = MaterialTheme.typography.titleSmall,
-            color = if (focado) RoxoProfundo else if (activo) cor else CremeFraco,
+            color = if (focado) Tinta else if (activo) Tinta else TintaFraca,
             letterSpacing = 2.sp,
-        )
-        Text(
-            text = " $total",
-            style = MaterialTheme.typography.labelSmall,
-            color = if (focado) RoxoProfundo else CremeFraco,
         )
     }
 }
@@ -348,7 +366,7 @@ private fun Cabecalho(
             // em amarelo espaçado, recortado da logomarca oficial (uma imagem, não a fonte embutida; a licença da
             // Carbona que existe é a web). Substitui o lettering em grafíti e o "DO BRASIL" em Poppins.
             Image(
-                painter = painterResource(R.drawable.lettering_caramelo),
+                painter = painterResource(R.drawable.lettering_caramelo_tinta),
                 contentDescription = "Caramelo do Brasil",
                 modifier = Modifier.padding(start = Espaco.medio).height(46.dp),
             )

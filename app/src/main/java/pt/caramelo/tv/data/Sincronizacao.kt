@@ -165,7 +165,8 @@ object Sincronizacao {
         val porSlug = fabrica.mapNotNull { f -> slugDe(f)?.let { it to f } }.toMap()
         val usados = mutableSetOf<String>()
         val porSeccao = mutableMapOf<Section, Int>()
-        return crm.itens.mapNotNull { c ->
+        // Os esgotados vao para o fim de cada seccao, pela ordem do painel (1/10/2026): a frente da fila e' o que ha.
+        return crm.itens.sortedBy { if (it.estado == "esgotado") 1 else 0 }.mapNotNull { c ->
             val seccao = seccaoDe(c.seccao) ?: return@mapNotNull null
             val base = (porSlug[c.slug] ?: fabrica.firstOrNull { it.section == seccao && normal(it.title) == normal(c.nome) })
                 ?.takeIf { it.id !in usados }
@@ -179,7 +180,10 @@ object Sincronizacao {
                 // O video e o cartaz da propria TV quando ela os tem (tocam sem rede);
                 // senao os do CRM.
                 videoUrl = base?.videoUrl?.takeIf { it.isNotBlank() } ?: c.video.orEmpty(),
-                imageUrl = base?.imageUrl?.takeIf { it.isNotBlank() } ?: c.imagem.orEmpty(),
+                // O recorte do site primeiro (1/10/2026): a lista e a ficha sao agora papel bege, e o recorte
+                // pousa nele como na loja; o cartaz da TV, com a margem roxa, so quando o CRM nao tem foto.
+                imageUrl = c.imagem?.takeIf { it.isNotBlank() } ?: base?.imageUrl.orEmpty(),
+                esgotado = c.estado == "esgotado",
                 orientation = base?.orientation ?: MediaOrientation.SQUARE,
                 // A linha (CBD ou infundida) vem sempre do CRM, nunca da ficha de fabrica: e' o que manda
                 // na zona de venda, e uma etiqueta errada e' o erro mais caro (CLAUDE.md §1).

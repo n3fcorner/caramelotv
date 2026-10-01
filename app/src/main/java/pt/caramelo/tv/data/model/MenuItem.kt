@@ -46,6 +46,8 @@ data class MenuItem(
     val imageUrl: String = "",
     val orientation: MediaOrientation = MediaOrientation.SQUARE,
     val strain: Strain = Strain(),
+    /** Sem stock no CRM (1/10/2026): o mosaico leva o carimbo SOLD OUT e vai para o fim da fila. */
+    val esgotado: Boolean = false,
 ) {
     val hasVideo: Boolean get() = videoUrl.isNotBlank()
 

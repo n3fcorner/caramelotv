@@ -47,6 +47,17 @@ import pt.caramelo.tv.ui.components.TerpenosDominantes
 import pt.caramelo.tv.ui.animation.hero
 import pt.caramelo.tv.ui.animation.heroBounds
 import pt.caramelo.tv.ui.components.FundoDaMarca
+import pt.caramelo.tv.ui.components.FundoDePapel
+import pt.caramelo.tv.ui.theme.PapelTheme
+import pt.caramelo.tv.ui.theme.PapelSombra
+import pt.caramelo.tv.ui.theme.Tinta
+import pt.caramelo.tv.ui.theme.Roxo
+import pt.caramelo.tv.ui.theme.Laranja
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import pt.caramelo.tv.ui.components.TvButton
 import pt.caramelo.tv.ui.components.formatarTempo
 import pt.caramelo.tv.ui.theme.Amarelo
@@ -86,8 +97,10 @@ fun DetailsScreen(
         label = "entrada-ficha",
     )
 
+    // A ficha no papel, como a do site (1/10/2026): bege e tinta; o leitor de video continua no escuro.
+    PapelTheme {
     Box(Modifier.fillMaxSize()) {
-    FundoDaMarca()
+    FundoDePapel()
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -113,11 +126,11 @@ fun DetailsScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.width(22.dp).height(3.dp).background(Amarelo))
+                Box(Modifier.width(22.dp).height(3.dp).background(Laranja))
                 Text(
                     text = termo(item.section.label).uppercase(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = Amarelo,
+                    color = Roxo,
                     letterSpacing = 3.sp,
                     modifier = Modifier.padding(start = Espaco.curto),
                 )
@@ -126,7 +139,7 @@ fun DetailsScreen(
             Text(
                 text = item.displayTitle,
                 style = MaterialTheme.typography.displayMedium,
-                color = Creme,
+                color = Tinta,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
@@ -205,6 +218,7 @@ fun DetailsScreen(
         }
     }
     }
+    }
 }
 
 /** Rotulo em amarelo mais o valor, o par que se repete por toda a ficha. */
@@ -214,13 +228,13 @@ private fun Campo(rotulo: String, valor: String) {
         Text(
             text = rotulo.uppercase(),
             style = MaterialTheme.typography.labelSmall,
-            color = Amarelo,
+            color = Roxo,
             letterSpacing = 2.sp,
         )
         Text(
             text = valor,
             style = MaterialTheme.typography.bodyMedium,
-            color = Creme,
+            color = Tinta,
             modifier = Modifier.padding(top = Espaco.minimo),
         )
     }
@@ -228,24 +242,25 @@ private fun Campo(rotulo: String, valor: String) {
 
 @Composable
 private fun Cartaz(item: MenuItem, posterUrl: String, modifier: Modifier = Modifier) {
+    // O recorte inteiro pousado no papel, com a sombra por baixo, como na ficha do site (1/10/2026). Fit e nunca Crop.
     Box(modifier, contentAlignment = Alignment.Center) {
-        val forma = Modifier
-            .fillMaxHeight()
-            .aspectRatio(item.orientation.aspect)
-            .hero(item.id)
-
+        Box(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = Espaco.largo)
+                .fillMaxWidth(0.5f)
+                .height(22.dp)
+                .background(Brush.radialGradient(listOf(PapelSombra, Color.Transparent)), RoundedCornerShape(50)),
+        )
         if (posterUrl.isBlank()) {
-            Box(
-                modifier = forma.background(MaterialTheme.colorScheme.surface),
-                contentAlignment = Alignment.Center,
-            ) {
+            Box(Modifier.fillMaxSize().hero(item.id), contentAlignment = Alignment.Center) {
                 Text(
                     text = when (item.state) {
                         ItemState.EM_BREVE -> tr("EM BREVE", "COMING SOON")
                         else -> tr("SLOT LIVRE", "EMPTY SLOT")
                     },
                     style = MaterialTheme.typography.titleMedium,
-                    color = Amarelo.copy(alpha = 0.5f),
+                    color = Roxo,
                     letterSpacing = 4.sp,
                 )
             }
@@ -253,8 +268,9 @@ private fun Cartaz(item: MenuItem, posterUrl: String, modifier: Modifier = Modif
             AsyncImage(
                 model = posterUrl,
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = forma.background(RoxoProfundo),
+                contentScale = ContentScale.Fit,
+                alignment = Alignment.BottomCenter,
+                modifier = Modifier.fillMaxSize().padding(top = Espaco.largo, bottom = Espaco.seccao).hero(item.id),
             )
         }
     }
