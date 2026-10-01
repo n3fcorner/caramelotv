@@ -95,7 +95,10 @@ import pt.caramelo.tv.ui.animation.Entrada
 import pt.caramelo.tv.ui.animation.LocalSharedTransition
 import pt.caramelo.tv.ui.animation.hero
 import pt.caramelo.tv.ui.animation.heroBounds
-import pt.caramelo.tv.ui.components.FundoDaMarca
+import pt.caramelo.tv.ui.components.FundoDePapel
+import pt.caramelo.tv.ui.theme.PapelTheme
+import pt.caramelo.tv.ui.theme.Papel
+import pt.caramelo.tv.ui.theme.Tinta
 import pt.caramelo.tv.ui.components.PerfilIndicaSativa
 import pt.caramelo.tv.ui.components.TerpenosDominantes
 import pt.caramelo.tv.ui.components.formatarTempo
@@ -274,6 +277,9 @@ fun PlayerScreen(
     val foco = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { foco.requestFocus() } }
 
+    // O leitor no papel, como a lista e a ficha (1/10/2026, "os videos ainda estao no tema antigo azul"): bege e tinta,
+    // o video pousado sem moldura, e as etiquetas sobre o video a tinta, que se le em cima de qualquer fotograma.
+    PapelTheme {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -307,7 +313,7 @@ fun PlayerScreen(
                 }
             },
     ) {
-        FundoDaMarca()
+        FundoDePapel()
 
         // A vista de video, na geometria exacta do painel (a mesma Row que o Leitor
         // usa), por baixo de tudo o que anima. Enquanto um ecra voa para o outro, ou
@@ -334,8 +340,8 @@ fun PlayerScreen(
                         (LayoutInflater.from(ctx).inflate(R.layout.player_view_texture, null) as PlayerView).apply {
                             this.player = player
                             keepScreenOn = true
-                            setShutterBackgroundColor(RoxoProfundo.toArgb())
-                            setBackgroundColor(RoxoProfundo.toArgb())
+                            setShutterBackgroundColor(Papel.toArgb())
+                            setBackgroundColor(Papel.toArgb())
                             vista = this
                         }
                     },
@@ -388,6 +394,7 @@ fun PlayerScreen(
                 atrator = atrator,
             )
         }
+    }
     }
 }
 
@@ -456,8 +463,7 @@ private fun PainelDeVideo(
             .aspectRatio(1f)
             // A mesma chave do mosaico e do cartaz: a foto voa ate aqui e o video
             // aparece por baixo dela, em vez de o quadrado surgir do nada.
-            .hero(item.id)
-            .border(BorderStroke(2.dp, Amarelo)),
+            .hero(item.id),
     ) {
         // O cartaz tapa o video ate haver um fotograma para mostrar e o painel estar
         // assente, e depois esbate-se. E' a mesma imagem que veio a voar do mosaico:
@@ -479,7 +485,8 @@ private fun PainelDeVideo(
             AsyncImage(
                 model = posterUrl,
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
+                // O recorte do site pousado no papel: inteiro, sem cortar a flor.
+                contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize().graphicsLayer { alpha = veuDoCartaz },
             )
         }
@@ -489,7 +496,7 @@ private fun PainelDeVideo(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(Espaco.medio)
-                .background(RoxoProfundo.copy(alpha = 0.88f))
+                .background(Tinta.copy(alpha = 0.88f))
                 .padding(horizontal = Espaco.medio, vertical = Espaco.curto),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -508,7 +515,7 @@ private fun PainelDeVideo(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .background(RoxoProfundo.copy(alpha = 0.88f))
+                .background(Tinta.copy(alpha = 0.88f))
                 .padding(horizontal = Espaco.medio, vertical = Espaco.curto),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -561,11 +568,11 @@ private fun FichaDoProduto(
         verticalArrangement = Arrangement.Center,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.width(22.dp).height(3.dp).background(Amarelo))
+            Box(Modifier.width(22.dp).height(3.dp).background(Laranja))
             Text(
                 text = termo(item.section.label).uppercase(),
                 style = MaterialTheme.typography.labelSmall,
-                color = Amarelo,
+                color = Laranja,
                 letterSpacing = 3.sp,
                 modifier = Modifier.padding(start = Espaco.curto),
             )
@@ -574,7 +581,7 @@ private fun FichaDoProduto(
         Text(
             text = item.title,
             style = MaterialTheme.typography.displayMedium,
-            color = Creme,
+            color = Tinta,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
@@ -630,7 +637,7 @@ private fun FichaDoProduto(
                 else -> tr("❚❚ Em pausa", "❚❚ Paused")
             },
             style = MaterialTheme.typography.labelMedium,
-            color = if (aReproduzir && !atrator) Amarelo else MaterialTheme.colorScheme.onSurfaceVariant,
+            color = if (aReproduzir && !atrator) Laranja else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = Espaco.medio),
         )
 
@@ -652,7 +659,7 @@ private fun FichaDoProduto(
 private fun Assinatura(modifier: Modifier = Modifier) {
     val inicio = tr("Afinal, somos todos ", "After all, we're all ")
     val frase = buildAnnotatedString {
-        withStyle(SpanStyle(color = Creme)) { append(inicio) }
+        withStyle(SpanStyle(color = Tinta)) { append(inicio) }
         withStyle(SpanStyle(color = Laranja)) { append("Caramelos.") }
     }
     Column(modifier) {
@@ -716,12 +723,12 @@ private fun ErroDeLeitura(codigo: String, url: String, modifier: Modifier = Modi
         Text(
             text = tr("Não foi possível reproduzir", "Could not play"),
             style = MaterialTheme.typography.titleMedium,
-            color = Creme,
+            color = Tinta,
         )
         Text(
             text = codigo,
             style = MaterialTheme.typography.labelSmall,
-            color = Amarelo,
+            color = Laranja,
             modifier = Modifier.padding(top = Espaco.curto),
         )
         Text(
