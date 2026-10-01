@@ -26,10 +26,14 @@ private val CarameloColors = darkColorScheme(
     onSurfaceVariant = CremeFraco,
 )
 
-/** Margens de seguranca contra overscan: muitas TVs cortam os primeiros pixeis do painel. */
+/**
+ * Margens de seguranca contra overscan: muitas TVs cortam os primeiros pixeis do painel. 1/10/2026 ("os limites de
+ * ecra na TV nao estao certos"): passam dos 4 % para cerca de 6 % do ecra (58 de 960 e 34 de 540 dp), acima dos
+ * 5 % que o Android TV recomenda, para a TV da loja nao comer o cabecalho nem os mosaicos das pontas.
+ */
 object Overscan {
-    val horizontal = 40.dp
-    val vertical = 22.dp
+    val horizontal = 58.dp
+    val vertical = 34.dp
 }
 
 /**
