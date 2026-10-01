@@ -107,10 +107,10 @@ object Sincronizacao {
         Section.HASH -> "hash"
     }
 
-    private val SLUG_CARTAZ = Regex("""posters/([a-z0-9-]+)\.""")
+    private val SLUG_CARTAZ = Regex("""(?:posters/|img/produtos/)([a-z0-9-]+?)(?:-tv)?\.(?:jpg|webp)""")
     private val NAO_ALFANUM = Regex("[^a-z0-9]")
 
-    /** O slug que o [DefaultCatalog] guarda no caminho do cartaz ("posters/<slug>.jpg"). */
+    /** O slug que o [DefaultCatalog] guarda no caminho do cartaz ("img/produtos/<slug>-tv.webp", antes "posters/<slug>.jpg"). */
     private fun slugDe(item: MenuItem): String? = SLUG_CARTAZ.find(item.imageUrl)?.groupValues?.get(1)
 
     private fun normal(s: String) = s.lowercase().replace(NAO_ALFANUM, "")
@@ -165,7 +165,8 @@ object Sincronizacao {
         val porSlug = fabrica.mapNotNull { f -> slugDe(f)?.let { it to f } }.toMap()
         val usados = mutableSetOf<String>()
         val porSeccao = mutableMapOf<Section, Int>()
-        return crm.itens.mapNotNull { c ->
+        // Os esgotados vao para o fim de cada seccao, pela ordem do painel (1/10/2026): a frente da fila e' o que ha.
+        return crm.itens.sortedBy { if (it.estado == "esgotado") 1 else 0 }.mapNotNull { c ->
             val seccao = seccaoDe(c.seccao) ?: return@mapNotNull null
             val base = (porSlug[c.slug] ?: fabrica.firstOrNull { it.section == seccao && normal(it.title) == normal(c.nome) })
                 ?.takeIf { it.id !in usados }
@@ -176,10 +177,14 @@ object Sincronizacao {
                 slot = slot,
                 section = seccao,
                 title = c.nome,
-                // O video e o cartaz da propria TV quando ela os tem (tocam sem rede);
-                // senao os do CRM.
-                videoUrl = base?.videoUrl?.takeIf { it.isNotBlank() } ?: c.video.orEmpty(),
-                imageUrl = base?.imageUrl?.takeIf { it.isNotBlank() } ?: c.imagem.orEmpty(),
+                // O video do site primeiro (1/10/2026, "na TV nem tem fotos nem videos"): os ficheiros da propria TV
+                // vivem na pasta interna da app, que se perde a cada desinstalacao (a troca de assinatura obriga a uma);
+                // o do CRM esta sempre no site. O da TV fica so para a flor que o site ainda nao tem.
+                videoUrl = c.video?.takeIf { it.isNotBlank() } ?: base?.videoUrl.orEmpty(),
+                // O recorte do site primeiro (1/10/2026): a lista e a ficha sao agora papel bege, e o recorte
+                // pousa nele como na loja; o cartaz da TV, com a margem roxa, so quando o CRM nao tem foto.
+                imageUrl = c.imagem?.takeIf { it.isNotBlank() } ?: base?.imageUrl.orEmpty(),
+                esgotado = c.estado == "esgotado",
                 orientation = base?.orientation ?: MediaOrientation.SQUARE,
                 // A linha (CBD ou infundida) vem sempre do CRM, nunca da ficha de fabrica: e' o que manda
                 // na zona de venda, e uma etiqueta errada e' o erro mais caro (CLAUDE.md §1).

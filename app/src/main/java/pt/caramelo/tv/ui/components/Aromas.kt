@@ -27,6 +27,7 @@ import androidx.tv.material3.Text
 import pt.caramelo.tv.ui.i18n.tr
 import pt.caramelo.tv.ui.theme.Amarelo
 import pt.caramelo.tv.ui.theme.Creme
+import pt.caramelo.tv.ui.theme.legivel
 import pt.caramelo.tv.ui.theme.CremeFraco
 import pt.caramelo.tv.ui.theme.Espaco
 import pt.caramelo.tv.ui.theme.Laranja
@@ -101,9 +102,9 @@ enum class Aroma(val pt: String, val en: String, val cor: Color, private val cha
 fun AromasIlustrados(texto: String, textoTraduzido: String, modifier: Modifier = Modifier, tamanho: Dp = 44.dp) {
     val familias = remember(texto) { Aroma.de(texto) }
     Column(modifier) {
-        Text(tr("AROMA", "AROMA"), style = MaterialTheme.typography.labelSmall, color = Amarelo, letterSpacing = 2.sp)
+        Text(tr("AROMA", "AROMA"), style = MaterialTheme.typography.labelSmall, color = legivel(Amarelo), letterSpacing = 2.sp)
         if (familias.isEmpty()) {
-            Text(textoTraduzido, style = MaterialTheme.typography.bodyMedium, color = Creme, modifier = Modifier.padding(top = Espaco.minimo))
+            Text(textoTraduzido, style = MaterialTheme.typography.bodyMedium, color = legivel(Creme), modifier = Modifier.padding(top = Espaco.minimo))
             return@Column
         }
         Row(Modifier.padding(top = Espaco.curto), horizontalArrangement = Arrangement.spacedBy(Espaco.medio)) {
@@ -113,7 +114,7 @@ fun AromasIlustrados(texto: String, textoTraduzido: String, modifier: Modifier =
                     Text(
                         text = tr(a.pt, a.en),
                         style = MaterialTheme.typography.labelSmall,
-                        color = CremeFraco,
+                        color = legivel(CremeFraco),
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         modifier = Modifier.padding(top = Espaco.minimo),
@@ -127,10 +128,11 @@ fun AromasIlustrados(texto: String, textoTraduzido: String, modifier: Modifier =
 /** Um desenho de aroma, a traco. A grelha e' de 24 unidades, como os icones da interface. */
 @Composable
 fun DesenhoDeAroma(aroma: Aroma, modifier: Modifier = Modifier) {
+    val cor = legivel(aroma.cor) // no papel, o bege e o amarelo dos desenhos passam a tinta e a amarelo escuro
     Canvas(modifier) {
         val u = size.minDimension / 24f
         val traco = Stroke(width = 1.9f * u, cap = StrokeCap.Round, join = StrokeJoin.Round)
-        desenhar(aroma, u, traco, aroma.cor)
+        desenhar(aroma, u, traco, cor)
     }
 }
 

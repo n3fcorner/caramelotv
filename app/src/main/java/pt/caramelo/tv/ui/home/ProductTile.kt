@@ -4,10 +4,8 @@ import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,13 +18,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,24 +35,31 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import pt.caramelo.tv.ui.theme.Laranja
+import pt.caramelo.tv.ui.theme.Papel
+import pt.caramelo.tv.ui.theme.PapelSombra
+import pt.caramelo.tv.ui.theme.Roxo
+import pt.caramelo.tv.ui.theme.Tinta
+import pt.caramelo.tv.ui.theme.TintaFraca
+import pt.caramelo.tv.ui.theme.Vermelho
 import pt.caramelo.tv.data.model.ItemState
 import pt.caramelo.tv.data.model.MenuItem
 import pt.caramelo.tv.ui.animation.hero
-import pt.caramelo.tv.ui.components.BarraIndicaSativa
-import pt.caramelo.tv.ui.theme.Amarelo
-import pt.caramelo.tv.ui.theme.Creme
 import pt.caramelo.tv.ui.theme.Espaco
 import pt.caramelo.tv.ui.theme.Movimento
-import pt.caramelo.tv.ui.theme.RoxoProfundo
 
 /**
- * Mosaico de produto. So tipografia sobre a foto — descricao, aroma e cultivo vivem
- * na ficha, nao aqui.
+ * Mosaico de produto, no estilo do site (1/10/2026, Francisco: "no mesmo estilo do site e do manual"): o recorte da
+ * flor pousado no papel, sem caixa, com a sombra por baixo, e o nome em tinta por baixo da foto. O esgotado leva o
+ * carimbo SOLD OUT por cima e a foto esbatida; o que ainda nao chegou, a etiqueta EM BREVE.
  *
- * O nome cresce com o foco em vez de aparecer e desaparecer: em repouso e pequeno e
- * muito espacejado, e ao ganhar foco fecha o espacejamento, cresce e recebe uma
- * regua amarela. Fica sempre legivel de longe, mas o item focado destaca-se pela
- * hierarquia e nao por ser o unico com texto.
+ * O foco: o mosaico cresce com a mola da casa, a foto levanta um pouco, aparece a orla em tinta e a regua laranja
+ * abre por baixo do nome. Le-se de longe sem ser o unico com texto.
  */
 @Composable
 fun ProductTile(
@@ -75,16 +77,14 @@ fun ProductTile(
         animationSpec = Movimento.foco,
         label = "foco-mosaico",
     )
-    // A mola ultrapassa os limites de proposito — e o que da o ressalto na escala.
-    // Tudo o resto (paddings, larguras, alfas) tem de ver o valor ja limitado, ou
-    // rebenta com "Padding must be non-negative" no primeiro desfoque.
+    // A mola ultrapassa os limites de proposito (o ressalto na escala); o resto ve o valor limitado.
     val p = mola.coerceIn(0f, 1f)
+    val forma = RoundedCornerShape(8.dp)
 
     Surface(
         onClick = onClick,
         onLongClick = onLongClick,
         modifier = modifier
-            // Cresce por cima dos vizinhos em vez de ser cortado por eles.
             .zIndex(if (p > 0.001f) 1f else 0f)
             .graphicsLayer {
                 val escala = 1f + (Movimento.ESCALA_FOCO - 1f) * mola
@@ -96,118 +96,118 @@ fun ProductTile(
                 if (it.isFocused) onFocus()
             }
             .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier),
-        shape = ClickableSurfaceDefaults.shape(shape = RectangleShape),
+        shape = ClickableSurfaceDefaults.shape(shape = forma),
         colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = Creme,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            focusedContentColor = Creme,
+            containerColor = Color.Transparent,
+            contentColor = Tinta,
+            focusedContainerColor = Color.White.copy(alpha = 0.28f),
+            focusedContentColor = Tinta,
         ),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
         border = ClickableSurfaceDefaults.border(
-            focusedBorder = Border(BorderStroke(3.dp, Amarelo), shape = RectangleShape),
+            focusedBorder = Border(BorderStroke(3.dp, Tinta), shape = forma),
         ),
     ) {
-        Box(Modifier.fillMaxSize().clipToBounds()) {
-            Fotografia(item = item, posterUrl = posterUrl, realce = p)
+        Column(Modifier.fillMaxSize().padding(Espaco.curto)) {
+            Box(Modifier.fillMaxWidth().weight(1f)) {
+                Fotografia(item = item, posterUrl = posterUrl, levanta = p)
 
-            if (item.state == ItemState.EM_BREVE) {
-                Text(
-                    text = tr("EM BREVE", "COMING SOON"),
-                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.5.sp, lineHeight = 12.sp),
-                    color = RoxoProfundo,
-                    letterSpacing = 1.sp,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(Espaco.minimo)
-                        .background(Amarelo)
-                        .padding(horizontal = 5.dp, vertical = 2.dp),
-                )
+                if (item.esgotado) {
+                    Carimbo(Modifier.align(Alignment.Center))
+                } else if (item.state == ItemState.EM_BREVE) {
+                    Text(
+                        text = tr("EM BREVE", "COMING SOON"),
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 12.sp),
+                        color = Papel,
+                        letterSpacing = 1.sp,
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .background(Roxo, RoundedCornerShape(4.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp),
+                    )
+                }
+
+                // O cultivo no canto de cima, em traco, como no site.
+                Cultivo.de(item)?.let { cultivo ->
+                    PontoDeCultivo(
+                        cultivo = cultivo,
+                        modifier = Modifier.align(Alignment.TopEnd),
+                    )
+                }
             }
 
-            // O cultivo no canto de cima, fora da faixa e longe do EM BREVE.
-            Cultivo.de(item)?.let { cultivo ->
-                PontoDeCultivo(
-                    cultivo = cultivo,
-                    modifier = Modifier.align(Alignment.TopEnd).padding(Espaco.curto),
-                )
-            }
-
-            // A faixa assenta no terco de baixo do mosaico, que nos cartazes e'
-            // margem roxa: o produto e' composto alto (CENTRO 0,33 no
-            // recortar-flores.py) precisamente para nada lhe ficar por cima.
-            // Faixa solida, nao degrade: sem ela o creme perde-se nas fotos claras.
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .fillMaxWidth()
-                    .background(RoxoProfundo.copy(alpha = 0.90f))
-                    .padding(horizontal = Espaco.curto, vertical = 4.dp),
-            ) {
-                // A regua abre da esquerda a medida que o foco entra.
-                Box(
-                    Modifier
-                        .padding(bottom = Espaco.minimo * p)
-                        .width(26.dp * p)
-                        .height(3.dp * p)
-                        .background(Amarelo),
-                )
-                Text(
-                    text = item.displayTitle.uppercase(),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = lerp(11.sp, 13.sp, p),
-                        lineHeight = lerp(13.5.sp, 16.sp, p),
-                        letterSpacing = lerp(1.4.sp, 0.3.sp, p),
-                    ),
-                    color = Creme.copy(alpha = 0.80f + 0.20f * p),
-                    // Duas linhas sempre reservadas: com nomes de uma e de duas
-                    // linhas misturados, as faixas ficavam com alturas aos saltos.
-                    minLines = 2,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-
-            }
-
-            // Indica e sativa numa barra fina no fundo, como nos cartoes do telemovel.
-            if (item.strain.temPerfil) {
-                BarraIndicaSativa(
-                    peso = item.strain.indicaEfectiva,
-                    altura = 4.dp,
-                    modifier = Modifier.align(Alignment.BottomStart),
-                )
-            }
+            // A regua abre da esquerda a medida que o foco entra.
+            Box(
+                Modifier
+                    .padding(top = Espaco.minimo)
+                    .width(30.dp * p)
+                    .height(3.dp)
+                    .background(Laranja.copy(alpha = p)),
+            )
+            Text(
+                text = item.displayTitle,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = lerp(15.sp, 17.sp, p),
+                    lineHeight = lerp(18.sp, 20.sp, p),
+                    letterSpacing = 0.sp,
+                ),
+                color = if (item.esgotado) TintaFraca else Tinta,
+                maxLines = 2,
+                minLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = Espaco.minimo),
+            )
         }
     }
 }
 
+/** O carimbo de borracha: vermelho do manual, rodado, com o papel a passar por baixo. */
 @Composable
-private fun Fotografia(item: MenuItem, posterUrl: String, realce: Float) {
-    Box(Modifier.fillMaxSize().background(RoxoProfundo)) {
+private fun Carimbo(modifier: Modifier = Modifier) {
+    Text(
+        text = "SOLD OUT",
+        style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp, lineHeight = 22.sp),
+        color = Vermelho,
+        letterSpacing = 2.sp,
+        modifier = modifier
+            .graphicsLayer { rotationZ = -14f }
+            .background(Papel.copy(alpha = 0.6f), RoundedCornerShape(6.dp))
+            .border(3.dp, Vermelho, RoundedCornerShape(6.dp))
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+    )
+}
+
+@Composable
+private fun Fotografia(item: MenuItem, posterUrl: String, levanta: Float) {
+    Box(Modifier.fillMaxSize()) {
+        // A sombra do produto pousado: uma elipse suave por baixo, que se afasta quando a foto levanta.
+        Box(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(0.62f)
+                .height(14.dp)
+                .graphicsLayer { alpha = 1f - 0.4f * levanta; scaleX = 1f - 0.12f * levanta }
+                .background(Brush.radialGradient(listOf(PapelSombra, Color.Transparent)), RoundedCornerShape(50)),
+        )
         if (posterUrl.isNotBlank()) {
             AsyncImage(
                 model = posterUrl,
                 contentDescription = null,
-                // Fit e nao Crop: o cartaz e' quadrado e a caixa tambem, mas se um
-                // dia nao forem, corta-se margem roxa e nunca produto.
+                // Fit: o recorte inteiro, nunca cortado; assenta no fundo, como na loja.
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize().hero(item.id),
+                alignment = Alignment.BottomCenter,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 6.dp)
+                    .graphicsLayer {
+                        translationY = -6.dp.toPx() * levanta
+                        alpha = if (item.esgotado) 0.6f else 1f
+                    }
+                    .hero(item.id),
+                colorFilter = if (item.esgotado) ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0.35f) }) else null,
             )
         } else {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
-                    .hero(item.id),
-            )
+            Box(Modifier.fillMaxSize().hero(item.id))
         }
-
-        // Em repouso a foto fica um pouco recolhida; ao focar acende. E o mesmo
-        // gesto do nome a crescer, so que na imagem.
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.30f * (1f - realce.coerceIn(0f, 1f)))),
-        )
     }
 }

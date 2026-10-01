@@ -30,6 +30,9 @@ import androidx.tv.material3.Text
 import pt.caramelo.tv.data.model.Strain
 import pt.caramelo.tv.ui.theme.Amarelo
 import pt.caramelo.tv.ui.theme.Creme
+import pt.caramelo.tv.ui.theme.legivel
+import pt.caramelo.tv.ui.theme.noPapel
+import pt.caramelo.tv.ui.theme.Tinta
 import pt.caramelo.tv.ui.theme.CremeFraco
 import pt.caramelo.tv.ui.theme.Espaco
 import pt.caramelo.tv.ui.theme.RoxoProfundo
@@ -62,24 +65,24 @@ fun PerfilIndicaSativa(strain: Strain, modifier: Modifier = Modifier) {
             Text(
                 buildAnnotatedString {
                     append("$indicaTxt ")
-                    withStyle(SpanStyle(color = Creme, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)) { append("$peso") }
+                    withStyle(SpanStyle(color = legivel(Creme), fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)) { append("$peso") }
                 },
                 style = MaterialTheme.typography.labelMedium,
-                color = CremeFraco,
+                color = legivel(CremeFraco),
             )
             Text(
                 text = (if (strain.type.isBlank()) tr("Perfil", "Profile") else termo(strain.type)).uppercase(),
                 style = MaterialTheme.typography.labelSmall,
-                color = Amarelo,
+                color = legivel(Amarelo),
                 letterSpacing = 2.sp,
             )
             Text(
                 buildAnnotatedString {
-                    withStyle(SpanStyle(color = Creme, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)) { append("${100 - peso}") }
+                    withStyle(SpanStyle(color = legivel(Creme), fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)) { append("${100 - peso}") }
                     append(" $sativaTxt")
                 },
                 style = MaterialTheme.typography.labelMedium,
-                color = CremeFraco,
+                color = legivel(CremeFraco),
             )
         }
         BarraIndicaSativa(peso, altura = 8.dp, modifier = Modifier.padding(top = Espaco.curto))
@@ -88,7 +91,7 @@ fun PerfilIndicaSativa(strain: Strain, modifier: Modifier = Modifier) {
             Text(
                 text = tr("Estimado pelo tipo.", "Estimated from the type."),
                 style = MaterialTheme.typography.labelSmall,
-                color = CremeFraco,
+                color = legivel(CremeFraco),
                 modifier = Modifier.padding(top = Espaco.minimo),
             )
         }
@@ -102,8 +105,8 @@ fun BarraIndicaSativa(peso: Int, altura: Dp, modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth().height(altura),
         horizontalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        Box(Modifier.weight(peso.coerceAtLeast(1).toFloat()).fillMaxHeight().background(Amarelo))
-        Box(Modifier.weight((100 - peso).coerceAtLeast(1).toFloat()).fillMaxHeight().background(VerdeClaro))
+        Box(Modifier.weight(peso.coerceAtLeast(1).toFloat()).fillMaxHeight().background(legivel(Amarelo)))
+        Box(Modifier.weight((100 - peso).coerceAtLeast(1).toFloat()).fillMaxHeight().background(legivel(VerdeClaro)))
     }
 }
 
@@ -123,7 +126,7 @@ fun TerpenosDominantes(terpenos: List<String>, percentagens: List<Int> = emptyLi
     val ORDEM = listOf(1f, 0.72f, 0.5f, 0.36f, 0.26f)
     val CORES = listOf(Amarelo, Laranja, VerdeClaro, Lilas, Creme)
     Column(modifier) {
-        Text(tr("TERPENOS DOMINANTES", "DOMINANT TERPENES"), style = MaterialTheme.typography.labelSmall, color = Amarelo, letterSpacing = 2.sp)
+        Text(tr("TERPENOS DOMINANTES", "DOMINANT TERPENES"), style = MaterialTheme.typography.labelSmall, color = legivel(Amarelo), letterSpacing = 2.sp)
         Column(Modifier.padding(top = Espaco.curto), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             lista.forEachIndexed { i, nome ->
                 val fraccao = if (comPct) percentagens[i] / maximo else ORDEM[i]
@@ -131,19 +134,19 @@ fun TerpenosDominantes(terpenos: List<String>, percentagens: List<Int> = emptyLi
                     Text(
                         text = termo(nome),
                         style = MaterialTheme.typography.labelMedium,
-                        color = Creme,
+                        color = legivel(Creme),
                         maxLines = 1,
                         modifier = Modifier.width(118.dp),
                     )
                     Box(Modifier.weight(1f).height(10.dp)) {
-                        Box(Modifier.fillMaxWidth().fillMaxHeight().background(RoxoProfundo.copy(alpha = 0.6f)))
-                        Box(Modifier.fillMaxWidth(fraccao.coerceIn(0.04f, 1f)).fillMaxHeight().background(CORES[i % CORES.size]))
+                        Box(Modifier.fillMaxWidth().fillMaxHeight().background(if (noPapel()) Tinta.copy(alpha = 0.08f) else RoxoProfundo.copy(alpha = 0.6f)))
+                        Box(Modifier.fillMaxWidth(fraccao.coerceIn(0.04f, 1f)).fillMaxHeight().background(legivel(CORES[i % CORES.size])))
                     }
                     if (comPct) {
                         Text(
                             text = "${percentagens[i]}%",
                             style = MaterialTheme.typography.labelSmall,
-                            color = CremeFraco,
+                            color = legivel(CremeFraco),
                             modifier = Modifier.width(40.dp).padding(start = Espaco.curto),
                         )
                     }
@@ -154,7 +157,7 @@ fun TerpenosDominantes(terpenos: List<String>, percentagens: List<Int> = emptyLi
             text = if (comPct) tr("Perfil publicado pelo produtor, em % dos terpenos.", "Profile published by the grower, as % of terpenes.")
             else tr("Por ordem de dominância, segundo o produtor ou a genética.", "In order of dominance, according to the grower or the genetics."),
             style = MaterialTheme.typography.labelSmall,
-            color = CremeFraco,
+            color = legivel(CremeFraco),
             maxLines = 1,
             modifier = Modifier.padding(top = Espaco.minimo),
         )

@@ -31,3 +31,13 @@ val Marinho = Color(0xFF072645)       // Azul Escuro
 val VerdeClaro = Color(0xFF46C47A)
 /** Lilas dos contornos da mascote no fundo — pouco contraste, de proposito. */
 val Lilas = Color(0xFFC9B6E8)       // contorno do logo, texto sobre amarelo
+
+/**
+ * O papel e a tinta do site (1/10/2026, Francisco: "a app da TV no mesmo estilo do site e do manual"): a lista e a ficha
+ * de cada flor passam a ser o bege do manual com a tinta azul escura, como caramelodobrasil.eu. O leitor de video, as
+ * analises e as definicoes ficam no escuro, que e' o certo para video e PDF.
+ */
+val Papel = Color(0xFFF4EED6)        // Bege do manual, o papel do site
+val PapelSombra = Color(0x2E072645)   // a sombra do produto pousado
+val Tinta = Color(0xFF072645)         // Azul Escuro, a tinta do texto
+val TintaFraca = Color(0xFF55657A)    // texto secundario sobre o papel

@@ -26,8 +26,12 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import pt.caramelo.tv.data.model.MenuItem
 import pt.caramelo.tv.ui.theme.Amarelo
-import pt.caramelo.tv.ui.theme.Creme
-import pt.caramelo.tv.ui.theme.CremeFraco
+import pt.caramelo.tv.ui.theme.Roxo
+import pt.caramelo.tv.ui.theme.Verde
+import pt.caramelo.tv.ui.theme.AzulReal
+import pt.caramelo.tv.ui.theme.Tinta
+import pt.caramelo.tv.ui.theme.TintaFraca
+import androidx.compose.foundation.shape.RoundedCornerShape
 import pt.caramelo.tv.ui.theme.Espaco
 import pt.caramelo.tv.ui.theme.Laranja
 import pt.caramelo.tv.ui.theme.VerdeClaro
@@ -39,9 +43,10 @@ import pt.caramelo.tv.ui.theme.VerdeClaro
  * desta lista, ou vazio, nao leva ponto: melhor sem marca do que com marca errada.
  */
 enum class Cultivo(val nome: String, val cor: Color) {
-    INDOOR("Indoor", Amarelo),
-    GREENHOUSE("Greenhouse", VerdeClaro),
-    GLASSHOUSE("Glasshouse", Creme),
+    // As cores do site (1/10/2026): indoor roxo, estufa verde, vidro azul, exterior laranja; leem-se no papel e no escuro.
+    INDOOR("Indoor", Roxo),
+    GREENHOUSE("Greenhouse", Verde),
+    GLASSHOUSE("Glasshouse", AzulReal),
     OUTDOOR("Outdoor", Laranja);
 
     companion object {
@@ -105,7 +110,7 @@ fun PontoDeCultivo(cultivo: Cultivo, modifier: Modifier = Modifier, tamanho: Dp 
 fun LegendaDeCultivo(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
-            .background(Color.White.copy(alpha = 0.12f))
+            .background(Tinta.copy(alpha = 0.05f), RoundedCornerShape(8.dp))
             .padding(horizontal = Espaco.medio, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(Espaco.largo),
         verticalAlignment = Alignment.CenterVertically,
@@ -116,20 +121,7 @@ fun LegendaDeCultivo(modifier: Modifier = Modifier) {
                 Text(
                     text = cultivo.nome.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = CremeFraco,
-                    letterSpacing = 2.sp,
-                    modifier = Modifier.padding(start = Espaco.curto),
-                )
-            }
-        }
-        // A barra do fundo dos mosaicos: amarelo indica, verde sativa.
-        listOf(termo("Índica") to Amarelo, termo("Sativa") to VerdeClaro).forEach { (nome, cor) ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AmostraDeCor(cor, Modifier.width(18.dp))
-                Text(
-                    text = nome.uppercase(),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = CremeFraco,
+                    color = TintaFraca,
                     letterSpacing = 2.sp,
                     modifier = Modifier.padding(start = Espaco.curto),
                 )

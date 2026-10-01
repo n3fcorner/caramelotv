@@ -5,9 +5,11 @@ import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.luminance
 import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.darkColorScheme
+import androidx.tv.material3.lightColorScheme
 
 private val CarameloColors = darkColorScheme(
     primary = Amarelo,
@@ -61,5 +63,53 @@ fun CarameloTheme(content: @Composable () -> Unit) {
         // Fora de uma Surface o LocalContentColor da lib de TV e preto, o que torna
         // qualquer Text sem cor explicita invisivel no fundo escuro.
         CompositionLocalProvider(LocalContentColor provides Creme, content = content)
+    }
+}
+
+/**
+ * O tema do papel (1/10/2026, "no mesmo estilo do site"): a lista e a ficha de cada flor em bege com tinta azul
+ * escura, como caramelodobrasil.eu. Os botoes (TvButton) leem daqui: o principal continua amarelo com tinta, o
+ * discreto e' tinta sobre o papel. O leitor de video, as analises e as definicoes ficam no [CarameloTheme] escuro.
+ */
+private val PapelColors = lightColorScheme(
+    primary = Amarelo,
+    onPrimary = Marinho,
+    primaryContainer = Laranja,
+    onPrimaryContainer = Marinho,
+    secondary = Laranja,
+    onSecondary = Marinho,
+    background = Papel,
+    onBackground = Tinta,
+    surface = Papel,
+    onSurface = Tinta,
+    surfaceVariant = androidx.compose.ui.graphics.Color(0xFFE6DCB9),
+    onSurfaceVariant = TintaFraca,
+)
+
+@Composable
+fun PapelTheme(content: @Composable () -> Unit) {
+    MaterialTheme(colorScheme = PapelColors, typography = CarameloTypography) {
+        CompositionLocalProvider(LocalContentColor provides Tinta, content = content)
+    }
+}
+
+/** Verdadeiro dentro do [PapelTheme]: a tinta do conteudo e' escura. */
+@Composable
+fun noPapel(): Boolean = LocalContentColor.current.luminance() < 0.5f
+
+/**
+ * A mesma cor, legivel no fundo onde esta (1/10/2026): no papel o bege passa a tinta, o amarelo escurece, o lilas e o
+ * verde claro voltam ao roxo e ao verde do manual; no escuro fica tudo como era.
+ */
+@Composable
+fun legivel(c: androidx.compose.ui.graphics.Color): androidx.compose.ui.graphics.Color {
+    if (!noPapel()) return c
+    return when (c) {
+        Creme -> Tinta
+        CremeFraco -> TintaFraca
+        Amarelo -> androidx.compose.ui.graphics.Color(0xFFB98500)
+        Lilas -> Roxo
+        VerdeClaro -> Verde
+        else -> c
     }
 }

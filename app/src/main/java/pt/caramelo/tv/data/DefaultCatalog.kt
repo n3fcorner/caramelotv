@@ -218,8 +218,8 @@ object DefaultCatalog {
         slot = slot,
         section = section,
         title = titulo,
-        videoUrl = if (temVideo(slug)) "media/$slug.mp4" else "",
-        imageUrl = "posters/$slug.jpg",
+        videoUrl = if (temVideo(slug)) "$SITE/video/$slug.mp4" else "",
+        imageUrl = "$SITE/img/produtos/$slug-tv.webp",
         strain = Strain(linha, formato, cultivo, aroma, infundido, genetica, tipo, indica, terpenos, terpenosPct),
     )
 
@@ -246,7 +246,7 @@ object DefaultCatalog {
         slot = slot,
         section = section,
         title = titulo,
-        imageUrl = if (slug.isBlank()) "" else "posters/$slug.jpg",
+        imageUrl = if (slug.isBlank()) "" else "$SITE/img/produtos/$slug-tv.webp",
         strain = Strain(
             line = linha,
             format = "Flor",
@@ -261,6 +261,14 @@ object DefaultCatalog {
 
     /** Todos tem clipe menos a MAC, que ainda nao foi filmada. */
     private val SEM_VIDEO = emptySet<String>()
+
+    /**
+     * As fotos e os videos de fabrica vem do site (1/10/2026, "na TV nem tem fotos nem videos"). Eram
+     * caminhos relativos a pasta interna da app, que fica vazia a cada instalacao: sem rede ao arrancar,
+     * ou antes da primeira sincronizacao com o CRM, a TV mostrava tudo em branco. O site tem os mesmos
+     * nomes (<slug>-tv.webp, <slug>.mp4) e e o que o CRM manda de qualquer forma.
+     */
+    private const val SITE = "https://caramelodobrasil.eu"
 
     private fun id(section: Section, slot: Int) = when (section) {
         Section.INFUSAO -> "thcp-$slot"
