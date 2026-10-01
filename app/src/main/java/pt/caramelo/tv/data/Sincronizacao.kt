@@ -177,9 +177,10 @@ object Sincronizacao {
                 slot = slot,
                 section = seccao,
                 title = c.nome,
-                // O video e o cartaz da propria TV quando ela os tem (tocam sem rede);
-                // senao os do CRM.
-                videoUrl = base?.videoUrl?.takeIf { it.isNotBlank() } ?: c.video.orEmpty(),
+                // O video do site primeiro (1/10/2026, "na TV nem tem fotos nem videos"): os ficheiros da propria TV
+                // vivem na pasta interna da app, que se perde a cada desinstalacao (a troca de assinatura obriga a uma);
+                // o do CRM esta sempre no site. O da TV fica so para a flor que o site ainda nao tem.
+                videoUrl = c.video?.takeIf { it.isNotBlank() } ?: base?.videoUrl.orEmpty(),
                 // O recorte do site primeiro (1/10/2026): a lista e a ficha sao agora papel bege, e o recorte
                 // pousa nele como na loja; o cartaz da TV, com a margem roxa, so quando o CRM nao tem foto.
                 imageUrl = c.imagem?.takeIf { it.isNotBlank() } ?: base?.imageUrl.orEmpty(),
