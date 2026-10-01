@@ -107,10 +107,10 @@ object Sincronizacao {
         Section.HASH -> "hash"
     }
 
-    private val SLUG_CARTAZ = Regex("""posters/([a-z0-9-]+)\.""")
+    private val SLUG_CARTAZ = Regex("""(?:posters/|img/produtos/)([a-z0-9-]+?)(?:-tv)?\.(?:jpg|webp)""")
     private val NAO_ALFANUM = Regex("[^a-z0-9]")
 
-    /** O slug que o [DefaultCatalog] guarda no caminho do cartaz ("posters/<slug>.jpg"). */
+    /** O slug que o [DefaultCatalog] guarda no caminho do cartaz ("img/produtos/<slug>-tv.webp", antes "posters/<slug>.jpg"). */
     private fun slugDe(item: MenuItem): String? = SLUG_CARTAZ.find(item.imageUrl)?.groupValues?.get(1)
 
     private fun normal(s: String) = s.lowercase().replace(NAO_ALFANUM, "")
