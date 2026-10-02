@@ -106,6 +106,7 @@ import pt.caramelo.tv.ui.theme.Amarelo
 import pt.caramelo.tv.ui.theme.Creme
 import pt.caramelo.tv.ui.theme.Espaco
 import pt.caramelo.tv.ui.theme.Laranja
+import pt.caramelo.tv.ui.theme.corDaSeccao
 import pt.caramelo.tv.ui.theme.Overscan
 import pt.caramelo.tv.ui.theme.RoxoProfundo
 import pt.caramelo.tv.ui.theme.VerdeClaro
@@ -568,11 +569,11 @@ private fun FichaDoProduto(
         verticalArrangement = Arrangement.Center,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.width(22.dp).height(3.dp).background(Laranja))
+            Box(Modifier.width(22.dp).height(3.dp).background(corDaSeccao(item.section)))
             Text(
                 text = termo(item.section.label).uppercase(),
                 style = MaterialTheme.typography.labelSmall,
-                color = Laranja,
+                color = corDaSeccao(item.section),
                 letterSpacing = 3.sp,
                 modifier = Modifier.padding(start = Espaco.curto),
             )

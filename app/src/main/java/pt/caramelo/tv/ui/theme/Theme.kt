@@ -6,6 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import pt.caramelo.tv.data.model.Section
 import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.darkColorScheme
@@ -117,3 +120,21 @@ fun legivel(c: androidx.compose.ui.graphics.Color): androidx.compose.ui.graphics
         else -> c
     }
 }
+
+/**
+ * As regras de cor da TV (2/10/2026, Francisco: "tudo colorido e chamativo, com regras claras, com as cores da marca"):
+ *
+ *  1. O cabecalho e' a faixa da marca: azul escuro a fundir para o roxo tropical, da altura da logomarca.
+ *  2. Cada seccao tem uma cor so, a mesma em todo o lado (separador, barra, cartao, etiqueta):
+ *     CBD verde Brasil, infusao roxo tropical, hash laranja caramelo.
+ *  3. O foco e' sempre amarelo canario: botao, separador ou cartao com o foco acende a amarelo, e mais nada o faz.
+ *  4. O papel bege fica por baixo de tudo; o vermelho e' so para o SOLD OUT.
+ */
+fun corDaSeccao(s: Section): Color = when (s) {
+    Section.CBD -> Verde
+    Section.INFUSAO -> Roxo
+    Section.HASH -> Laranja
+}
+
+/** A faixa do cabecalho: do azul escuro do manual para o roxo tropical. */
+val FaixaDaMarca: Brush = Brush.horizontalGradient(listOf(Marinho, Roxo))
