@@ -14,7 +14,8 @@ import androidx.compose.ui.graphics.Color
 val Roxo = Color(0xFF7554A3)          // Roxo Tropical, superficie dos mosaicos
 val RoxoClaro = Color(0xFF8A6BB8)     // superficie em foco (o roxo do manual um degrau acima)
 val RoxoFundo = Color(0xFF072645)     // Azul Escuro, fundo do ecra
-val RoxoProfundo = Color(0xFF041A30)  // barras, letterbox, sombras (o azul escuro um degrau abaixo)
+val RoxoProfundo = Color(0xFF041A30)
+val RoxoTopo = Color(0xFF3A2A57)      // o roxo do cabecalho, igual ao topo da montra do telemovel (2/10/2026)  // barras, letterbox, sombras (o azul escuro um degrau abaixo)
 
 val Amarelo = Color(0xFFFFC20F)       // Amarelo Canario
 val Laranja = Color(0xFFF58634)       // Laranja Caramelo

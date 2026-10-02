@@ -136,5 +136,6 @@ fun corDaSeccao(s: Section): Color = when (s) {
     Section.HASH -> Laranja
 }
 
-/** A faixa do cabecalho: do azul escuro do manual para o roxo tropical. */
-val FaixaDaMarca: Brush = Brush.horizontalGradient(listOf(Marinho, Roxo))
+/** A faixa do cabecalho (2/10/2026, Francisco: "so quero o roxo no header, o papel em baixo"): o mesmo roxo profundo da
+ * montra do telemovel, liso de ponta a ponta; por baixo fica o papel. */
+val FaixaDaMarca: Brush = Brush.horizontalGradient(listOf(RoxoTopo, RoxoTopo))
