@@ -41,6 +41,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import pt.caramelo.tv.ui.theme.Laranja
+import pt.caramelo.tv.ui.theme.Amarelo
+import pt.caramelo.tv.ui.theme.Creme
 import pt.caramelo.tv.ui.theme.Papel
 import pt.caramelo.tv.ui.theme.PapelSombra
 import pt.caramelo.tv.ui.theme.Roxo
@@ -58,8 +60,8 @@ import pt.caramelo.tv.ui.theme.Movimento
  * flor pousado no papel, sem caixa, com a sombra por baixo, e o nome em tinta por baixo da foto. O esgotado leva o
  * carimbo SOLD OUT por cima e a foto esbatida; o que ainda nao chegou, a etiqueta EM BREVE.
  *
- * O foco: o mosaico cresce com a mola da casa, a foto levanta um pouco, aparece a orla em tinta e a regua laranja
- * abre por baixo do nome. Le-se de longe sem ser o unico com texto.
+ * O foco: o mosaico cresce com a mola da casa, a foto levanta um pouco, o cartao enche-se da cor da seccao com a orla
+ * amarela e a regua amarela abre por baixo do nome, que passa a bege (2/10/2026, regras de cor em Theme.kt).
  */
 @Composable
 fun ProductTile(
@@ -70,6 +72,8 @@ fun ProductTile(
     onFocus: () -> Unit,
     modifier: Modifier = Modifier,
     focusRequester: FocusRequester? = null,
+    /** A cor da seccao (regra 2): o cartao assenta nela em repouso e enche-se dela com o foco. */
+    cor: Color = Laranja,
 ) {
     var focused by remember { mutableStateOf(false) }
     val mola by animateFloatAsState(
@@ -98,14 +102,15 @@ fun ProductTile(
             .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier),
         shape = ClickableSurfaceDefaults.shape(shape = forma),
         colors = ClickableSurfaceDefaults.colors(
-            containerColor = Color.Transparent,
+            containerColor = cor.copy(alpha = 0.10f),
             contentColor = Tinta,
-            focusedContainerColor = Color.White.copy(alpha = 0.28f),
-            focusedContentColor = Tinta,
+            focusedContainerColor = cor,
+            focusedContentColor = Creme,
         ),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
         border = ClickableSurfaceDefaults.border(
-            focusedBorder = Border(BorderStroke(3.dp, Tinta), shape = forma),
+            // Regra 3: o foco e' amarelo.
+            focusedBorder = Border(BorderStroke(4.dp, Amarelo), shape = forma),
         ),
     ) {
         Column(Modifier.fillMaxSize().padding(Espaco.curto)) {
@@ -122,7 +127,7 @@ fun ProductTile(
                         letterSpacing = 1.sp,
                         modifier = Modifier
                             .align(Alignment.TopStart)
-                            .background(Roxo, RoundedCornerShape(4.dp))
+                            .background(cor, RoundedCornerShape(4.dp))
                             .padding(horizontal = 6.dp, vertical = 2.dp),
                     )
                 }
@@ -142,7 +147,7 @@ fun ProductTile(
                     .padding(top = Espaco.minimo)
                     .width(30.dp * p)
                     .height(3.dp)
-                    .background(Laranja.copy(alpha = p)),
+                    .background(Amarelo.copy(alpha = p)),
             )
             Text(
                 text = item.displayTitle,
@@ -151,7 +156,11 @@ fun ProductTile(
                     lineHeight = lerp(18.sp, 20.sp, p),
                     letterSpacing = 0.sp,
                 ),
-                color = if (item.esgotado) TintaFraca else Tinta,
+                color = when {
+                    focused -> Creme
+                    item.esgotado -> TintaFraca
+                    else -> Tinta
+                },
                 maxLines = 2,
                 minLines = 2,
                 overflow = TextOverflow.Ellipsis,

@@ -53,6 +53,7 @@ import pt.caramelo.tv.ui.theme.PapelSombra
 import pt.caramelo.tv.ui.theme.Tinta
 import pt.caramelo.tv.ui.theme.Roxo
 import pt.caramelo.tv.ui.theme.Laranja
+import pt.caramelo.tv.ui.theme.corDaSeccao
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -126,11 +127,11 @@ fun DetailsScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.width(22.dp).height(3.dp).background(Laranja))
+                Box(Modifier.width(22.dp).height(3.dp).background(corDaSeccao(item.section)))
                 Text(
                     text = termo(item.section.label).uppercase(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = Roxo,
+                    color = corDaSeccao(item.section),
                     letterSpacing = 3.sp,
                     modifier = Modifier.padding(start = Espaco.curto),
                 )

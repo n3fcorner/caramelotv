@@ -80,6 +80,10 @@ import pt.caramelo.tv.ui.theme.Movimento
 import pt.caramelo.tv.ui.theme.Overscan
 import pt.caramelo.tv.ui.theme.RoxoProfundo
 import pt.caramelo.tv.ui.theme.VerdeClaro
+import pt.caramelo.tv.ui.theme.CarameloTheme
+import pt.caramelo.tv.ui.theme.FaixaDaMarca
+import pt.caramelo.tv.ui.theme.corDaSeccao
+import androidx.compose.foundation.layout.offset
 
 /**
  * Ecra inicial: tres submenus, CBD, Infusao e Hash (Francisco, 29/9/2026: "tens que
@@ -102,11 +106,7 @@ import pt.caramelo.tv.ui.theme.VerdeClaro
 private val ORDEM_SECCOES = listOf(Section.CBD, Section.INFUSAO, Section.HASH)
 
 /** O par de cores de cada pagina: as duas barras do cabecalho. A primeira e' tambem a do separador. */
-private fun parDe(s: Section): Pair<Color, Color> = when (s) {
-    Section.CBD -> VerdeClaro to Amarelo
-    Section.INFUSAO -> Amarelo to Laranja
-    Section.HASH -> Laranja to VerdeClaro
-}
+private fun parDe(s: Section): Pair<Color, Color> = corDaSeccao(s) to Amarelo
 
 private fun corDe(s: Section): Color = parDe(s).first
 
@@ -167,21 +167,32 @@ fun HomeScreen(
                     false
                 }
             }
-            .padding(horizontal = Overscan.horizontal, vertical = Overscan.vertical),
+            .padding(bottom = Overscan.vertical),
         verticalArrangement = Arrangement.spacedBy(Espaco.medio),
     ) {
         // Depois da primeira cascata, marca-se: nas vezes seguintes o menu ja
         // esta composto quando a foto chega do leitor.
         LaunchedEffect(Unit) { onMostrado() }
 
-        Cabecalho(
-            temContinuar = catalog.lastWatched() != null,
-            onContinue = onContinue,
-            onSettings = onSettings,
-            onMontra = onMontra,
-            onCoa = onCoa,
-            onIdioma = onIdioma,
-        )
+        // A faixa da marca (2/10/2026): azul escuro a fundir para o roxo, de ponta a ponta do ecra e com a altura
+        // da logomarca; os botoes por cima dela no tema escuro (bege em repouso, amarelo com o foco).
+        CarameloTheme {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .background(FaixaDaMarca)
+                    .padding(start = Overscan.horizontal, end = Overscan.horizontal, top = Overscan.vertical, bottom = Espaco.largo),
+            ) {
+                Cabecalho(
+                    temContinuar = catalog.lastWatched() != null,
+                    onContinue = onContinue,
+                    onSettings = onSettings,
+                    onMontra = onMontra,
+                    onCoa = onCoa,
+                    onIdioma = onIdioma,
+                )
+            }
+        }
 
         // Duas barras por baixo do cabecalho, com o par de cores da pagina aberta (Francisco, 29/9/2026:
         // "duas barras por baixo do header, de cores diferentes de pagina para pagina"). A cor de cima e'
@@ -190,15 +201,15 @@ fun HomeScreen(
         val cima by animateColorAsState(corCima, tween(260), label = "barra-cima")
         val baixo by animateColorAsState(corBaixo, tween(260), label = "barra-baixo")
         // As cores leem-se so no desenho (drawBehind): a animacao nao recompoe o ecra inteiro a cada fotograma.
-        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Box(Modifier.fillMaxWidth().height(6.dp).drawBehind { drawRect(cima) })
-            Box(Modifier.fillMaxWidth().height(6.dp).drawBehind { drawRect(baixo) })
+        Column(Modifier.fillMaxWidth().offset(y = -Espaco.medio), verticalArrangement = Arrangement.spacedBy(0.dp)) {
+            Box(Modifier.fillMaxWidth().height(8.dp).drawBehind { drawRect(cima) })
+            Box(Modifier.fillMaxWidth().height(4.dp).drawBehind { drawRect(baixo) })
         }
 
         // Os tres submenus a esquerda e a legenda dos pontos a direita, na mesma linha:
         // a grelha fica com a altura toda que sobra.
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = Overscan.horizontal),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -224,10 +235,10 @@ fun HomeScreen(
             targetState = seccao,
             transitionSpec = { fadeIn(tween(180)).togetherWith(fadeOut(tween(120))) },
             label = "submenu",
-            modifier = Modifier.fillMaxWidth().weight(1f),
+            modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = Overscan.horizontal),
         ) { s ->
             val daSeccao = if (s == seccao) itens else catalog.section(s)
-            Grelha(daSeccao, catalog, requesters, onFocusItem, onOpenItem, onEditItem, cascata = cascata)
+            Grelha(daSeccao, catalog, requesters, onFocusItem, onOpenItem, onEditItem, cascata = cascata, cor = corDaSeccao(s))
         }
 
     }
@@ -250,6 +261,7 @@ private fun Grelha(
     onOpenItem: (MenuItem) -> Unit,
     onEditItem: (MenuItem) -> Unit,
     cascata: Boolean = false,
+    cor: Color = Amarelo,
 ) {
     BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterStart) {
         val alto = maxHeight * 0.92f
@@ -270,6 +282,7 @@ private fun Grelha(
                         onLongClick = { onEditItem(item) },
                         onFocus = { onFocusItem(item) },
                         focusRequester = requesters[item.id],
+                        cor = cor,
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -282,11 +295,15 @@ private fun Grelha(
 @Composable
 private fun Separador(titulo: String, activo: Boolean, onFoco: () -> Unit, focusRequester: FocusRequester, cor: Color) {
     var focado by remember { mutableStateOf(false) }
-    val fundo = when {
-        focado -> cor
-        activo -> cor.copy(alpha = 0.22f)
-        else -> Color.Transparent
-    }
+    // Regra 3: o foco e' amarelo; regra 2: a seccao aberta leva a sua cor cheia; as outras ficam com um filete da cor.
+    val fundo by animateColorAsState(
+        when {
+            focado -> Amarelo
+            activo -> cor
+            else -> cor.copy(alpha = 0.12f)
+        },
+        tween(160), label = "separador",
+    )
     Row(
         modifier = Modifier
             .focusRequester(focusRequester)
@@ -299,7 +316,7 @@ private fun Separador(titulo: String, activo: Boolean, onFoco: () -> Unit, focus
         Text(
             text = titulo.uppercase(),
             style = MaterialTheme.typography.titleSmall,
-            color = if (focado) Tinta else if (activo) Tinta else TintaFraca,
+            color = if (focado) Tinta else if (activo) Creme else Tinta,
             letterSpacing = 2.sp,
         )
     }
@@ -366,7 +383,7 @@ private fun Cabecalho(
             // em amarelo espaçado, recortado da logomarca oficial (uma imagem, não a fonte embutida; a licença da
             // Carbona que existe é a web). Substitui o lettering em grafíti e o "DO BRASIL" em Poppins.
             Image(
-                painter = painterResource(R.drawable.lettering_caramelo_tinta),
+                painter = painterResource(R.drawable.lettering_caramelo),
                 contentDescription = "Caramelo do Brasil",
                 modifier = Modifier.padding(start = Espaco.medio).height(46.dp),
             )
