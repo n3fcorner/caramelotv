@@ -30,6 +30,17 @@ jobs:
       - name: Chave nova so no main
         if: steps.chave.outputs.cache-hit != 'true' && github.ref != 'refs/heads/main'
         run: echo "::warning::Sem chave do main na cache; este APK sai com uma chave provisoria."
+      # A chave propria da app (4/10/2026): com os segredos TV_KEYSTORE_B64 e TV_KEYSTORE_PROPRIEDADES a release assina sempre com
+      # a mesma chave (caramelotv.keystore), e cada versao instala-se por cima da anterior, a mao ou sozinha (Atualizacao.kt). A cache
+      # da chave de debug falhava: cada compilacao do main saia com uma chave nova e a TV pedia para desinstalar.
+      - name: Chave de assinatura da app
+        env:
+          TV_KEYSTORE_B64: ${{ secrets.TV_KEYSTORE_B64 }}
+          TV_KEYSTORE_PROPRIEDADES: ${{ secrets.TV_KEYSTORE_PROPRIEDADES }}
+        run: |
+          if [ -z "$TV_KEYSTORE_B64" ] || [ -z "$TV_KEYSTORE_PROPRIEDADES" ]; then echo "::warning::Sem a chave propria: a release sai com a chave de debug."; exit 0; fi
+          printf '%s' "$TV_KEYSTORE_B64" | base64 -d > caramelotv.keystore
+          printf '%s\n' "$TV_KEYSTORE_PROPRIEDADES" > keystore.properties
       - name: Compilar a release
         run: chmod +x gradlew && ./gradlew --no-daemon assembleRelease
       - uses: actions/cache/save@v4
@@ -51,3 +62,14 @@ jobs:
           name: relatorio-lint
           path: app/build/reports/lint-results-release.html
           retention-days: 14
+      # A TV atualiza-se sozinha (4/10/2026): a release do main vai para o site, que a serve em /tv/caramelotv.apk; a app pergunta
+      # de hora a hora por /tv/versao.json. Sem o segredo TV_APK_SEGREDO no repositorio, o passo nao faz nada.
+      - name: Publicar a versao para a TV
+        if: github.ref == 'refs/heads/main'
+        env:
+          TV_APK_SEGREDO: ${{ secrets.TV_APK_SEGREDO }}
+        run: |
+          if [ -z "$TV_APK_SEGREDO" ]; then echo "::warning::Sem TV_APK_SEGREDO: a TV nao recebe esta versao sozinha."; exit 0; fi
+          curl -fsS -X POST -H "x-segredo: $TV_APK_SEGREDO" -H "content-type: application/octet-stream" \
+            --data-binary @app/build/outputs/apk/release/app-release.apk \
+            "https://caramelodobrasil.eu/api/tv/apk?versao=$GITHUB_RUN_NUMBER&nome=1.0.$GITHUB_RUN_NUMBER"
