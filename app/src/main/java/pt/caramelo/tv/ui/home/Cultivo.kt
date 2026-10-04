@@ -112,18 +112,21 @@ fun LegendaDeCultivo(modifier: Modifier = Modifier) {
         modifier = modifier
             .background(Tinta.copy(alpha = 0.05f), RoundedCornerShape(8.dp))
             .padding(horizontal = Espaco.medio, vertical = 6.dp),
-        horizontalArrangement = Arrangement.spacedBy(Espaco.largo),
+        // Numa linha so (4/10/2026): com o espacamento largo o OUTDOOR partia em OUTD / OOR ao lado dos separadores.
+        horizontalArrangement = Arrangement.spacedBy(Espaco.medio),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Cultivo.entries.forEach { cultivo ->
             Row(verticalAlignment = Alignment.CenterVertically) {
-                PontoDeCultivo(cultivo, tamanho = 20.dp)
+                PontoDeCultivo(cultivo, tamanho = 18.dp)
                 Text(
                     text = cultivo.nome.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
                     color = TintaFraca,
-                    letterSpacing = 2.sp,
-                    modifier = Modifier.padding(start = Espaco.curto),
+                    letterSpacing = 1.sp,
+                    maxLines = 1,
+                    softWrap = false,
+                    modifier = Modifier.padding(start = Espaco.minimo),
                 )
             }
         }

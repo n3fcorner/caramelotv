@@ -3,6 +3,12 @@
 package pt.caramelo.tv.ui.home
 
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.BringIntoViewSpec
+import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.animation.AnimatedContent
 import pt.caramelo.tv.ui.theme.Laranja
@@ -181,6 +187,9 @@ fun HomeScreen(
                 Modifier
                     .fillMaxWidth()
                     .background(FaixaDaMarca)
+                    // Para baixo, de qualquer botao, vai ao separador aberto (4/10/2026): de Definicoes caia-se no
+                    // mosaico que estivesse por baixo e saltava-se a linha dos separadores.
+                    .focusProperties { down = separadores.getValue(seccao) }
                     .padding(start = Overscan.horizontal, end = Overscan.horizontal, top = Overscan.vertical, bottom = Espaco.largo),
             ) {
                 Cabecalho(
@@ -235,10 +244,15 @@ fun HomeScreen(
             targetState = seccao,
             transitionSpec = { fadeIn(tween(180)).togetherWith(fadeOut(tween(120))) },
             label = "submenu",
-            modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = Overscan.horizontal),
+            // Sem margem lateral: a fila corre ate a borda do ecra e a margem de seguranca vai por dentro dela.
+            modifier = Modifier.fillMaxWidth().weight(1f),
         ) { s ->
             val daSeccao = if (s == seccao) itens else catalog.section(s)
-            Grelha(daSeccao, catalog, requesters, onFocusItem, onOpenItem, onEditItem, cascata = cascata, cor = corDaSeccao(s))
+            Grelha(
+                daSeccao, catalog, requesters, onFocusItem, onOpenItem, onEditItem, cascata = cascata, cor = corDaSeccao(s),
+                separador = separadores.getValue(s),
+                ultimo = focusedId?.takeIf { id -> daSeccao.any { it.id == id } }?.let { requesters[it] },
+            )
         }
 
     }
@@ -248,10 +262,20 @@ fun HomeScreen(
 
 /**
  * A fila lateral de uma seccao (1/10/2026, Francisco: "quero que a lista de produtos seja navegavel lateralmente"):
- * os mosaicos todos do mesmo tamanho, grandes, numa linha que o D-pad percorre; o foco puxa o mosaico para dentro do
- * ecra (bringIntoView do horizontalScroll). Row e nao LazyRow: todos compostos, por isso o FocusRequester de cada um
- * existe sempre e o foco volta ao sitio certo ao sair de uma ficha.
+ * os mosaicos todos do mesmo tamanho, grandes, numa linha que o D-pad percorre. Row e nao LazyRow: todos compostos,
+ * por isso o FocusRequester de cada um existe sempre e o foco volta ao sitio certo ao sair de uma ficha.
+ *
+ * As bordas (4/10/2026, Francisco: "pensa que ha limites, e ha coisas para alem das bordas"):
+ *  - a fila tem a largura do ecra e a margem de seguranca vai por dentro (padding depois do scroll): os mosaicos
+ *    deslizam ate a borda fisica em vez de serem cortados numa linha invisivel a 58 dp;
+ *  - o mosaico cresce 9 % com o foco, por isso a altura deixa essa folga e o mosaico em foco nunca e' cortado;
+ *  - o foco nunca assenta encostado a borda ([FocoComFolga]): fica sempre um bocado do vizinho a vista, que e' o que
+ *    diz que ha mais para la;
+ *  - a regua por baixo diz onde se esta ("04 / 15").
+ * Para cima vai sempre ao separador aberto, de qualquer mosaico (antes so do primeiro: do Uranium nao se saia da
+ * fila); ao descer do separador volta-se ao ultimo mosaico visto.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Grelha(
     itens: List<MenuItem>,
@@ -262,32 +286,95 @@ private fun Grelha(
     onEditItem: (MenuItem) -> Unit,
     cascata: Boolean = false,
     cor: Color = Amarelo,
+    separador: FocusRequester,
+    ultimo: FocusRequester?,
 ) {
-    BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterStart) {
-        val alto = maxHeight * 0.92f
-        val largo = alto * 0.72f
-        Row(
-            modifier = Modifier.fillMaxWidth().focusGroup().horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(Espaco.largo),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            itens.forEachIndexed { i, item ->
-                // Na primeira vez que o menu aparece os mosaicos entram em cascata; nas seguintes ja estao parados,
-                // para a foto que volta da ficha encontrar o seu mosaico no sitio.
-                Entrada(ordem = i, modifier = Modifier.width(largo).height(alto), activa = cascata) {
-                    ProductTile(
-                        item = item,
-                        posterUrl = catalog.imageUrlOf(item),
-                        onClick = { onOpenItem(item) },
-                        onLongClick = { onEditItem(item) },
-                        onFocus = { onFocusItem(item) },
-                        focusRequester = requesters[item.id],
-                        cor = cor,
-                        modifier = Modifier.fillMaxSize(),
-                    )
+    var focado by remember { mutableIntStateOf(-1) }
+    val densidade = LocalDensity.current
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(Espaco.curto)) {
+        BoxWithConstraints(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.CenterStart) {
+            // A folga da escala do foco em cima e em baixo, mais um pouco para a orla amarela.
+            val alto = maxHeight / Movimento.ESCALA_FOCO - Espaco.curto
+            val largo = alto * 0.72f
+            // Quanto do vizinho fica sempre a vista: pouco mais de um terco de mosaico, depois da margem de seguranca.
+            val folga = Overscan.horizontal + largo * 0.38f
+            val spec = remember(densidade, folga) { with(densidade) { FocoComFolga(folga.toPx()) } }
+            CompositionLocalProvider(LocalBringIntoViewSpec provides spec) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        // Ao descer do separador entra-se no ultimo mosaico visto, nao no que calhar por baixo.
+                        .focusProperties { enter = { ultimo ?: FocusRequester.Default } }
+                        .focusGroup()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = Overscan.horizontal),
+                    horizontalArrangement = Arrangement.spacedBy(Espaco.largo),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    itens.forEachIndexed { i, item ->
+                        // Na primeira vez que o menu aparece os mosaicos entram em cascata; nas seguintes ja estao parados,
+                        // para a foto que volta da ficha encontrar o seu mosaico no sitio.
+                        Entrada(ordem = i, modifier = Modifier.width(largo).height(alto), activa = cascata) {
+                            ProductTile(
+                                item = item,
+                                posterUrl = catalog.imageUrlOf(item),
+                                onClick = { onOpenItem(item) },
+                                onLongClick = { onEditItem(item) },
+                                onFocus = { focado = i; onFocusItem(item) },
+                                focusRequester = requesters[item.id],
+                                cor = cor,
+                                modifier = Modifier.fillMaxSize().focusProperties { up = separador },
+                            )
+                        }
+                    }
                 }
             }
         }
+        Posicao(focado, itens.size, cor)
+    }
+}
+
+/**
+ * Onde assenta o mosaico que recebe o foco: nunca a menos de [folga] px de uma borda. O horizontalScroll trazia-o so
+ * ate ficar inteiro, encostado ao fim do ecra, e o vizinho desaparecia; assim ha sempre um pedaco dele a vista.
+ * No inicio e no fim da fila o scroll para nos limites, e o primeiro e o ultimo assentam na margem de seguranca.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+private class FocoComFolga(private val folga: Float) : BringIntoViewSpec {
+    override fun calculateScrollDistance(offset: Float, size: Float, containerSize: Float): Float {
+        val fim = offset + size
+        val antes = folga.coerceAtMost((containerSize - size) / 2f)
+        return when {
+            offset < antes -> offset - antes
+            fim > containerSize - antes -> fim - (containerSize - antes)
+            else -> 0f
+        }
+    }
+}
+
+/** A regua da fila: a cor da seccao ate ao mosaico em foco, e "04 / 15" a direita. Le-se, nao se navega. */
+@Composable
+private fun Posicao(i: Int, n: Int, cor: Color) {
+    val fracao by animateFloatAsState(if (n > 0 && i >= 0) (i + 1f) / n else 0f, tween(220), label = "regua")
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = Overscan.horizontal),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        // A fracao le-se so no desenho: andar na fila nao recompoe a regua.
+        Box(
+            Modifier.weight(1f).height(3.dp).drawBehind {
+                drawRect(Tinta.copy(alpha = 0.10f))
+                drawRect(cor, size = size.copy(width = size.width * fracao))
+            },
+        )
+        Text(
+            text = if (i >= 0) "%02d / %02d".format(i + 1, n) else "$n " + tr("artigos", "items"),
+            style = MaterialTheme.typography.labelSmall,
+            color = TintaFraca,
+            letterSpacing = 2.sp,
+            maxLines = 1,
+            modifier = Modifier.padding(start = Espaco.medio),
+        )
     }
 }
 
