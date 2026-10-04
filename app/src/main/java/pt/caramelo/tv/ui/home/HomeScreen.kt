@@ -149,9 +149,14 @@ fun HomeScreen(
     }
     val separadores = remember { ORDEM_SECCOES.associateWith { FocusRequester() } }
 
-    LaunchedEffect(Unit) {
+    // Se ninguem tem o foco, pede-se para o produto certo; e outra vez quando a lista muda. Na primeira instalacao o ecra nasce com
+    // os produtos de fabrica e, segundos depois, chegam os do painel, que trocam os mosaicos: o foco pedido ao primeiro ficava num
+    // mosaico que ja nao existia, e a primeira tecla caia no separador (4/10/2026, visto na TV da loja).
+    var temFoco by remember { mutableStateOf(false) }
+    LaunchedEffect(itens.map { it.id }) {
         // Esperar pelo primeiro frame: o FocusRequester so responde depois do no colocado.
         withFrameNanos { }
+        if (temFoco) return@LaunchedEffect
         val alvo = focusedId?.takeIf { id -> itens.any { it.id == id } }?.let { requesters[it] }
             ?: requesters[itens.firstOrNull()?.id] ?: separadores[seccao]
         runCatching { alvo?.requestFocus() }
@@ -163,6 +168,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .onFocusChanged { temFoco = it.hasFocus }
             .onPreviewKeyEvent { evento ->
                 // Qualquer tecla adia a montra automatica, mesmo as que nao mexem
                 // o foco (por exemplo carregar na margem da grelha).
