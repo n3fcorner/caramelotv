@@ -49,7 +49,7 @@ import pt.caramelo.tv.ui.animation.heroBounds
 import pt.caramelo.tv.ui.components.FundoDaMarca
 import pt.caramelo.tv.ui.components.FundoDePapel
 import pt.caramelo.tv.ui.theme.PapelTheme
-import pt.caramelo.tv.ui.theme.PapelSombra
+import pt.caramelo.tv.ui.components.SombraDePousar
 import pt.caramelo.tv.ui.theme.Tinta
 import pt.caramelo.tv.ui.theme.Roxo
 import pt.caramelo.tv.ui.theme.Laranja
@@ -250,14 +250,7 @@ private fun Campo(rotulo: String, valor: String) {
 private fun Cartaz(item: MenuItem, posterUrl: String, modifier: Modifier = Modifier) {
     // O recorte inteiro pousado no papel, com a sombra por baixo, como na ficha do site (1/10/2026). Fit e nunca Crop.
     Box(modifier, contentAlignment = Alignment.Center) {
-        Box(
-            Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = Espaco.largo)
-                .fillMaxWidth(0.5f)
-                .height(22.dp)
-                .background(Brush.radialGradient(listOf(PapelSombra, Color.Transparent)), RoundedCornerShape(50)),
-        )
+        SombraDePousar(Modifier.align(Alignment.BottomCenter).padding(bottom = Espaco.seccao - 22.dp).fillMaxWidth(0.62f).height(44.dp))
         if (posterUrl.isBlank()) {
             Box(Modifier.fillMaxSize().hero(item.id), contentAlignment = Alignment.Center) {
                 Text(

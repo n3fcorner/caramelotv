@@ -1,5 +1,7 @@
 package pt.caramelo.tv.ui.components
 
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import pt.caramelo.tv.ui.i18n.termo
 import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.foundation.background
@@ -70,11 +72,18 @@ fun PerfilIndicaSativa(strain: Strain, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.labelMedium,
                 color = legivel(CremeFraco),
             )
+            // O tipo curto ao meio (4/10/2026): o do painel traz ", com infusao aromatica", que ja se ve na linha e no separador;
+            // inteiro empurrava o numero da sativa e a barra para fora da caixa.
+            val tipoCurto = strain.type.substringBefore(", com ").substringBefore(", with ").trim()
             Text(
-                text = (if (strain.type.isBlank()) tr("Perfil", "Profile") else termo(strain.type)).uppercase(),
+                text = (if (tipoCurto.isBlank()) tr("Perfil", "Profile") else termo(tipoCurto)).uppercase(),
                 style = MaterialTheme.typography.labelSmall,
                 color = legivel(Amarelo),
                 letterSpacing = 2.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f).padding(horizontal = Espaco.curto),
             )
             Text(
                 buildAnnotatedString {

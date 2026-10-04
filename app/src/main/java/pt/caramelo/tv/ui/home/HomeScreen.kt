@@ -32,6 +32,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -397,6 +398,7 @@ private fun Separador(titulo: String, activo: Boolean, onFoco: () -> Unit, focus
             .onFocusChanged { f -> focado = f.isFocused; if (f.isFocused) onFoco() }
             .focusable()
             .background(fundo, RoundedCornerShape(8.dp))
+            .border(2.dp, Tinta, RoundedCornerShape(8.dp))
             .padding(horizontal = Espaco.largo, vertical = Espaco.curto),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -480,9 +482,7 @@ private fun Cabecalho(
             // Arranca a passagem automatica ja, em vez de esperar pelo tempo de
             // inactividade. E o botao que se carrega ao abrir a loja.
             TvButton(text = tr("Montra", "Showcase"), onClick = onMontra, primary = true)
-            if (temContinuar) {
-                TvButton(text = tr("Continuar", "Continue"), onClick = onContinue, discreto = true)
-            }
+            // O "Continuar" saiu (4/10/2026): abrir um produto ja retoma o video onde ficou, e o botao so baralhava o cabecalho.
             // Cada botao e' a mesma caixa que o titulo do ecra que abre: carregar em
             // Definicoes faz o botao crescer ate ser o cabecalho das Definicoes, e
             // voltar faz o cabecalho encolher outra vez ate ao botao.

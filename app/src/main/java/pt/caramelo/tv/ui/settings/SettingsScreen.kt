@@ -1,5 +1,11 @@
 package pt.caramelo.tv.ui.settings
 
+import androidx.compose.foundation.layout.Box
+import pt.caramelo.tv.ui.theme.corDaSeccao
+import pt.caramelo.tv.ui.theme.TintaFraca
+import pt.caramelo.tv.ui.theme.Tinta
+import pt.caramelo.tv.ui.components.FundoDePapel
+import pt.caramelo.tv.ui.theme.PapelTheme
 import pt.caramelo.tv.ui.i18n.Idioma
 import pt.caramelo.tv.ui.i18n.LocalIdioma
 import pt.caramelo.tv.ui.i18n.termo
@@ -55,10 +61,13 @@ fun SettingsScreen(
         runCatching { firstRow.requestFocus() }
     }
 
+    // No papel, como a lista e a ficha (4/10/2026, Francisco: "as definicoes nao tao top"): era o ultimo ecra no azul antigo.
+    PapelTheme {
+    Box(Modifier.fillMaxSize()) {
+    FundoDePapel()
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = Overscan.horizontal, vertical = Overscan.vertical),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -67,12 +76,20 @@ fun SettingsScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                tr("Definições", "Settings"),
-                style = MaterialTheme.typography.headlineMedium,
-                // A mesma caixa que o botao do menu: e' ele que cresce ate aqui.
-                modifier = Modifier.heroBounds("ecra-definicoes"),
-            )
+            Column {
+                Text(
+                    tr("Definições", "Settings"),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Tinta,
+                    // A mesma caixa que o botao do menu: e' ele que cresce ate aqui.
+                    modifier = Modifier.heroBounds("ecra-definicoes"),
+                )
+                Text(
+                    tr("Os produtos, as fotos, os vídeos e os preços vêm do painel da loja, de 5 em 5 minutos.", "Products, photos, videos and prices come from the shop panel every 5 minutes."),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = TintaFraca,
+                )
+            }
             TvButton(text = tr("Voltar", "Back"), onClick = onBack)
         }
 
@@ -88,7 +105,8 @@ fun SettingsScreen(
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(catalog.items, key = { it.id }) { item ->
                         SelectableRow(
-                            label = "${termo(item.section.label)} · ${item.displayTitle}",
+                            label = item.displayTitle,
+                            marca = corDaSeccao(item.section),
                             value = when (item.state) {
                                 ItemState.PRONTO -> tr("com vídeo", "with video")
                                 ItemState.EM_BREVE -> tr("em breve", "coming soon")
@@ -133,19 +151,6 @@ fun SettingsScreen(
                     onToggle = { onSettingsChange(catalog.settings.copy(loopPlayback = it)) },
                 )
 
-                SectionHeader(text = tr("Servidor de media", "Media server"), modifier = Modifier.padding(top = 16.dp))
-                Text(
-                    text = catalog.settings.mediaBaseUrl,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = tr("Prefixo dos caminhos relativos dos itens. Muda-se por ADB: ", "Prefix for the items' relative paths. Change it over ADB: ") +
-                        "caramelotv://base?url=http://...",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-
                 SectionHeader(text = tr("Manutenção", "Maintenance"), modifier = Modifier.padding(top = 16.dp))
                 TvButton(
                     text = tr("Limpar progresso", "Clear progress"),
@@ -166,6 +171,8 @@ fun SettingsScreen(
         }
     }
 }
+    }
+    }
 
 /** Segundos de comando parado ate a montra arrancar sozinha. Zero desliga. */
 private val ESPERAS = listOf(0, 30, 60, 120, 300)

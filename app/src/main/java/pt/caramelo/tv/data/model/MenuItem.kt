@@ -48,6 +48,8 @@ data class MenuItem(
     val strain: Strain = Strain(),
     /** Sem stock no CRM (1/10/2026): o mosaico leva o carimbo SOLD OUT e vai para o fim da fila. */
     val esgotado: Boolean = false,
+    /** O boletim do lote aberto, quando e' publico (4/10/2026): a tabela do ecra Analises. */
+    val analise: Analise? = null,
 ) {
     val hasVideo: Boolean get() = videoUrl.isNotBlank()
 
@@ -61,3 +63,17 @@ data class MenuItem(
     /** Nome a mostrar, incluindo nos slots ainda por preencher. */
     val displayTitle: String get() = title.ifBlank { "Slot livre" }
 }
+
+/** Os numeros do boletim de analise de um lote, tal como o laboratorio os da (percentagem em massa). */
+@Serializable
+data class Analise(
+    val lote: String = "",
+    val laboratorio: String = "",
+    val numero: String = "",
+    val data: String = "",
+    val metodo: String = "",
+    val thc: Double? = null,
+    val cbd: Double? = null,
+    val d9thc: Double? = null,
+    val cbg: Double? = null,
+)

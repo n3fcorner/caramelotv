@@ -59,33 +59,4 @@ data class Catalog(
         else -> settings.mediaBaseUrl.trimEnd('/') + "/" + path.trimStart('/')
     }
 
-    /** Os boletins de analise, com o caminho ja resolvido contra a base. */
-    fun boletins(): List<Boletim> = BOLETINS.map { it.copy(url = absolute(it.url)) }
 }
-
-/**
- * Um boletim de analise.
- *
- * Sao **certificados distintos**, um por variedade, e nao paginas de um documento
- * unico — o PDF que o Leo mandou traz os quatro digitalizados em sequencia. Por
- * isso cada um leva o seu nome: na TV, "pagina 3 de 4" nao diz nada a ninguem,
- * "Sour Lifter" diz.
- */
-data class Boletim(
-    val url: String,
-    val titulo: String,
-    val laboratorio: String,
-)
-
-/**
- * A lista fica escrita e nao sai de uma listagem de pasta: a app le de `file://`
- * na propria TV e nao tem como listar uma pasta remota quando a base e' HTTP. E o
- * nome de cada um so esta dentro da imagem, portanto tinha de ser transcrito na
- * mesma. Os ficheiros vivem em `videos/web/coa` e vao para a TV com os cartazes.
- */
-private val BOLETINS = listOf(
-    Boletim("coa/coa-1.jpg", "Lemon Kush Pop", "IFHA · Viena"),
-    Boletim("coa/coa-2.jpg", "Uranium", "IFHA · Viena"),
-    Boletim("coa/coa-3.jpg", "Sour Lifter", "IFHA · Viena"),
-    Boletim("coa/coa-4.jpg", "Whyper Pod · Gelato", "Abexan"),
-)

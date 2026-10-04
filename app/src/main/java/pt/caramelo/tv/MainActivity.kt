@@ -160,11 +160,12 @@ private fun Navegacao(viewModel: MainViewModel, catalog: Catalog) {
                     // o novo da direita; voltar faz o inverso. A foto partilhada voa
                     // por cima disto tudo. Sem escala: o hero ja da a sensacao de
                     // profundidade, e escala mais deslize era movimento a mais.
+                    // Em sequencia e nao em cruz (4/10/2026, Francisco: "a transicao entre ecras nao ta clean, ha sobreposicao"): o
+                    // ecra velho sai em 150 ms e o novo so comeca a entrar quando ele ja quase se foi; os dois nunca se leem ao mesmo
+                    // tempo. O deslize e' curto e so no que entra.
                     val sentido = viewModel.sentidoNav
-                    (fadeIn(tween(320)) + slideInHorizontally(tween(360)) { largura -> sentido * largura / 14 })
-                        .togetherWith(
-                            fadeOut(tween(220)) + slideOutHorizontally(tween(360)) { largura -> -sentido * largura / 14 },
-                        )
+                    (fadeIn(tween(260, delayMillis = 130)) + slideInHorizontally(tween(320, delayMillis = 130)) { largura -> sentido * largura / 28 })
+                        .togetherWith(fadeOut(tween(150)))
                 },
                 label = "navegacao",
             ) { alvo ->
@@ -214,7 +215,7 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
         )
 
         Screen.Coa -> CoaScreen(
-            boletins = catalog.boletins(),
+            itens = catalog.items,
             onBack = { viewModel.pop() },
         )
 
