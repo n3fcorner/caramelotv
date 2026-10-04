@@ -114,16 +114,20 @@ fun DetailsScreen(
             modifier = Modifier.weight(0.56f).fillMaxHeight(),
         )
 
+        // Os botoes ficam fora do scroll (4/10/2026): com o foco no primeiro, a coluna descia sozinha ate ele e o
+        // nome do produto saia pelo topo do ecra.
         Column(
             modifier = Modifier
                 .weight(0.44f)
                 .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
                 .graphicsLayer {
                     alpha = ficha
                     // Entra a deslizar da direita, o sentido de leitura da ficha.
                     translationX = (1f - ficha) * 48.dp.toPx()
                 },
+        ) {
+        Column(
+            modifier = Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -186,8 +190,9 @@ fun DetailsScreen(
                 Entrada(ordem = 4) { PerfilIndicaSativa(item.strain, Modifier.padding(top = Espaco.medio)) }
             }
 
+        }
             Row(
-                modifier = Modifier.padding(top = Espaco.seccao),
+                modifier = Modifier.padding(top = Espaco.largo),
                 horizontalArrangement = Arrangement.spacedBy(Espaco.curto),
                 verticalAlignment = Alignment.CenterVertically,
             ) {

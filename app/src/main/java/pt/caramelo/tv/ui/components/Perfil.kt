@@ -158,7 +158,7 @@ fun TerpenosDominantes(terpenos: List<String>, percentagens: List<Int> = emptyLi
             else tr("Por ordem de dominância, segundo o produtor ou a genética.", "In order of dominance, according to the grower or the genetics."),
             style = MaterialTheme.typography.labelSmall,
             color = legivel(CremeFraco),
-            maxLines = 1,
+            maxLines = 2,
             modifier = Modifier.padding(top = Espaco.minimo),
         )
     }

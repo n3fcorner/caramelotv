@@ -195,8 +195,11 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
             catalog = catalog,
             focusedId = viewModel.focusedId,
             onFocusItem = { viewModel.onFocused(it.id) },
+            // OK num produto com video abre logo o leitor, que ja e' a pagina do produto (video e ficha lado a
+            // lado). Passar antes pela ficha com o botao Reproduzir parecia recarregar a mesma pagina (4/10/2026,
+            // Francisco: "um erro absolutamente critico") e obrigava a dois Voltar. A ficha fica para quem nao tem video.
             onOpenItem = { item ->
-                if (catalog.settings.autoplay && item.hasVideo) viewModel.play(item, resume = true)
+                if (item.hasVideo) viewModel.play(item, resume = true)
                 else viewModel.openDetails(item)
             },
             onEditItem = { viewModel.push(Screen.EditItem(it.id)) },

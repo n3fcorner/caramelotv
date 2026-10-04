@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PanelSettings(
-    /** Arranca o video logo ao abrir os detalhes, sem passar pelo botao Reproduzir. */
+    /** Ja nao se usa (4/10/2026): o produto com video abre sempre no leitor. Fica para ler os catalogos gravados. */
     val autoplay: Boolean = false,
     /** Guarda a posicao de cada video e oferece Retomar. */
     val resumePlayback: Boolean = true,

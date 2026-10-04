@@ -112,11 +112,6 @@ fun SettingsScreen(
                     onClick = { onSettingsChange(catalog.settings.copy(idioma = if (catalog.settings.idioma == "en") "pt" else "en")) },
                 )
                 ToggleRow(
-                    label = tr("Reprodução automática", "Autoplay"),
-                    checked = catalog.settings.autoplay,
-                    onToggle = { onSettingsChange(catalog.settings.copy(autoplay = it)) },
-                )
-                ToggleRow(
                     label = tr("Retomar vídeos", "Resume videos"),
                     checked = catalog.settings.resumePlayback,
                     onToggle = { onSettingsChange(catalog.settings.copy(resumePlayback = it)) },
