@@ -4,6 +4,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- A app instala as versoes novas de si propria (4/10/2026, Atualizacao.kt); a TV pede confirmacao a cada uma. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- Obrigatorio para a app ser reconhecida como app de TV -->
     <uses-feature
@@ -58,6 +60,11 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <!-- A resposta do instalador as atualizacoes da propria app. -->
+        <receiver
+            android:name=".data.ResultadoDaInstalacao"
+            android:exported="false" />
     </application>
 
 </manifest>

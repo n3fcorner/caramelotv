@@ -22,8 +22,10 @@ android {
         applicationId = "pt.caramelo.tv"
         minSdk = 23
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        // Cada compilacao do GitHub tem um numero maior (4/10/2026): e' o que a app compara para se atualizar sozinha (Atualizacao.kt).
+        val compilacao = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
+        versionCode = compilacao
+        versionName = "1.0.$compilacao"
     }
 
     signingConfigs {
@@ -60,6 +62,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
