@@ -14,6 +14,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
@@ -359,15 +361,11 @@ fun PlayerScreen(
         transicaoProduto.AnimatedContent(
             contentKey = { it.id },
             transitionSpec = {
-                // Seguinte: o novo sobe do fundo e o velho sai por cima. Anterior: o
-                // inverso. Um quinto do ecra chega para se ler o sentido sem parecer
-                // que a montra deu um salto. O que sai nao se esbate: fica opaco a
-                // deslizar, com o ultimo fotograma, ate o novo (que entra a esbater-se
-                // por cima) o tapar. Assim nunca ha um buraco entre os dois.
-                (fadeIn(tween(300)) + slideInVertically(tween(420)) { altura -> sentido * altura / 5 })
-                    .togetherWith(
-                        slideOutVertically(tween(420)) { altura -> -sentido * altura / 5 },
-                    )
+                // Sem o deslize para cima (4/10/2026, Francisco: "o swipe up nao e' o que adoro, e esta mal desenhado"): o
+                // produto que sai esbate-se em 160 ms, e o seguinte aparece depois dele, com um nada de escala, como os ecras.
+                // Os dois nunca se sobrepoem; no intervalo ve-se o papel, que e' o fundo de todos.
+                (fadeIn(tween(280, delayMillis = 140)) + scaleIn(tween(320, delayMillis = 140), initialScale = 0.985f))
+                    .togetherWith(fadeOut(tween(160)))
             },
         ) { alvo ->
             // `item` e' sempre o alvo mais recente; o `alvo` de um conteudo a sair ja
@@ -464,7 +462,9 @@ private fun PainelDeVideo(
             .aspectRatio(1f)
             // A mesma chave do mosaico e do cartaz: a foto voa ate aqui e o video
             // aparece por baixo dela, em vez de o quadrado surgir do nada.
-            .hero(item.id),
+            .hero(item.id)
+            // O contorno de tinta dos cartoes (4/10/2026), tambem a volta do video.
+            .border(2.dp, Tinta),
     ) {
         // O cartaz tapa o video ate haver um fotograma para mostrar e o painel estar
         // assente, e depois esbate-se. E' a mesma imagem que veio a voar do mosaico:

@@ -1,5 +1,9 @@
 package pt.caramelo.tv.ui.home
 
+import androidx.compose.foundation.border
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.vector.PathParser
 import pt.caramelo.tv.ui.i18n.termo
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.geometry.Offset
@@ -58,48 +62,39 @@ enum class Cultivo(val nome: String, val cor: Color) {
 }
 
 /**
- * O desenho do cultivo (29/9/2026, Francisco: "desenhinhos pequenos também no tipo de
- * cultivo"), no mesmo traco dos aromas: linhas simples na cor do cultivo, so o tracado,
- * sem disco nem fundo (Francisco, 30/9/2026: "todos os desenhos sao so o tracado"). Indoor e' a lampada
- * pendurada com a luz, greenhouse o tunel de estufa, glasshouse a casa de vidro com
- * as vidracas. Canvas, sem imagens: nitido em qualquer TV e sem memoria a mais.
+ * O desenho do cultivo, o mesmo da loja e da montra (4/10/2026, Francisco: "os icones estao muito triviais e banais"): o mesmo
+ * rebento de duas folhas redondas (nunca uma folha que lembre a planta) no seu sitio: debaixo do candeeiro de cultivo, no tunel de
+ * plastico, na casa de vidro e ao sol, na colina. Os caminhos sao os do pictogramas.js do site, na grelha de 48, so traco.
+ * [cor] muda no foco: o mosaico enche-se da cor da seccao e o desenho na mesma cor desaparecia (4/10/2026).
  */
+private val parser = PathParser()
+private fun caminho(d: String): Path = parser.parsePathString(d).toPath().also { parser.clear() }
+private val REBENTO = listOf("M0 0v-13", "M0-7c-1.5-5.4-6-7.8-11-7.6c.6 5.2 4.6 8.4 11 7.6", "M0-10.4c1.6-5 5.8-7.2 10.4-7c-.6 4.8-4.4 7.8-10.4 7").map(::caminho)
+private class Desenho(val linhas: List<Path>, val rebento: Triple<Float, Float, Float>)
+private val DESENHOS: Map<Cultivo, Desenho> by lazy {
+    mapOf(
+        Cultivo.INDOOR to Desenho(listOf("M24 2v4", "M13.5 13c0-4 4.7-6.8 10.5-6.8s10.5 2.8 10.5 6.8z", "M18.5 17.5l-1.8 2.6M24 17.5v3.2M29.5 17.5l1.8 2.6", "M16.5 37.5h15l-2 7h-11z").map(::caminho), Triple(24f, 37.5f, 0.78f)),
+        Cultivo.GREENHOUSE to Desenho(listOf("M4 43V31a20 19 0 0 1 40 0v12", "M12 43V20M36 43V20", "M2 43h44").map(::caminho), Triple(24f, 43f, 0.78f)),
+        Cultivo.GLASSHOUSE to Desenho(listOf("M5 43V21L24 6l19 15v22", "M12 16v27M36 16v27M5 31h7M36 31h7", "M2 43h44").map(::caminho), Triple(24f, 43f, 0.78f)),
+        Cultivo.OUTDOOR to Desenho(listOf("M16 11.5a4.5 4.5 0 1 0-9 0a4.5 4.5 0 1 0 9 0", "M11.5 2.5v2M11.5 18.5v2M2.5 11.5h2M18.5 11.5h2M5.1 5.1l1.4 1.4M16.5 16.5l1.4 1.4M17.9 5.1l-1.4 1.4", "M2 44c6-9 14-13.5 22-13.5S40 35 46 44").map(::caminho), Triple(30f, 30.8f, 0.82f)),
+    )
+}
+
 @Composable
-fun PontoDeCultivo(cultivo: Cultivo, modifier: Modifier = Modifier, tamanho: Dp = 24.dp) {
+fun PontoDeCultivo(cultivo: Cultivo, modifier: Modifier = Modifier, tamanho: Dp = 24.dp, cor: Color = cultivo.cor) {
     Canvas(modifier.size(tamanho)) {
-        val w = size.minDimension
-        val m = w * 0.06f // margem
-        val a = w - 2 * m // lado da area do desenho
-        fun p(x: Float, y: Float) = Offset(m + x * a, m + y * a)
-        val traco = Stroke(width = w * 0.1f, cap = StrokeCap.Round, join = StrokeJoin.Round)
-        val cor = cultivo.cor
-        when (cultivo) {
-            Cultivo.INDOOR -> {
-                drawLine(cor, p(0.5f, 0f), p(0.5f, 0.2f), traco.width, StrokeCap.Round)
-                drawPath(Path().apply { moveTo(p(0.28f, 0.52f).x, p(0.28f, 0.52f).y); lineTo(p(0.38f, 0.2f).x, p(0.38f, 0.2f).y); lineTo(p(0.62f, 0.2f).x, p(0.62f, 0.2f).y); lineTo(p(0.72f, 0.52f).x, p(0.72f, 0.52f).y); close() }, cor, style = traco)
-                listOf(Triple(0.5f, 0.66f, 0.92f), Triple(0.3f, 0.64f, 0.84f), Triple(0.7f, 0.64f, 0.84f)).forEach { (x, y0, y1) ->
-                    val dx = (x - 0.5f) * 0.5f
-                    drawLine(cor, p(x, y0), p(x + dx, y1), traco.width, StrokeCap.Round)
+        val k = size.minDimension / 48f
+        val d = DESENHOS.getValue(cultivo)
+        val largura = 3.6f
+        scale(k, pivot = Offset.Zero) {
+            val traco = Stroke(width = largura, cap = StrokeCap.Round, join = StrokeJoin.Round)
+            d.linhas.forEach { drawPath(it, cor, style = traco) }
+            val (x, y, f) = d.rebento
+            translate(x, y) {
+                scale(f, pivot = Offset.Zero) {
+                    val t = Stroke(width = largura / f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+                    REBENTO.forEach { drawPath(it, cor, style = t) }
                 }
-            }
-            Cultivo.GREENHOUSE -> {
-                drawArc(cor, 180f, 180f, false, topLeft = p(0.02f, 0.2f), size = Size(a * 0.96f, a * 1.3f), style = traco)
-                drawArc(cor, 180f, 180f, false, topLeft = p(0.3f, 0.36f), size = Size(a * 0.4f, a * 0.9f), style = traco)
-                drawLine(cor, p(0f, 0.86f), p(1f, 0.86f), traco.width, StrokeCap.Round)
-            }
-            Cultivo.OUTDOOR -> {
-                // O sol: o disco e os oito raios
-                drawCircle(cor, radius = a * 0.2f, center = p(0.5f, 0.5f), style = traco)
-                for (k in 0 until 8) {
-                    val ang = Math.toRadians(k * 45.0)
-                    val cx = kotlin.math.cos(ang).toFloat(); val cy = kotlin.math.sin(ang).toFloat()
-                    drawLine(cor, p(0.5f + cx * 0.33f, 0.5f + cy * 0.33f), p(0.5f + cx * 0.47f, 0.5f + cy * 0.47f), traco.width, StrokeCap.Round)
-                }
-            }
-            Cultivo.GLASSHOUSE -> {
-                drawPath(Path().apply { moveTo(p(0.06f, 0.92f).x, p(0.06f, 0.92f).y); lineTo(p(0.06f, 0.42f).x, p(0.06f, 0.42f).y); lineTo(p(0.5f, 0.06f).x, p(0.5f, 0.06f).y); lineTo(p(0.94f, 0.42f).x, p(0.94f, 0.42f).y); lineTo(p(0.94f, 0.92f).x, p(0.94f, 0.92f).y); close() }, cor, style = traco)
-                drawLine(cor, p(0.5f, 0.06f), p(0.5f, 0.92f), traco.width * 0.7f, StrokeCap.Round)
-                drawLine(cor, p(0.06f, 0.66f), p(0.94f, 0.66f), traco.width * 0.7f, StrokeCap.Round)
             }
         }
     }
@@ -111,6 +106,7 @@ fun LegendaDeCultivo(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .background(Tinta.copy(alpha = 0.05f), RoundedCornerShape(8.dp))
+            .border(1.5.dp, Tinta.copy(alpha = 0.55f), RoundedCornerShape(8.dp))
             .padding(horizontal = Espaco.medio, vertical = 6.dp),
         // Numa linha so (4/10/2026): com o espacamento largo o OUTDOOR partia em OUTD / OOR ao lado dos separadores.
         horizontalArrangement = Arrangement.spacedBy(Espaco.medio),

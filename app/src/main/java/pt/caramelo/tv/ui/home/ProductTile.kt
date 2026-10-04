@@ -44,7 +44,8 @@ import pt.caramelo.tv.ui.theme.Laranja
 import pt.caramelo.tv.ui.theme.Amarelo
 import pt.caramelo.tv.ui.theme.Creme
 import pt.caramelo.tv.ui.theme.Papel
-import pt.caramelo.tv.ui.theme.PapelSombra
+import pt.caramelo.tv.ui.components.SombraDePousar
+import androidx.compose.foundation.layout.offset
 import pt.caramelo.tv.ui.theme.Roxo
 import pt.caramelo.tv.ui.theme.Tinta
 import pt.caramelo.tv.ui.theme.TintaFraca
@@ -109,7 +110,9 @@ fun ProductTile(
         ),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
         border = ClickableSurfaceDefaults.border(
-            // Regra 3: o foco e' amarelo.
+            // O traco da marca (4/10/2026, Francisco: "falta outlining preto, ta tudo limitless"): em repouso o cartao tem o
+            // contorno fino de tinta, como os desenhos do manual; no foco (regra 3) o contorno passa a amarelo e mais grosso.
+            border = Border(BorderStroke(2.dp, Tinta), shape = forma),
             focusedBorder = Border(BorderStroke(4.dp, Amarelo), shape = forma),
         ),
     ) {
@@ -137,6 +140,8 @@ fun ProductTile(
                     PontoDeCultivo(
                         cultivo = cultivo,
                         modifier = Modifier.align(Alignment.TopEnd),
+                        // No foco o cartao enche-se da cor da seccao, que e' a mesma de alguns desenhos: passa a bege.
+                        cor = if (focused) Creme else cultivo.cor,
                     )
                 }
             }
@@ -189,14 +194,10 @@ private fun Carimbo(modifier: Modifier = Modifier) {
 @Composable
 private fun Fotografia(item: MenuItem, posterUrl: String, levanta: Float) {
     Box(Modifier.fillMaxSize()) {
-        // A sombra do produto pousado: uma elipse suave por baixo, que se afasta quando a foto levanta.
-        Box(
-            Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth(0.62f)
-                .height(14.dp)
-                .graphicsLayer { alpha = 1f - 0.4f * levanta; scaleX = 1f - 0.12f * levanta }
-                .background(Brush.radialGradient(listOf(PapelSombra, Color.Transparent)), RoundedCornerShape(50)),
+        // A sombra de contacto, centrada na base do recorte (que assenta no fundo, a 6dp); afasta-se quando a foto levanta.
+        SombraDePousar(
+            Modifier.align(Alignment.BottomCenter).fillMaxWidth(0.78f).height(40.dp).offset(y = 14.dp),
+            levanta = levanta,
         )
         if (posterUrl.isNotBlank()) {
             AsyncImage(

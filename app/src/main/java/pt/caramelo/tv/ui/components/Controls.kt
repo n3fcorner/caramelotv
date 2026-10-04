@@ -1,5 +1,10 @@
 package pt.caramelo.tv.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import pt.caramelo.tv.ui.theme.noPapel
+import androidx.compose.foundation.shape.RoundedCornerShape
 import pt.caramelo.tv.ui.i18n.tr
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -38,7 +43,9 @@ fun TvButton(
     enabled: Boolean = true,
     focusRequester: FocusRequester? = null,
 ) {
-    val shape = RectangleShape
+    // No papel os botoes tem os cantos de 8dp e o contorno de tinta do manual (4/10/2026); no cabecalho escuro ficam como estavam.
+    val papel = noPapel()
+    val shape = if (papel) RoundedCornerShape(8.dp) else RectangleShape
     val scheme = MaterialTheme.colorScheme
 
     Surface(
@@ -66,7 +73,8 @@ fun TvButton(
         ),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.06f),
         border = ClickableSurfaceDefaults.border(
-            focusedBorder = Border(BorderStroke(2.dp, Creme), shape = shape),
+            border = if (papel) Border(BorderStroke(2.dp, scheme.onSurface), shape = shape) else Border.None,
+            focusedBorder = Border(BorderStroke(2.dp, if (papel) scheme.onSurface else Creme), shape = shape),
         ),
     ) {
         Box(
@@ -93,8 +101,12 @@ fun SelectableRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     focusRequester: FocusRequester? = null,
+    /** Um traco de cor a esquerda (a cor da seccao do produto). */
+    marca: Color? = null,
 ) {
-    val shape = RectangleShape
+    val papel = noPapel()
+    // No papel as linhas sao cartoes brancos de cantos de 8dp, como os da loja; no escuro fica tudo como era.
+    val shape = if (papel) RoundedCornerShape(8.dp) else RectangleShape
     val scheme = MaterialTheme.colorScheme
 
     Surface(
@@ -104,14 +116,15 @@ fun SelectableRow(
             .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier),
         shape = ClickableSurfaceDefaults.shape(shape = shape),
         colors = ClickableSurfaceDefaults.colors(
-            containerColor = scheme.surface,
+            containerColor = if (papel) Color.White.copy(alpha = 0.6f) else scheme.surface,
             contentColor = scheme.onSurface,
             focusedContainerColor = scheme.primary,
             focusedContentColor = scheme.onPrimary,
         ),
-        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.03f),
+        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
         border = ClickableSurfaceDefaults.border(
-            focusedBorder = Border(BorderStroke(2.dp, Creme), shape = shape),
+            border = if (papel) Border(BorderStroke(2.dp, scheme.onSurface), shape = shape) else Border.None,
+            focusedBorder = Border(BorderStroke(2.dp, if (papel) scheme.onSurface else Creme), shape = shape),
         ),
     ) {
         Row(
@@ -121,6 +134,7 @@ fun SelectableRow(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            marca?.let { Box(Modifier.padding(end = 12.dp).width(4.dp).height(22.dp).background(it, RoundedCornerShape(2.dp))) }
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,

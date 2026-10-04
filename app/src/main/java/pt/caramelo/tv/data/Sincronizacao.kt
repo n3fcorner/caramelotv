@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import pt.caramelo.tv.data.model.MediaOrientation
 import pt.caramelo.tv.data.model.MenuItem
+import pt.caramelo.tv.data.model.Analise
 import pt.caramelo.tv.data.model.Section
 import pt.caramelo.tv.data.model.Strain
 import java.net.HttpURLConnection
@@ -25,7 +26,14 @@ import java.net.URL
 object Sincronizacao {
 
     @Serializable
-    data class LoteCrm(val codigo: String = "", val url: String = "")
+    data class LoteCrm(val codigo: String = "", val url: String = "", val analise: AnaliseCrm? = null)
+
+    /** Os numeros do boletim do lote (4/10/2026): os mesmos da pagina /lote do site, para a tabela do ecra Analises. */
+    @Serializable
+    data class AnaliseCrm(
+        val laboratorio: String = "", val numero: String = "", val data: String = "", val metodo: String = "",
+        val thc: Double? = null, val cbd: Double? = null, val d9thc: Double? = null, val cbg: Double? = null,
+    )
 
     @Serializable
     data class TerpenoCrm(val nome: String = "", val pct: Double? = null)
@@ -185,6 +193,7 @@ object Sincronizacao {
                 // pousa nele como na loja; o cartaz da TV, com a margem roxa, so quando o CRM nao tem foto.
                 imageUrl = c.imagem?.takeIf { it.isNotBlank() } ?: base?.imageUrl.orEmpty(),
                 esgotado = c.estado == "esgotado",
+                analise = c.lote?.let { l -> l.analise?.let { a -> Analise(l.codigo, a.laboratorio, a.numero, a.data, a.metodo, a.thc, a.cbd, a.d9thc, a.cbg) } },
                 orientation = base?.orientation ?: MediaOrientation.SQUARE,
                 // A linha (CBD ou infundida) vem sempre do CRM, nunca da ficha de fabrica: e' o que manda
                 // na zona de venda, e uma etiqueta errada e' o erro mais caro (CLAUDE.md §1).
