@@ -190,7 +190,7 @@ fun CoaScreen(
             letterSpacing = 3.sp,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(horizontal = Overscan.horizontal, vertical = Espaco.medio)
+                .padding(horizontal = Overscan.horizontal, vertical = Overscan.vertical)
                 .heroBounds("ecra-analises")
                 .background(RoxoProfundo.copy(alpha = 0.7f))
                 .padding(horizontal = Espaco.curto, vertical = Espaco.minimo),
@@ -201,7 +201,9 @@ fun CoaScreen(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .background(RoxoProfundo.copy(alpha = 0.86f))
-                .padding(horizontal = Overscan.horizontal, vertical = Espaco.curto),
+                // A faixa vai ate ao fundo do ecra, mas o texto fica dentro da margem de seguranca (4/10/2026): a
+                // legenda estava a 36 px do fundo, onde uma TV com overscan a corta.
+                .padding(start = Overscan.horizontal, end = Overscan.horizontal, top = Espaco.curto, bottom = Overscan.vertical),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Espaco.minimo),
         ) {
