@@ -65,6 +65,15 @@
         <receiver
             android:name=".data.ResultadoDaInstalacao"
             android:exported="false" />
+
+        <!-- Depois de cada atualizacao a app volta a abrir-se (5/10/2026). -->
+        <receiver
+            android:name=".data.Reabrir"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
