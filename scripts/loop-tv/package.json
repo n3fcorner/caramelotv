@@ -1,0 +1,13 @@
+{
+  "name": "caramelotv-loop-tv",
+  "private": true,
+  "type": "module",
+  "description": "O globo, o zoom out e o tracejado até Lisboa do loop da TV",
+  "dependencies": {
+    "d3-array": "3.2.4",
+    "d3-geo": "3.1.1",
+    "playwright-core": "1.63.0",
+    "topojson-client": "3.1.0",
+    "world-atlas": "2.0.2"
+  }
+}

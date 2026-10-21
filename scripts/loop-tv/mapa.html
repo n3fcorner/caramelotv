@@ -1,0 +1,143 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Carbona;font-weight:400;src:url(../../../caramelo-b2b/saas/public/fonts/carbona/Carbona-Regular.woff2)}
+@font-face{font-family:Carbona;font-weight:700;src:url(../../../caramelo-b2b/saas/public/fonts/carbona/Carbona-Bold.woff2)}
+@font-face{font-family:Carbona;font-weight:800;src:url(../../../caramelo-b2b/saas/public/fonts/carbona/Carbona-ExtraBold.woff2)}
+html,body{margin:0;background:#072645;overflow:hidden}
+svg{display:block}
+text{font-family:Carbona,Montserrat,"Avenir Next",Arial,sans-serif}
+</style>
+<script src="node_modules/d3-array/dist/d3-array.min.js"></script>
+<script src="node_modules/d3-geo/dist/d3-geo.min.js"></script>
+<script src="node_modules/topojson-client/dist/topojson-client.min.js"></script>
+</head><body>
+<svg id="s" width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <clipPath id="clipCara"><circle cx="0" cy="0" r="46"/></clipPath>
+    <clipPath id="clipCartao"><rect id="clipRect"/></clipPath>
+  </defs>
+  <rect width="1920" height="1080" fill="#072645"/>
+  <g id="globo"></g>
+  <g id="rota"></g>
+  <g id="pinos"></g>
+  <g id="cartao"></g>
+  <g id="cara"></g>
+  <g id="etiquetas"></g>
+</svg>
+<script>
+// Paleta oficial do manual
+const C = { verde:"#00923F", laranja:"#F58634", amarelo:"#FFC20F", bege:"#F4EED6", vermelho:"#E13831", azul:"#3374D8", escuro:"#072645", tinta:"#111111" };
+const W = 1920, H = 1080;
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, at = {}, pai) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); if (pai) pai.appendChild(e); return e; };
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (t) => Math.max(0, Math.min(1, t));
+const fase = (t, a, b) => clamp((t - a) / (b - a));
+const io3 = (t) => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+const ioSin = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
+const salto = (t) => { if (t <= 0) return 0; if (t >= 1) return 1; const c1 = 1.70158, c3 = c1 + 1; return 1 + c3*Math.pow(t-1,3) + c1*Math.pow(t-1,2); };
+
+let paises, terra;
+window.preparar = (topo) => {
+  paises = topojson.feature(topo, topo.objects.countries).features;
+  terra = topojson.merge(topo, topo.objects.countries.geometries);
+};
+
+// Um troço: a cena do clipe encolhe até ser um postal no sítio de origem, e o tracejado vai até Lisboa.
+window.TROCO = {
+  origem: [-43.2, -22.9],           // de onde vem (lon, lat)
+  destino: [-9.14, 38.72],          // Lisboa
+  vista: { centro: [-24, 6], raio: 700 },
+  zoom: 8,                           // quantas vezes maior começa
+  nome: "LEO",
+  cena: "cena-leo.png",
+  cara: "cara-leo.png",
+  destaque: { 76: C.verde, 620: C.laranja }, // Brasil, Portugal (ids ISO numéricos)
+};
+
+window.frame = (t) => {
+  const T = window.TROCO;
+  const g = document.getElementById("globo"); g.replaceChildren();
+  const rota = document.getElementById("rota"); rota.replaceChildren();
+  const pinos = document.getElementById("pinos"); pinos.replaceChildren();
+  const cartao = document.getElementById("cartao"); cartao.replaceChildren();
+  const cara = document.getElementById("cara"); cara.replaceChildren();
+  const etq = document.getElementById("etiquetas"); etq.replaceChildren();
+
+  // câmara: do zoom na origem até à vista do globo
+  const z = io3(fase(t, 0.4, 3.0));
+  const raio = T.vista.raio * Math.exp(lerp(Math.log(T.zoom), 0, z));
+  const lon = lerp(T.origem[0], T.vista.centro[0], z), lat = lerp(T.origem[1], T.vista.centro[1], z);
+  const deriva = fase(t, 3.0, 7.5) * 1.2; // a câmara não pára de todo
+  const proj = d3.geoOrthographic().rotate([-(lon + deriva), -lat]).scale(raio).translate([W/2, H/2]).clipAngle(90).precision(0.3);
+  const path = d3.geoPath(proj);
+
+  el("path", { d: path({type:"Sphere"}), fill: C.azul, stroke: C.tinta, "stroke-width": 7 }, g);
+  for (const f of paises) {
+    const cor = T.destaque[+f.id] || C.bege;
+    el("path", { d: path(f), fill: cor }, g);
+  }
+  el("path", { d: path(terra), fill: "none", stroke: C.tinta, "stroke-width": 4.5, "stroke-linejoin": "round" }, g);
+  // fronteiras finas
+  for (const f of paises) el("path", { d: path(f), fill: "none", stroke: C.tinta, "stroke-opacity": .28, "stroke-width": 1.4 }, g);
+
+  const pO = proj(T.origem), pD = proj(T.destino);
+
+  // o tracejado, pelo círculo máximo
+  const r = ioSin(fase(t, 3.0, 5.6));
+  if (r > 0) {
+    const interp = d3.geoInterpolate(T.origem, T.destino);
+    const pts = []; for (let i = 0; i <= 120; i++) { const k = i / 120 * r; pts.push(proj(interp(k))); }
+    const d = "M" + pts.map(p => p.map(v => v.toFixed(1)).join(",")).join("L");
+    el("path", { d, fill: "none", stroke: C.tinta, "stroke-width": 17, "stroke-linecap": "round", "stroke-dasharray": "26 18" }, rota);
+    el("path", { d, fill: "none", stroke: C.amarelo, "stroke-width": 9, "stroke-linecap": "round", "stroke-dasharray": "26 18" }, rota);
+    // a cara vai na ponta
+    const ponta = pts[pts.length - 1];
+    const sc = salto(fase(t, 3.0, 3.35)) * (1 - 0.0 * fase(t, 5.6, 6.0));
+    const gc = el("g", { transform: `translate(${ponta[0]},${ponta[1]}) scale(${sc})` }, cara);
+    el("circle", { r: 56, fill: C.tinta }, gc);
+    el("circle", { r: 52, fill: C.amarelo }, gc);
+    el("circle", { r: 46, fill: C.bege }, gc);
+    el("image", { href: T.cara, x: -46, y: -46, width: 92, height: 92, "clip-path": "url(#clipCara)" }, gc);
+  }
+
+  // pino da origem por baixo do postal
+  const po = salto(fase(t, 2.4, 2.8));
+  if (po > 0) pino(pinos, pO, po, C.vermelho);
+
+  // o postal com a cena
+  const s = raio / T.vista.raio;          // 9 → 1
+  const larg = (W / T.zoom) * s, alt = larg * 9 / 16;
+  const rot = lerp(0, -5, z);
+  // no fim, o postal fica por cima e à esquerda do pino, para o tracejado sair à vista
+  const cx = pO[0] - lerp(0, larg * 0.6, z), cy = pO[1] - lerp(0, alt / 2 + 96, z);
+  const gp = el("g", { transform: `translate(${cx},${cy}) rotate(${rot})` }, cartao);
+  const borda = lerp(0, 9, z);
+  el("rect", { x: -larg/2 - borda - 4, y: -alt/2 - borda - 4, width: larg + 2*borda + 8, height: alt + 2*borda + 8, fill: C.tinta }, gp);
+  el("rect", { x: -larg/2 - borda, y: -alt/2 - borda, width: larg + 2*borda, height: alt + 2*borda, fill: "#ffffff" }, gp);
+  el("image", { href: T.cena, x: -larg/2, y: -alt/2, width: larg, height: alt, preserveAspectRatio: "xMidYMid slice" }, gp);
+
+  // etiquetas
+  const en = salto(fase(t, 2.6, 3.0));
+  if (en > 0) etiqueta(etq, cx - larg/2 - borda - 14, cy - alt/2 - borda - 40, T.nome, C.amarelo, C.escuro, en, "esq");
+  const el2 = salto(fase(t, 5.7, 6.1));
+  if (el2 > 0) etiqueta(etq, pD[0] + 66, pD[1] - 27, "LISBOA", C.escuro, C.amarelo, el2, "esq");
+};
+
+function pino(pai, p, s, cor) {
+  const g = el("g", { transform: `translate(${p[0]},${p[1]}) scale(${s})` }, pai);
+  el("path", { d: "M0,0 C-8,-14 -24,-30 -24,-48 A24,24 0 1 1 24,-48 C24,-30 8,-14 0,0 Z", fill: cor, stroke: C.tinta, "stroke-width": 5, "stroke-linejoin": "round" }, g);
+  el("circle", { cx: 0, cy: -48, r: 9, fill: C.bege, stroke: C.tinta, "stroke-width": 3 }, g);
+}
+
+function etiqueta(pai, x, y, txt, fundo, cor, s) {
+  const g = el("g", { transform: `translate(${x},${y}) scale(${s})` }, pai);
+  const t = el("text", { x: 18, y: 38, "font-size": 34, "font-weight": 800, fill: cor, "letter-spacing": "2" }, g);
+  t.textContent = txt;
+  const w = t.getComputedTextLength() + 38;
+  const r = el("rect", { x: 0, y: 0, width: w, height: 54, fill: fundo, stroke: C.tinta, "stroke-width": 4 }, g);
+  g.insertBefore(r, t);
+}
+</script>
+</body></html>

@@ -297,6 +297,29 @@ cd web && vercel deploy --prod
 O `playsinline` no `<video>` não é decorativo: sem ele o Safari do iPhone salta
 para ecrã inteiro e sai da página.
 
+## Loop da marca
+
+Um minuto em 16:9 para a montra automática, entre os produtos: Leo, o Caramelo do
+hidrante, sai do Brasil; a câmara recua até um globo e um tracejado leva-o a Lisboa;
+depois cada pessoa da equipa, de onde vem, como um cão da mesma família; no fim todos à
+porta da loja da Alameda.
+
+As cenas vêm do Gemini Pro (o quadro) e do Flow (Frames to Video, com o quadro no início
+e no fim). Os prompts vivem no `caramelo-b2b`, em `saas/src/dados/prompts-gemini.js`
+(`PERSONAGENS_TV`, `CENAS_TV`, `finalTV`), com o PDF em `plan/para-francisco/`.
+
+O globo, o zoom out e o tracejado fazem-se aqui, por código, porque um mapa do Veo sai com
+a geografia errada e cada clipe com outro mapa:
+
+```bash
+cd scripts/loop-tv && npm install
+node render.mjs --cena ultimo-fotograma.png --saida troco-leo.mp4
+```
+
+`mapa.html` desenha um fotograma por instante (`window.TROCO` diz a pessoa, a origem e a
+vista); `render.mjs` passa-os ao ffmpeg. Lê as fontes e o cão do `caramelo-b2b` ao lado
+deste repositório. Sem `--cena`, o postal é uma cena provisória.
+
 ## Onde continuar
 
 - `ControlPanel.kt` — acrescentar uma entrada em `PanelAction` e tratá-la na `MainActivity`.
