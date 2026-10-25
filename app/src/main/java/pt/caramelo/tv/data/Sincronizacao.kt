@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import pt.caramelo.tv.data.model.MediaOrientation
 import pt.caramelo.tv.data.model.MenuItem
 import pt.caramelo.tv.data.model.Analise
+import pt.caramelo.tv.data.model.Parafernalia
 import pt.caramelo.tv.data.model.Section
 import pt.caramelo.tv.data.model.Strain
 import java.net.HttpURLConnection
@@ -69,8 +70,24 @@ object Sincronizacao {
         val painel: PainelCrm? = null,
     )
 
+    /** Um artigo de parafernalia como o CRM o manda (25/10/2026): foto, preco, categoria e, nas piteiras e kits, o video da rotacao e o .glb. */
     @Serializable
-    data class CatalogoCrm(val itens: List<ItemCrm> = emptyList())
+    data class ParafernaliaCrm(
+        val slug: String = "",
+        val nome: String = "",
+        val categoria: String = "",
+        val estado: String = "",
+        val preco: Double? = null,
+        val imagem: String? = null,
+        val modelo3d: String? = null,
+        val giro: String? = null,
+    )
+
+    @Serializable
+    data class CatalogoCrm(
+        val itens: List<ItemCrm> = emptyList(),
+        val parafernalia: List<ParafernaliaCrm> = emptyList(),
+    )
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
@@ -91,7 +108,7 @@ object Sincronizacao {
             val texto = ligacao.inputStream.bufferedReader().use { it.readText() }
             if (texto.length > 1_000_000) return null
             val lido = json.decodeFromString(CatalogoCrm.serializer(), texto)
-            if (lido.itens.isEmpty()) null else json.encodeToString(CatalogoCrm.serializer(), lido)
+            if (lido.itens.isEmpty() && lido.parafernalia.isEmpty()) null else json.encodeToString(CatalogoCrm.serializer(), lido)
         } catch (e: Exception) {
             null
         } finally {
@@ -101,6 +118,21 @@ object Sincronizacao {
 
     fun ler(raw: String?): CatalogoCrm? =
         raw?.takeIf { it.isNotBlank() }?.let { runCatching { json.decodeFromString(CatalogoCrm.serializer(), it) }.getOrNull() }
+
+    /** A parafernalia do CRM, tal como chega (ja ordenada pelo servidor: categoria e depois nome), com as fotos e o video prontos. */
+    fun parafernalia(crm: CatalogoCrm): List<Parafernalia> =
+        crm.parafernalia.map {
+            Parafernalia(
+                slug = it.slug,
+                nome = it.nome,
+                categoria = it.categoria,
+                estado = it.estado,
+                preco = it.preco,
+                imagem = it.imagem.orEmpty(),
+                modelo3d = it.modelo3d,
+                giro = it.giro,
+            )
+        }
 
     private fun seccaoDe(s: String): Section? = when (s) {
         "cbd" -> Section.CBD

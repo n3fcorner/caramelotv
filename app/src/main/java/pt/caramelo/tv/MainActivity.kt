@@ -48,6 +48,7 @@ import pt.caramelo.tv.ui.coa.CoaScreen
 import pt.caramelo.tv.ui.components.TvButton
 import pt.caramelo.tv.ui.details.DetailsScreen
 import pt.caramelo.tv.ui.home.HomeScreen
+import pt.caramelo.tv.ui.parafernalia.ParafernaliaScreen
 import pt.caramelo.tv.ui.player.PlayerScreen
 import pt.caramelo.tv.ui.settings.EditItemScreen
 import pt.caramelo.tv.ui.settings.SettingsScreen
@@ -208,6 +209,7 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
             onSettings = { viewModel.push(Screen.Settings) },
             onMontra = viewModel::iniciarAtrator,
             onCoa = { viewModel.push(Screen.Coa) },
+            onParafernalia = { viewModel.push(Screen.Parafernalia) },
             onInteracao = viewModel::registarInteracao,
             onIdioma = { viewModel.updateSettings { it.copy(idioma = if (it.idioma == "en") "pt" else "en") } },
             cascata = !viewModel.menuJaMostrado,
@@ -217,6 +219,13 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
         Screen.Coa -> CoaScreen(
             itens = catalog.items,
             onBack = { viewModel.pop() },
+        )
+
+        Screen.Parafernalia -> ParafernaliaScreen(
+            parafernalia = catalog.parafernalia,
+            imagemDe = { catalog.imagemDe(it) },
+            giroDe = { catalog.giroDe(it) },
+            onInteracao = viewModel::registarInteracao,
         )
 
         is Screen.Details -> WithItem(catalog, screen.id, viewModel) { item ->

@@ -17,6 +17,11 @@ data class Catalog(
      * guardando o resto (definicoes, posicoes, ultimo visto).
      */
     val defaultsFingerprint: String = "",
+    /**
+     * A parafernalia da loja (25/10/2026): vem do CRM, nunca da fabrica, e o repositorio volta a enche-la
+     * a cada leitura ([CatalogRepository.comCrm]). Tem pagina propria na app; nao entra no catalogo da flor.
+     */
+    val parafernalia: List<Parafernalia> = emptyList(),
 ) {
     fun section(section: Section): List<MenuItem> =
         items.filter { it.section == section }.sortedBy { it.slot }
@@ -50,6 +55,11 @@ data class Catalog(
     fun videoUrlOf(item: MenuItem): String = absolute(item.videoUrl)
 
     fun imageUrlOf(item: MenuItem): String = absolute(item.imageUrl)
+
+    /** A foto e o video da rotacao de um artigo de parafernalia (o CRM ja os manda absolutos; resolve-se por seguranca). */
+    fun imagemDe(p: Parafernalia): String = absolute(p.imagem)
+
+    fun giroDe(p: Parafernalia): String = p.giro?.takeIf { it.isNotBlank() }?.let { absolute(it) } ?: ""
 
     /** Deixa passar URLs completos; a tudo o resto prefixa a base configurada. */
     private fun absolute(path: String): String = when {

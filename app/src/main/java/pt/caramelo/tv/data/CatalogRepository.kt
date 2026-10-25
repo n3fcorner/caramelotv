@@ -66,13 +66,15 @@ class CatalogRepository(private val context: Context) {
     private fun Catalog.comCrm(raw: String?): Catalog {
         val crm = Sincronizacao.ler(raw) ?: return this
         if (settings.crmUrl.isBlank()) return this
+        // A parafernalia vem sempre do CRM, nunca da fabrica nem do que esta gravado: enche-se a cada leitura.
+        val comParaf = copy(parafernalia = Sincronizacao.parafernalia(crm))
         val itens = Sincronizacao.juntar(crm, fabrica)
-        if (itens.isEmpty()) return this
+        if (itens.isEmpty()) return comParaf
         // O que se editou na propria TV (titulo, video, imagem em Definicoes > Editar) continua por
         // cima do CRM: sem isto o Guardar nao fazia nada assim que havia catalogo do CRM (auditoria 29/9).
         val porId = fabrica.associateBy { it.id }
         val editados = items.filter { s -> porId[s.id]?.let { f -> f.title != s.title || f.videoUrl != s.videoUrl || f.imageUrl != s.imageUrl } ?: true }.associateBy { it.id }
-        return copy(items = itens.map { i -> editados[i.id]?.let { e -> i.copy(title = e.title, videoUrl = e.videoUrl, imageUrl = e.imageUrl) } ?: i })
+        return comParaf.copy(items = itens.map { i -> editados[i.id]?.let { e -> i.copy(title = e.title, videoUrl = e.videoUrl, imageUrl = e.imageUrl) } ?: i })
     }
 
     private val fabrica by lazy { DefaultCatalog.build().items }
