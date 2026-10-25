@@ -128,6 +128,7 @@ fun HomeScreen(
     onSettings: () -> Unit,
     onMontra: () -> Unit,
     onCoa: () -> Unit,
+    onParafernalia: () -> Unit,
     onInteracao: () -> Unit,
     onIdioma: () -> Unit = {},
     /** Verdadeiro na primeira vez que o menu aparece: os mosaicos entram em cascata. */
@@ -201,10 +202,12 @@ fun HomeScreen(
             ) {
                 Cabecalho(
                     temContinuar = catalog.lastWatched() != null,
+                    temParafernalia = catalog.parafernalia.isNotEmpty(),
                     onContinue = onContinue,
                     onSettings = onSettings,
                     onMontra = onMontra,
                     onCoa = onCoa,
+                    onParafernalia = onParafernalia,
                     onIdioma = onIdioma,
                 )
             }
@@ -450,10 +453,12 @@ private fun Seccao(
 @Composable
 private fun Cabecalho(
     temContinuar: Boolean,
+    temParafernalia: Boolean,
     onContinue: () -> Unit,
     onSettings: () -> Unit,
     onMontra: () -> Unit,
     onCoa: () -> Unit,
+    onParafernalia: () -> Unit,
     onIdioma: () -> Unit,
 ) {
     Row(
@@ -488,6 +493,10 @@ private fun Cabecalho(
             // Arranca a passagem automatica ja, em vez de esperar pelo tempo de
             // inactividade. E o botao que se carrega ao abrir a loja.
             TvButton(text = tr("Montra", "Showcase"), onClick = onMontra, primary = true)
+            // A parafernalia (25/10/2026): pagina propria com as piteiras e os acessorios, as piteiras a rodar em 3D. So aparece com artigos.
+            if (temParafernalia) {
+                TvButton(text = tr("Parafernália", "Accessories"), onClick = onParafernalia, discreto = true)
+            }
             // O "Continuar" saiu (4/10/2026): abrir um produto ja retoma o video onde ficou, e o botao so baralhava o cabecalho.
             // Cada botao e' a mesma caixa que o titulo do ecra que abre: carregar em
             // Definicoes faz o botao crescer ate ser o cabecalho das Definicoes, e
