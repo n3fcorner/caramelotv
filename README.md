@@ -141,6 +141,34 @@ As miniaturas saem do frame mais representativo de cada clipe, com o instante es
 à vista (uns começam em preto, noutros o produto só aparece a meio), o mesmo corte
 quadrado e um tratamento leve de contraste, saturação e nitidez.
 
+## Loops das piteiras
+
+As 15 artes das piteiras de vidro animadas no Gemini, para a montra automática.
+Cada kit junta três (uma de 7, uma de 6 e uma de 5 mm) numa cena com as três
+piteiras do kit a rodar por cima.
+
+```bash
+python3 scripts/arte-piteiras.py        # artes da folha-mestra -> arte/piteiras/
+python3 scripts/prompts-piteiras.py     # os prompts -> arte/piteiras/PROMPTS.md
+./scripts/fechar-loop.sh clipe.mp4 formula-1   # clipe do Gemini -> videos/loops/
+./scripts/cena-kit.sh atletas           # três loops + piteiras -> videos/loops/cena-atletas.mp4
+```
+
+`arte/piteiras/16x9/` são as telas que vão ao Gemini: a arte a toda a largura de um
+quadro 1920x1080, com o que falta pintar a cinzento liso. Tapa-se o logótipo, o
+letreiro, o selo do H e as faixas de título (o vídeo entorta letras; o logótipo
+verdadeiro entra no fim pelo `fechar-loop.sh`) e o que faria o Gemini recusar a
+imagem: a folha, o THC do escudo, o LEGALIZE, o R$ 4,20. O cinzento também fixa a
+proporção, porque o editor de imagem devolve a da imagem que recebe.
+
+O `fechar-loop.sh` cruza o último segundo do clipe com o primeiro, por isso o
+vídeo fecha mesmo que o Veo não volte à pose inicial; com `0` no fim só tira o
+último fotograma (para clipes do Flow com a mesma imagem nas pontas). O
+`cena-kit.sh` tira as piteiras do modelo 3D do painel com fundo transparente
+(`kit-transparente.mjs`, o mesmo visualizador dos giros) e põe uma volta por tema;
+`RASCUNHO=1` faz a cena com a arte parada, para ver o enquadramento antes de haver
+loops. Os modelos vêm de `../caramelo-b2b/saas/public`.
+
 ## Stack
 
 Kotlin 2.0 · Jetpack Compose · `androidx.tv:tv-material` (Compose for TV) ·
