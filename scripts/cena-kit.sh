@@ -35,10 +35,19 @@ L="${L:-168}"          # fotogramas de cada tema (7 s)
 X="${X:-12}"           # fotogramas do cruzamento (0,5 s)
 VOLTA=$((L - X))
 TOTAL=$((3 * L - 3 * X))
-# O kit: o quadrado do render (o kit ocupa uns 84% dele) escalado a KIT_LADO, ao
-# centro e um pouco abaixo do meio, longe do logotipo no canto de cima.
-KIT_LADO="${KIT_LADO:-1320}"
-KIT_DESCE="${KIT_DESCE:-70}"
+# O kit: o quadrado do render escalado a KIT_LADO, ao centro e um pouco abaixo do
+# meio, longe do logotipo no canto de cima.
+KIT_LADO="${KIT_LADO:-1240}"
+KIT_DESCE="${KIT_DESCE:-110}"
+# A janela onde as piteiras assentam (11/11/2026, Francisco: "uma janela para as
+# piteiras assentarem em cima e se verem bem em contraste"). Sobre artes tao
+# cheias de cor, as piteiras perdiam-se. E' uma faixa solida da marca, como a
+# regra da app para o texto sobre fotos: roxo de fundo, contorno creme e tinta,
+# sombra dura amarela, sem cantos redondos. Mede-se pelas proprias piteiras (a
+# caixa que as contem em todas as posicoes da volta) mais JANELA_FOLGA a toda a
+# volta, por isso serve a qualquer kit sem acertos a mao.
+JANELA_FOLGA="${JANELA_FOLGA:-56}"
+JANELA_COR="${JANELA_COR:-0x2E1F4C}"
 DESTINO=videos/loops
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
@@ -73,6 +82,25 @@ if [ "$(ls "$PNGS"/*.png 2>/dev/null | wc -l)" != "$VOLTA" ]; then
   node scripts/kit-transparente.mjs "$KIT" "$VOLTA"
 fi
 
+# --- a janela -----------------------------------------------------------------
+# A caixa das piteiras em todas as posicoes: o alfa de cada fotograma, o maximo de
+# todos (tmix), e o bbox do ffmpeg sobre isso. So o ffmpeg, para correr no Mac sem
+# mais nada instalado.
+CAIXA=$(ffmpeg -hide_banner -framerate $FPS -i "$PNGS/%03d.png" \
+  -vf "format=rgba,alphaextract,tmix=frames=$VOLTA:weights=1:scale=1,scale=$KIT_LADO:$KIT_LADO,bbox=min_val=60" \
+  -f null - 2>&1 | grep -o 'x1:[0-9]* x2:[0-9]* y1:[0-9]* y2:[0-9]*' | tail -1)
+read -r KX1 KX2 KY1 KY2 <<<"$(echo "$CAIXA" | sed 's/[a-z0-9]*://g')"
+[ -n "${KY2:-}" ] || { echo "nao consegui medir as piteiras em $PNGS"; exit 1; }
+OX=$(( (1920 - KIT_LADO) / 2 )); OY=$(( (1080 - KIT_LADO) / 2 + KIT_DESCE ))
+JX=$((OX + KX1 - JANELA_FOLGA)); JY=$((OY + KY1 - JANELA_FOLGA))
+JW=$((KX2 - KX1 + 2 * JANELA_FOLGA)); JH=$((KY2 - KY1 + 2 * JANELA_FOLGA))
+# De fora para dentro: a sombra amarela deslocada, o contorno de tinta, o creme, o roxo.
+JANELA="drawbox=x=$((JX + 16)):y=$((JY + 16)):w=$JW:h=$JH:color=0xFFBE00:t=fill,\
+drawbox=x=$JX:y=$JY:w=$JW:h=$JH:color=0x002448:t=fill,\
+drawbox=x=$((JX + 4)):y=$((JY + 4)):w=$((JW - 8)):h=$((JH - 8)):color=0xF5EED1:t=fill,\
+drawbox=x=$((JX + 12)):y=$((JY + 12)):w=$((JW - 24)):h=$((JH - 24)):color=$JANELA_COR:t=fill"
+echo "  janela ${JW}x${JH} em ${JX},${JY}"
+
 # --- a cena -------------------------------------------------------------------
 XS=$(seg "$X")
 ffmpeg -hide_banner -loglevel error -y \
@@ -85,9 +113,9 @@ ffmpeg -hide_banner -loglevel error -y \
 [1:v]settb=AVTB[b];[2:v]settb=AVTB[c];\
 [a1][b]xfade=transition=fade:duration=$XS:offset=$(seg $((L - 2 * X)))[s1];\
 [s1][c]xfade=transition=fade:duration=$XS:offset=$(seg $((2 * L - 3 * X)))[s2];\
-[s2][acab]xfade=transition=fade:duration=$XS:offset=$(seg $((3 * L - 4 * X)))[fundo];\
+[s2][acab]xfade=transition=fade:duration=$XS:offset=$(seg $((3 * L - 4 * X))),$JANELA[fundo];\
 [3:v]format=rgba,scale=$KIT_LADO:$KIT_LADO:flags=lanczos[kit];\
-[fundo][kit]overlay=(W-w)/2:(H-h)/2+$KIT_DESCE:shortest=1,trim=end_frame=$TOTAL,format=yuv420p[v]" \
+[fundo][kit]overlay=$OX:$OY:shortest=1,trim=end_frame=$TOTAL,format=yuv420p[v]" \
   -map "[v]" -an -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p -movflags +faststart "$DESTINO/cena-$KIT.mp4"
 
 ffmpeg -hide_banner -loglevel error -y -i "$DESTINO/cena-$KIT.mp4" -frames:v 1 -q:v 3 "$DESTINO/cena-$KIT.jpg"

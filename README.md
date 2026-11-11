@@ -165,7 +165,9 @@ O `fechar-loop.sh` cruza o último segundo do clipe com o primeiro, por isso o
 vídeo fecha mesmo que o Veo não volte à pose inicial; com `0` no fim só tira o
 último fotograma (para clipes do Flow com a mesma imagem nas pontas). O
 `cena-kit.sh` tira as piteiras do modelo 3D do painel com fundo transparente
-(`kit-transparente.mjs`, o mesmo visualizador dos giros) e põe uma volta por tema;
+(`kit-transparente.mjs`, o mesmo visualizador dos giros), põe uma volta por tema
+e assenta-as numa janela roxa da marca, medida pelas próprias piteiras, para se
+verem por cima de qualquer arte;
 `RASCUNHO=1` faz a cena com a arte parada, para ver o enquadramento antes de haver
 loops. Os modelos vêm de `../caramelo-b2b/saas/public`.
 
