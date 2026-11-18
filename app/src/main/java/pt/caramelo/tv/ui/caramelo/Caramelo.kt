@@ -27,8 +27,8 @@ import pt.caramelo.tv.R
  * O Caramelo, o anfitriao da app (18/11/2026, Francisco: "a aplicacao da TV para ser um Caramelo"). Cada ecra escolhe a
  * pose e o componente troca de loop com um esbatimento curto.
  *
- * Os loops vem do site (os loops com alfa das paginas) passados a WebP animado com transparencia, a 12 fotogramas por
- * segundo (um sim, um nao dos 24 do original) e 480 px de altura (`app/src/main/assets/caramelo/`). O Android nao le o alfa
+ * Os loops sao WebP animado com transparencia, a 12 fotogramas por segundo (um sim, um nao dos 24 do Flow) e 480 px
+ * de altura (`app/src/main/assets/caramelo/`). O Android nao le o alfa
  * dos WebM VP9 nem dos HEVC do site; o WebP animado le-se com o AnimatedImageDrawable (Android 9+), que descodifica no
  * processador e por isso nao disputa o descodificador de video das flores (a TCL nao aguenta dois videos ao mesmo tempo).
  *
@@ -36,26 +36,27 @@ import pt.caramelo.tv.R
  * Android 9, nos testes de imagem (que nao correm o descodificador) e quando o ecra pede [parado]: durante as transicoes
  * e enquanto toca o video de uma flor, para nao disputar o processador fraco da TV.
  *
- * As poses de hoje sao as do site; quando chegarem os loops do Caramelo curador (fase 5 do plano), troca-se so o
- * ficheiro de cada pose.
+ * As poses sao as do Caramelo curador (18/11/2026): colete verde, laco amarelo e luvas brancas, os seis loops do Flow
+ * recortados do magenta (arte/curador) e passados a WebP por scripts/curador-webp.sh. Substituem os oito do site, que
+ * saem do APK (o APK nao pode passar os 24 MiB que o site aceita).
  */
 enum class Pose(val ficheiro: String, @DrawableRes val cartaz: Int) {
-    /** Parado, a respirar: o Caramelo do hidrante, o da marca. */
-    Espera("caramelo", R.drawable.caramelo_caramelo),
-    /** Recebe quem chega: a montra a comecar. */
-    Acena("acenar", R.drawable.caramelo_acenar),
-    /** Apresenta o que esta em foco. */
-    Aponta("apontar", R.drawable.caramelo_apontar),
-    /** Tem nas maos o que se abriu. */
-    Segura("caixa", R.drawable.caramelo_caixa),
-    /** Le o boletim (as analises). */
-    Lupa("lupa", R.drawable.caramelo_lupa),
-    /** Mostra uma peca (a vitrine). */
-    Mostra("ups", R.drawable.caramelo_ups),
+    /** Parado, a respirar e a piscar. */
+    Espera("curador-espera", R.drawable.caramelo_curador_espera),
+    /** Faz uma venia e acena a quem chega: a montra a comecar, e a parafernalia. */
+    Acena("curador-acena", R.drawable.caramelo_curador_acena),
+    /** Apresenta com a mao aberta o que esta em foco: as flores. */
+    Aponta("curador-apresenta", R.drawable.caramelo_curador_apresenta),
+    /** Segura um frasco e levanta a tampa: abrir uma flor. */
+    Segura("curador-frasco", R.drawable.caramelo_curador_frasco),
+    /** Le o boletim com a lupa (as analises). */
+    Lupa("curador-lupa", R.drawable.caramelo_curador_lupa),
+    /** Mostra uma piteira de vidro, a roda-la nos dedos: as piteiras. */
+    Mostra("curador-mostra", R.drawable.caramelo_curador_mostra),
     /** Espera com paciencia (a carregar, sem rede). */
-    Paciencia("espera", R.drawable.caramelo_espera),
-    /** Traz uma mensagem (avisos). */
-    Carta("carta", R.drawable.caramelo_carta),
+    Paciencia("curador-espera", R.drawable.caramelo_curador_espera),
+    /** Traz uma mensagem (avisos). Sem loop proprio no curador: fica a espera. */
+    Carta("curador-espera", R.drawable.caramelo_curador_espera),
 }
 
 /** Um ImageLoader so para o Caramelo: o de omissao do Coil nao sabe animar WebP, e as fotos dos produtos nao precisam disso. */

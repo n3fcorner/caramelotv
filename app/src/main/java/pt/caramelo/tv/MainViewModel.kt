@@ -41,6 +41,9 @@ class MainViewModel(private val repo: CatalogRepository) : ViewModel() {
     var focusedId by mutableStateOf<String?>(null)
         private set
 
+    /** A peca em foco no ecra inicial ("f:<id>" uma flor, "p:<slug>" um artigo), para o foco voltar la ao regressar. */
+    var focoInicio by mutableStateOf<String?>(null)
+
     fun onFocused(id: String) {
         focusedId = id
         registarInteracao()

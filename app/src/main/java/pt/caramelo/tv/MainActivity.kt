@@ -48,7 +48,7 @@ import pt.caramelo.tv.ui.animation.LocalSharedTransition
 import pt.caramelo.tv.ui.coa.CoaScreen
 import pt.caramelo.tv.ui.components.TvButton
 import pt.caramelo.tv.ui.details.DetailsScreen
-import pt.caramelo.tv.ui.colecao.ColecaoScreen
+import pt.caramelo.tv.ui.inicio.InicioScreen
 import pt.caramelo.tv.ui.parafernalia.ParafernaliaScreen
 import pt.caramelo.tv.ui.player.PlayerScreen
 import pt.caramelo.tv.ui.settings.EditItemScreen
@@ -204,24 +204,23 @@ private object Rota {
 @Composable
 private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewModel) {
     when (screen) {
-        // A colecao do Caramelo (18/11/2026): os frascos nas prateleiras substituem a fila de mosaicos (HomeScreen, que
-        // fica no codigo ate a ficha nova da fase 2 e sai com o leitor e os detalhes).
-        // OK num frasco com video abre logo o leitor, que ja e' a pagina do produto (4/10/2026, Francisco: passar pela
-        // ficha com o botao Reproduzir obrigava a dois Voltar). A ficha fica para quem nao tem video.
-        Screen.Home -> ColecaoScreen(
+        // O ecra inicial da TV nova (18/11/2026, maqueta 4 aprovada): as tres filas (flores, piteiras, parafernalia) e o
+        // produto em foco em cima. OK numa flor com video abre logo o leitor; sem video, a ficha. OK numa piteira ou numa
+        // peca abre-a grande (a ParafernaliaScreen ja com ela aberta). [ativo] para o video da cena quando ha outro ecra.
+        Screen.Home -> InicioScreen(
             catalog = catalog,
-            focusedId = viewModel.focusedId,
-            onFocusItem = { viewModel.onFocused(it.id) },
-            onOpenItem = { item ->
+            focoGuardado = viewModel.focoInicio,
+            ativo = viewModel.current == Screen.Home,
+            onFoco = { viewModel.focoInicio = it; viewModel.registarInteracao() },
+            onFocoFlor = { viewModel.onFocused(it.id) },
+            onAbrirFlor = { item ->
                 if (item.hasVideo) viewModel.play(item, resume = true)
                 else viewModel.openDetails(item)
             },
-            onEditItem = { viewModel.push(Screen.EditItem(it.id)) },
+            onAbrirArtigo = { viewModel.push(Screen.Parafernalia(it.slug)) },
+            onEditar = { viewModel.push(Screen.EditItem(it.id)) },
+            onAnalises = { viewModel.push(Screen.Coa) },
             onSettings = { viewModel.push(Screen.Settings) },
-            onMontra = viewModel::iniciarAtrator,
-            onCoa = { viewModel.push(Screen.Coa) },
-            onParafernalia = { viewModel.push(Screen.Parafernalia) },
-            onIdioma = { viewModel.updateSettings { it.copy(idioma = if (it.idioma == "en") "pt" else "en") } },
         )
 
         Screen.Coa -> CoaScreen(
@@ -229,11 +228,13 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
             onBack = { viewModel.pop() },
         )
 
-        Screen.Parafernalia -> ParafernaliaScreen(
+        is Screen.Parafernalia -> ParafernaliaScreen(
             parafernalia = catalog.parafernalia,
             imagemDe = { catalog.imagemDe(it) },
             giroDe = { catalog.giroDe(it) },
             onInteracao = viewModel::registarInteracao,
+            abrir = screen.slug,
+            onSair = { viewModel.pop() },
         )
 
         is Screen.Details -> WithItem(catalog, screen.id, viewModel) { item ->

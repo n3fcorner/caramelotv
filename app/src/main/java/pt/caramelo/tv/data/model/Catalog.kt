@@ -61,6 +61,15 @@ data class Catalog(
 
     fun giroDe(p: Parafernalia): String = p.giro?.takeIf { it.isNotBlank() }?.let { absolute(it) } ?: ""
 
+    /** A cena da piteira (a arte com o giro dentro da janela) e o cartaz dela; vazio quando nao ha. */
+    fun cenaDe(p: Parafernalia): String = p.cena?.takeIf { it.isNotBlank() }?.let { absolute(it) } ?: ""
+
+    fun cartazDe(p: Parafernalia): String = p.cartaz?.takeIf { it.isNotBlank() }?.let { absolute(it) } ?: imagemDe(p)
+
+    /** As fotos reais das cores; sem nenhuma, a foto do artigo sozinha. */
+    fun fotosDe(p: Parafernalia): List<FotoDeCor> =
+        p.fotos.map { it.copy(imagem = absolute(it.imagem)) }.ifEmpty { listOf(FotoDeCor(imagem = imagemDe(p), estado = p.estado)) }
+
     /** Deixa passar URLs completos; a tudo o resto prefixa a base configurada. */
     private fun absolute(path: String): String = when {
         path.isBlank() -> ""

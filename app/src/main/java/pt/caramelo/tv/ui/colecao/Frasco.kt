@@ -94,12 +94,19 @@ fun Frasco(
     fotoUrl: String,
     focado: Boolean,
     modifier: Modifier = Modifier,
-    /** 0 fechado, 1 com a tampa no ar (ao abrir o frasco). */
-    abertura: Float = 0f,
+    /**
+     * 0 fechado, 1 com a tampa no ar (ao abrir o frasco). E' uma funcao, lida so no desenho: a tampa a flutuar no palco do
+     * ecra inicial anima a cada fotograma sem recompor o frasco.
+     */
+    abertura: () -> Float = { 0f },
     /** A foto da flor voa para a ficha a partir daqui (hero partilhado com o leitor). */
     comHero: Boolean = true,
+    /** Falso no palco do ecra inicial: ali o tamanho e' o do palco, e o foco so liga o brilho. */
+    cresce: Boolean = true,
+    /** O rotulo de papel; os frascos pequenos das filas nao o levam. */
+    comRotulo: Boolean = true,
 ) {
-    val foco by animateFloatAsState(if (focado) 1f else 0f, pt.caramelo.tv.ui.theme.Movimento.foco, label = "foco-frasco")
+    val foco by animateFloatAsState(if (focado && cresce) 1f else 0f, pt.caramelo.tv.ui.theme.Movimento.foco, label = "foco-frasco")
     Box(
         modifier
             .aspectRatio(FrascoGeo.PROPORCAO)
@@ -134,12 +141,13 @@ fun Frasco(
         Image(
             painterResource(tampaDe(item.section)), null,
             Modifier.fillMaxSize().graphicsLayer {
-                translationY = -size.height * 0.18f * abertura
-                rotationZ = -10f * abertura
+                val a = abertura()
+                translationY = -size.height * 0.18f * a
+                rotationZ = -10f * a
             },
             contentScale = ContentScale.FillBounds,
         )
-        Rotulo(item, Modifier.naFracao(FrascoGeo.rotulo))
+        if (comRotulo) Rotulo(item, Modifier.naFracao(FrascoGeo.rotulo))
     }
 }
 
@@ -167,20 +175,30 @@ private fun Modifier.brilho(activo: Boolean): Modifier {
     }
 }
 
-/** O rotulo de papel colado no frasco: o nome em Carbona e o preco; ESGOTADO a vermelho por cima quando nao ha. */
+/**
+ * O rotulo de papel colado no frasco: o nome em Carbona e o preco na cor da seccao; ESGOTADO a vermelho por cima quando
+ * nao ha. A letra segue a largura do rotulo (18/11/2026): no frasco grande do palco o nome encolhe para caber numa linha.
+ */
 @Composable
 private fun Rotulo(item: MenuItem, modifier: Modifier) {
     val forma = RoundedCornerShape(3.dp)
-    Box(modifier, contentAlignment = Alignment.Center) {
+    androidx.compose.foundation.layout.BoxWithConstraints(modifier, contentAlignment = Alignment.Center) {
+        val densidade = androidx.compose.ui.platform.LocalDensity.current
+        val largura = with(densidade) { maxWidth.toPx() }
+        val nome = item.title.uppercase()
+        // Carbona Black: ~0,66 da letra por caracter; o nome ocupa no maximo 84 % do papel
+        val letraPx = minOf(largura * 0.12f, largura * 0.84f / (maxOf(6, nome.length) * 0.66f))
+        val letra = with(densidade) { letraPx.toSp() }
+        val letraPreco = with(densidade) { (largura * 0.16f).toSp() }
         Column(
-            Modifier.fillMaxWidth().background(Papel, forma).border(1.5.dp, Tinta, forma).padding(horizontal = 4.dp, vertical = 3.dp),
+            Modifier.fillMaxWidth().background(Papel, forma).border(1.5.dp, Tinta, forma).padding(horizontal = 3.dp, vertical = 2.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                item.title.uppercase(),
-                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 11.sp, letterSpacing = 0.4.sp),
-                color = Tinta, maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,
+                nome,
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = letra, lineHeight = letra * 1.1f, letterSpacing = 0.3.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Black),
+                color = Tinta, maxLines = 1, softWrap = false, overflow = TextOverflow.Clip, textAlign = TextAlign.Center,
             )
             val p = when {
                 item.brevemente -> tr("EM BREVE", "SOON")
@@ -188,7 +206,7 @@ private fun Rotulo(item: MenuItem, modifier: Modifier) {
             }
             if (p.isNotBlank()) Text(
                 p,
-                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 11.sp),
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = letraPreco, lineHeight = letraPreco * 1.1f, fontWeight = androidx.compose.ui.text.font.FontWeight.Black),
                 color = corDaSeccao(item.section).let { if (item.section == Section.HASH) Tinta else it },
             )
         }

@@ -11,8 +11,11 @@ sealed interface Screen {
     ) : Screen
     /** O boletim de analise, em imagem: a TV nao abre PDF. */
     data object Coa : Screen
-    /** A parafernalia (piteiras, kits, acessorios): grelha e, ao escolher, a peca grande a rodar em loop. */
-    data object Parafernalia : Screen
+    /**
+     * A parafernalia (piteiras, kits, acessorios): grelha e, ao escolher, a peca grande a rodar em loop. Com [slug]
+     * (o OK numa peca do ecra inicial) abre logo essa peca, e Voltar regressa ao inicio.
+     */
+    data class Parafernalia(val slug: String? = null) : Screen
     data object Settings : Screen
     data class EditItem(val id: String) : Screen
 }
