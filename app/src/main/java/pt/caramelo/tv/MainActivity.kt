@@ -48,7 +48,7 @@ import pt.caramelo.tv.ui.animation.LocalSharedTransition
 import pt.caramelo.tv.ui.coa.CoaScreen
 import pt.caramelo.tv.ui.components.TvButton
 import pt.caramelo.tv.ui.details.DetailsScreen
-import pt.caramelo.tv.ui.home.HomeScreen
+import pt.caramelo.tv.ui.colecao.ColecaoScreen
 import pt.caramelo.tv.ui.parafernalia.ParafernaliaScreen
 import pt.caramelo.tv.ui.player.PlayerScreen
 import pt.caramelo.tv.ui.settings.EditItemScreen
@@ -204,27 +204,24 @@ private object Rota {
 @Composable
 private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewModel) {
     when (screen) {
-        Screen.Home -> HomeScreen(
+        // A colecao do Caramelo (18/11/2026): os frascos nas prateleiras substituem a fila de mosaicos (HomeScreen, que
+        // fica no codigo ate a ficha nova da fase 2 e sai com o leitor e os detalhes).
+        // OK num frasco com video abre logo o leitor, que ja e' a pagina do produto (4/10/2026, Francisco: passar pela
+        // ficha com o botao Reproduzir obrigava a dois Voltar). A ficha fica para quem nao tem video.
+        Screen.Home -> ColecaoScreen(
             catalog = catalog,
             focusedId = viewModel.focusedId,
             onFocusItem = { viewModel.onFocused(it.id) },
-            // OK num produto com video abre logo o leitor, que ja e' a pagina do produto (video e ficha lado a
-            // lado). Passar antes pela ficha com o botao Reproduzir parecia recarregar a mesma pagina (4/10/2026,
-            // Francisco: "um erro absolutamente critico") e obrigava a dois Voltar. A ficha fica para quem nao tem video.
             onOpenItem = { item ->
                 if (item.hasVideo) viewModel.play(item, resume = true)
                 else viewModel.openDetails(item)
             },
             onEditItem = { viewModel.push(Screen.EditItem(it.id)) },
-            onContinue = { catalog.lastWatched()?.let { viewModel.play(it, resume = true) } },
             onSettings = { viewModel.push(Screen.Settings) },
             onMontra = viewModel::iniciarAtrator,
             onCoa = { viewModel.push(Screen.Coa) },
             onParafernalia = { viewModel.push(Screen.Parafernalia) },
-            onInteracao = viewModel::registarInteracao,
             onIdioma = { viewModel.updateSettings { it.copy(idioma = if (it.idioma == "en") "pt" else "en") } },
-            cascata = !viewModel.menuJaMostrado,
-            onMostrado = { viewModel.menuJaMostrado = true },
         )
 
         Screen.Coa -> CoaScreen(

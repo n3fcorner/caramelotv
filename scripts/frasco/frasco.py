@@ -28,7 +28,7 @@ E = 0.014  # espessura do vidro
 FORA = [(0.0, 0.0), (0.33, 0.0), (0.355, 0.012), (0.36, 0.04), (0.36, 0.74), (0.355, 0.78), (0.33, 0.83),
         (0.29, 0.865), (0.272, 0.88), (0.272, 0.925), (0.285, 0.93), (0.292, 0.945), (0.285, 0.958), (0.27, 0.96)]
 DENTRO = [(0.258, 0.958), (0.258, 0.885), (0.278, 0.865), (0.318, 0.832), (0.343, 0.785), (0.346, 0.745),
-          (0.346, 0.055), (0.33, 0.045), (0.0, 0.045)]
+          (0.346, 0.04), (0.335, 0.03), (0.0, 0.03)]
 
 
 def torno(nome, perfil, passos=128):
@@ -89,13 +89,13 @@ caixa("caixa-dir", (1.7, -0.6, 0.6), (math.radians(90), 0, math.radians(70)), (0
 caixa("caixa-cima", (0, -0.2, 2.4), (0, 0, 0), (1.4, 1.4), 3)
 
 mundo = bpy.data.worlds.new("mundo"); cena.world = mundo; mundo.use_nodes = True
-mundo.node_tree.nodes["Background"].inputs["Color"].default_value = (0.42, 0.4, 0.36, 1)  # o papel da app, escuro, para o vidro ter de onde refletir
-mundo.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.6
+mundo.node_tree.nodes["Background"].inputs["Color"].default_value = (1.0, 0.97, 0.92, 1)  # uma sala clara e quente: os lados do vidro refletem claro, nao cinzento
+mundo.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.55
 
 # --- camara: um pouco de cima, para se ver a boca em elipse -------------------------------------------------------------
 cam_d = bpy.data.cameras.new("cam"); cam_d.lens = 85
 cam = bpy.data.objects.new("cam", cam_d); cena.collection.objects.link(cam); cena.camera = cam
-alvo = Vector((0, 0, 0.5)); dist = 4.15; elev = math.radians(9)
+alvo = Vector((0, 0, 0.51)); dist = 2.95; elev = math.radians(9)
 cam.location = alvo + Vector((0, -dist * math.cos(elev), dist * math.sin(elev)))
 cam.rotation_euler = (alvo - cam.location).to_track_quat("-Z", "Y").to_euler()
 
@@ -143,7 +143,7 @@ for nome, rgb in CORES.items():
 def proj(p):
     v = world_to_camera_view(cena, cam, Vector(p)); return (v.x, 1 - v.y)
 
-r_in = 0.335; base = 0.06; ombro = 0.78
+r_in = 0.33; base = 0.045; ombro = 0.84
 cantos = [proj((s * r_in, 0, z)) for s in (-1, 1) for z in (base, ombro)]
 boca = [proj((s * 0.27, 0, 0.955)) for s in (-1, 1)]
 tampa_cima = proj((0, 0, 1.024)); fundo = proj((0, 0, 0.0))
