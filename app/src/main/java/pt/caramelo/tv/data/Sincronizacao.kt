@@ -225,6 +225,9 @@ object Sincronizacao {
                 // pousa nele como na loja; o cartaz da TV, com a margem roxa, so quando o CRM nao tem foto.
                 imageUrl = c.imagem?.takeIf { it.isNotBlank() } ?: base?.imageUrl.orEmpty(),
                 esgotado = c.estado == "esgotado",
+                preco = c.preco,
+                estado = c.estado,
+                loteUrl = c.lote?.url.orEmpty(),
                 analise = c.lote?.let { l -> l.analise?.let { a -> Analise(l.codigo, a.laboratorio, a.numero, a.data, a.metodo, a.thc, a.cbd, a.d9thc, a.cbg) } },
                 orientation = base?.orientation ?: MediaOrientation.SQUARE,
                 // A linha (CBD ou infundida) vem sempre do CRM, nunca da ficha de fabrica: e' o que manda

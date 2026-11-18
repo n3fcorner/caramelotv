@@ -2,6 +2,7 @@ package pt.caramelo.tv
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -81,6 +82,16 @@ class MainActivity : ComponentActivity() {
                 CarameloRoot(viewModel = viewModel)
             }
         }
+    }
+
+    /**
+     * Qualquer tecla do comando conta como alguem a mexer, venha de que ecra vier (18/11/2026). Antes cada ecra
+     * contava as suas, e a montra da parafernalia nao contava nenhuma: a montra automatica arrancava por cima de
+     * quem estava a ver uma piteira. A tecla segue para o Compose como sempre.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN) viewModel.registarInteracao()
+        return super.dispatchKeyEvent(event)
     }
 
     /** A activity e singleTask: os deep links de configuracao chegam por aqui. */

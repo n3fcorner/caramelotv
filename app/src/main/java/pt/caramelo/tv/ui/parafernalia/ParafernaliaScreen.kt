@@ -1,5 +1,7 @@
 package pt.caramelo.tv.ui.parafernalia
 
+import pt.caramelo.tv.data.CacheDeMedia
+import pt.caramelo.tv.ui.components.precoTxt
 import android.view.LayoutInflater
 import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
@@ -345,7 +347,7 @@ private fun Montra(
     val lifecycleOwner = LocalLifecycleOwner.current
     val temVideo = giroUrl.isNotBlank()
     // Um player por montra (a chamada esta dentro de key(slug)): liberta-se sempre no onDispose.
-    val player = remember { if (temVideo) ExoPlayer.Builder(context).build() else null }
+    val player = remember { if (temVideo) CacheDeMedia.leitor(context) else null }
 
     if (player != null) {
         DisposableEffect(Unit) {
@@ -457,5 +459,3 @@ private fun Montra(
     }
 }
 
-private fun precoTxt(preco: Double?): String =
-    preco?.let { String.format(java.util.Locale("pt", "PT"), "%.2f €", it) } ?: ""
