@@ -2,6 +2,7 @@ package pt.caramelo.tv
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -47,7 +48,7 @@ import pt.caramelo.tv.ui.animation.LocalSharedTransition
 import pt.caramelo.tv.ui.coa.CoaScreen
 import pt.caramelo.tv.ui.components.TvButton
 import pt.caramelo.tv.ui.details.DetailsScreen
-import pt.caramelo.tv.ui.home.HomeScreen
+import pt.caramelo.tv.ui.inicio.InicioScreen
 import pt.caramelo.tv.ui.parafernalia.ParafernaliaScreen
 import pt.caramelo.tv.ui.player.PlayerScreen
 import pt.caramelo.tv.ui.settings.EditItemScreen
@@ -81,6 +82,16 @@ class MainActivity : ComponentActivity() {
                 CarameloRoot(viewModel = viewModel)
             }
         }
+    }
+
+    /**
+     * Qualquer tecla do comando conta como alguem a mexer, venha de que ecra vier (18/11/2026). Antes cada ecra
+     * contava as suas, e a montra da parafernalia nao contava nenhuma: a montra automatica arrancava por cima de
+     * quem estava a ver uma piteira. A tecla segue para o Compose como sempre.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN) viewModel.registarInteracao()
+        return super.dispatchKeyEvent(event)
     }
 
     /** A activity e singleTask: os deep links de configuracao chegam por aqui. */
@@ -193,27 +204,23 @@ private object Rota {
 @Composable
 private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewModel) {
     when (screen) {
-        Screen.Home -> HomeScreen(
+        // O ecra inicial da TV nova (18/11/2026, maqueta 4 aprovada): as tres filas (flores, piteiras, parafernalia) e o
+        // produto em foco em cima. OK numa flor com video abre logo o leitor; sem video, a ficha. OK numa piteira ou numa
+        // peca abre-a grande (a ParafernaliaScreen ja com ela aberta). [ativo] para o video da cena quando ha outro ecra.
+        Screen.Home -> InicioScreen(
             catalog = catalog,
-            focusedId = viewModel.focusedId,
-            onFocusItem = { viewModel.onFocused(it.id) },
-            // OK num produto com video abre logo o leitor, que ja e' a pagina do produto (video e ficha lado a
-            // lado). Passar antes pela ficha com o botao Reproduzir parecia recarregar a mesma pagina (4/10/2026,
-            // Francisco: "um erro absolutamente critico") e obrigava a dois Voltar. A ficha fica para quem nao tem video.
-            onOpenItem = { item ->
+            focoGuardado = viewModel.focoInicio,
+            ativo = viewModel.current == Screen.Home,
+            onFoco = { viewModel.focoInicio = it; viewModel.registarInteracao() },
+            onFocoFlor = { viewModel.onFocused(it.id) },
+            onAbrirFlor = { item ->
                 if (item.hasVideo) viewModel.play(item, resume = true)
                 else viewModel.openDetails(item)
             },
-            onEditItem = { viewModel.push(Screen.EditItem(it.id)) },
-            onContinue = { catalog.lastWatched()?.let { viewModel.play(it, resume = true) } },
+            onAbrirArtigo = { viewModel.push(Screen.Parafernalia(it.slug)) },
+            onEditar = { viewModel.push(Screen.EditItem(it.id)) },
+            onAnalises = { viewModel.push(Screen.Coa) },
             onSettings = { viewModel.push(Screen.Settings) },
-            onMontra = viewModel::iniciarAtrator,
-            onCoa = { viewModel.push(Screen.Coa) },
-            onParafernalia = { viewModel.push(Screen.Parafernalia) },
-            onInteracao = viewModel::registarInteracao,
-            onIdioma = { viewModel.updateSettings { it.copy(idioma = if (it.idioma == "en") "pt" else "en") } },
-            cascata = !viewModel.menuJaMostrado,
-            onMostrado = { viewModel.menuJaMostrado = true },
         )
 
         Screen.Coa -> CoaScreen(
@@ -221,11 +228,13 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
             onBack = { viewModel.pop() },
         )
 
-        Screen.Parafernalia -> ParafernaliaScreen(
+        is Screen.Parafernalia -> ParafernaliaScreen(
             parafernalia = catalog.parafernalia,
             imagemDe = { catalog.imagemDe(it) },
             giroDe = { catalog.giroDe(it) },
             onInteracao = viewModel::registarInteracao,
+            abrir = screen.slug,
+            onSair = { viewModel.pop() },
         )
 
         is Screen.Details -> WithItem(catalog, screen.id, viewModel) { item ->

@@ -1,5 +1,7 @@
 package pt.caramelo.tv.ui.parafernalia
 
+import pt.caramelo.tv.data.CacheDeMedia
+import pt.caramelo.tv.ui.components.precoTxt
 import android.view.LayoutInflater
 import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
@@ -93,8 +95,11 @@ fun ParafernaliaScreen(
     imagemDe: (Parafernalia) -> String,
     giroDe: (Parafernalia) -> String,
     onInteracao: () -> Unit = {},
+    /** O slug de uma peca para abrir logo (o OK no ecra inicial); Voltar fecha a peca e sai pelo [onSair]. */
+    abrir: String? = null,
+    onSair: (() -> Unit)? = null,
 ) {
-    var aberto by remember { mutableStateOf<Parafernalia?>(null) }
+    var aberto by remember { mutableStateOf(abrir?.let { s -> parafernalia.firstOrNull { it.slug == s } }) }
 
     PapelTheme {
         Box(Modifier.fillMaxSize()) {
@@ -123,7 +128,7 @@ fun ParafernaliaScreen(
             // key(slug): trocar de artigo cria uma montra nova e larga a anterior (liberta o ExoPlayer no onDispose).
             aberto?.let { item ->
                 androidx.compose.runtime.key(item.slug) {
-                    BackHandler(enabled = true) { aberto = null }
+                    BackHandler(enabled = true) { if (abrir != null && onSair != null) onSair() else aberto = null }
                     Montra(
                         item = item,
                         imagemUrl = imagemDe(item),
@@ -345,7 +350,7 @@ private fun Montra(
     val lifecycleOwner = LocalLifecycleOwner.current
     val temVideo = giroUrl.isNotBlank()
     // Um player por montra (a chamada esta dentro de key(slug)): liberta-se sempre no onDispose.
-    val player = remember { if (temVideo) ExoPlayer.Builder(context).build() else null }
+    val player = remember { if (temVideo) CacheDeMedia.leitor(context) else null }
 
     if (player != null) {
         DisposableEffect(Unit) {
@@ -457,5 +462,3 @@ private fun Montra(
     }
 }
 
-private fun precoTxt(preco: Double?): String =
-    preco?.let { String.format(java.util.Locale("pt", "PT"), "%.2f €", it) } ?: ""

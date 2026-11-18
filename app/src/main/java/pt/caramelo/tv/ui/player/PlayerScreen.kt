@@ -2,6 +2,7 @@
 
 package pt.caramelo.tv.ui.player
 
+import pt.caramelo.tv.data.CacheDeMedia
 import pt.caramelo.tv.ui.components.AromasIlustrados
 import pt.caramelo.tv.ui.i18n.termo
 import pt.caramelo.tv.ui.i18n.tr
@@ -177,7 +178,8 @@ fun PlayerScreen(
     var vista by remember { mutableStateOf<PlayerView?>(null) }
     var fotogramaDeSaida by remember { mutableStateOf<Fotograma?>(null) }
 
-    val player = remember { ExoPlayer.Builder(context).build() }
+    // Sempre sem som (18/11/2026): a TV e uma montra numa loja, e 5 dos clipes traziam faixa de audio (AUDITORIA, ponto 2).
+    val player = remember { CacheDeMedia.leitor(context).apply { volume = 0f } }
 
     // Tira uma fotografia ao que esta no ecra antes de o painel se ir embora: e' ela
     // que o painel leva a deslizar ou a voar, e nao um cartaz que nao se parece com

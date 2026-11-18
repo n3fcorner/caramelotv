@@ -9,25 +9,29 @@ import androidx.tv.material3.Typography
 import pt.caramelo.tv.R
 
 /**
- * Poppins, a geometrica do logotipo Caramelo do Brasil — o mesmo O circular do
- * wordmark. Embutida no APK, para nao depender da rede nem da letra do fabricante
- * da TV, que varia de modelo para modelo.
+ * Carbona, a letra principal do manual da marca (18/11/2026, Francisco: a licenca cobre apps). Os OTF vem do manual
+ * (6 TIPOGRAFIA - FONTE) tal e qual, embutidos no APK para nao depender da rede nem da letra do fabricante da TV.
+ * Substitui a Poppins, que era a reserva enquanto a licenca so se sabia para a web.
  */
-val Poppins = FontFamily(
-    Font(R.font.poppins_regular, FontWeight.Normal),
-    Font(R.font.poppins_medium, FontWeight.Medium),
-    Font(R.font.poppins_semibold, FontWeight.SemiBold),
-    Font(R.font.poppins_bold, FontWeight.Bold),
+val Carbona = FontFamily(
+    Font(R.font.carbona_regular, FontWeight.Normal),
+    Font(R.font.carbona_medium, FontWeight.Medium),
+    Font(R.font.carbona_semibold, FontWeight.SemiBold),
+    Font(R.font.carbona_bold, FontWeight.Bold),
+    Font(R.font.carbona_extrabold, FontWeight.ExtraBold),
+    Font(R.font.carbona_black, FontWeight.Black),
 )
 
 /**
  * Tamanhos de 10-foot UI: nada abaixo de 14sp, que a tres metros ja e o limite do
- * legivel. A Poppins tem olho pequeno para o corpo, por isso os tamanhos sobem um
+ * legivel. Os tamanhos ficaram os da Poppins, que tambem tinha o olho pequeno para o corpo, e sobem um
  * ponto em relacao ao que se usaria com a Roboto.
  */
 val CarameloTypography = Typography(
     displayLarge = estilo(54.sp, 60.sp, FontWeight.Bold),
     displayMedium = estilo(42.sp, 48.sp, FontWeight.Bold),
+    // O ecra das analises usava displaySmall sem ele existir aqui, e o titulo caia na letra do sistema.
+    displaySmall = estilo(36.sp, 42.sp, FontWeight.Bold),
     headlineMedium = estilo(31.sp, 38.sp, FontWeight.SemiBold),
     headlineSmall = estilo(25.sp, 32.sp, FontWeight.SemiBold),
     titleLarge = estilo(22.sp, 28.sp, FontWeight.SemiBold),
@@ -46,7 +50,7 @@ private fun estilo(
     lineHeight: androidx.compose.ui.unit.TextUnit,
     weight: FontWeight,
 ) = TextStyle(
-    fontFamily = Poppins,
+    fontFamily = Carbona,
     fontSize = size,
     lineHeight = lineHeight,
     fontWeight = weight,

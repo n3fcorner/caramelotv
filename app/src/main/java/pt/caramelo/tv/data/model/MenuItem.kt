@@ -50,7 +50,16 @@ data class MenuItem(
     val esgotado: Boolean = false,
     /** O boletim do lote aberto, quando e' publico (4/10/2026): a tabela do ecra Analises. */
     val analise: Analise? = null,
+    /** O PVP do pacote no site (18/11/2026, Francisco: "sim, no rotulo"): vai no rotulo do frasco e na ficha. Nulo sem preco. */
+    val preco: Double? = null,
+    /** O estado como o CRM o manda (venda, brevemente, esgotado), para o frasco: o brevemente e' o frasco vazio so com o rotulo. */
+    val estado: String = "",
+    /** A pagina publica do lote no site (/lote/<codigo>), para o QR da ficha. */
+    val loteUrl: String = "",
 ) {
+    /** Anunciado mas ainda sem lote a venda: o frasco fica vazio, so com o rotulo. */
+    val brevemente: Boolean get() = estado == "brevemente"
+
     val hasVideo: Boolean get() = videoUrl.isNotBlank()
 
     val state: ItemState
