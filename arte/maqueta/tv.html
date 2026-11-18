@@ -33,13 +33,11 @@ body[data-s=flores] #m-flores, body[data-s=piteiras] #m-pit, body[data-s=par] #m
 .poeira i{position:absolute;width:var(--t);height:var(--t);border-radius:50%;background:#fff3c9;opacity:0;animation:pairar var(--d) ease-in-out var(--a) infinite}
 @keyframes pairar{0%{opacity:0;transform:translate(0,0)}25%{opacity:.55}75%{opacity:.4}100%{opacity:0;transform:translate(var(--x),-120px)}}
 
-/* piteiras: a arte da piteira atras da janela, desfocada como fundo de camara (no lugar dela entra o loop do Flow) */
-#arte{position:absolute;left:-60px;top:70px;width:2200px;height:640px;background-size:auto 100%;background-repeat:repeat-x;
-  filter:blur(3px) saturate(1.15) brightness(.82);animation:passa 34s linear infinite;transition:background-image .6s}
-@keyframes passa{to{transform:translateX(-860px)}}
+/* piteiras: o loop do Flow da arte da piteira, a ecra inteiro por tras da janela */
+#arte{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:cover;transition:opacity .35s}
 #m-pit:after{content:"";position:absolute;inset:0;background:
-  linear-gradient(90deg,rgba(7,38,69,.97) 0%,rgba(7,38,69,.92) 34%,rgba(7,38,69,.30) 58%,rgba(7,38,69,.30) 82%,rgba(7,38,69,.7) 100%),
-  linear-gradient(180deg,rgba(7,38,69,.95) 0%,rgba(7,38,69,0) 18%,rgba(7,38,69,0) 58%,var(--tinta) 72%)}
+  linear-gradient(90deg,rgba(7,38,69,.96) 0%,rgba(7,38,69,.9) 33%,rgba(7,38,69,.35) 50%,rgba(7,38,69,.05) 66%,rgba(7,38,69,.1) 100%),
+  linear-gradient(180deg,rgba(7,38,69,.9) 0%,rgba(7,38,69,0) 16%,rgba(7,38,69,0) 56%,rgba(7,38,69,.94) 68%,var(--tinta) 76%)}
 
 /* ---------- cabecalho ---------- */
 header{position:absolute;left:110px;right:96px;top:40px;height:64px;display:flex;align-items:center;z-index:5}
@@ -126,10 +124,16 @@ body[data-s=piteiras] #janela{transform:none;opacity:1;animation:boia 5s ease-in
   background:linear-gradient(90deg,rgba(7,38,69,.45),rgba(7,38,69,0) 22%,rgba(7,38,69,0) 78%,rgba(7,38,69,.45)),repeating-linear-gradient(90deg,#C8641F 0 46px,#DE762E 46px 92px);
   background-size:100% 100%,92px 100%;animation:tambor 2.4s linear infinite}
 @keyframes tambor{to{background-position:0 0,-92px 0}}
-#peca{position:absolute;left:880px;top:150px;width:560px;height:560px;transform:scale(.7);opacity:0;transition:transform 1s var(--mola),opacity .5s;
-  -webkit-mask-image:radial-gradient(closest-side,#000 62%,transparent 98%)}
+#peca{position:absolute;left:940px;top:200px;width:440px;height:430px;transform:scale(.7);opacity:0;transition:transform 1s var(--mola),opacity .5s}
 body[data-s=par] #peca{transform:none;opacity:1}
-#peca video{width:100%;height:100%;object-fit:cover;transition:opacity .25s}
+#peca .boia{position:absolute;inset:0;animation:boia2 4.6s ease-in-out infinite}
+@keyframes boia2{50%{transform:translateY(-12px)}}
+#peca img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%;filter:drop-shadow(0 18px 18px rgba(0,0,0,.45))}
+#peca img.entra{animation:fotoEntra .9s var(--mola) both}
+#peca img.sai{animation:fotoSai .6s var(--suave) both}
+@keyframes fotoEntra{from{opacity:0;transform:translateX(120px) rotate(8deg) scale(.86)}}
+@keyframes fotoSai{to{opacity:0;transform:translateX(-120px) rotate(-8deg) scale(.86)}}
+#pedestal .sombra2{position:absolute;left:90px;right:90px;top:10px;height:36px;border-radius:50%;background:radial-gradient(closest-side,rgba(7,38,69,.55),rgba(7,38,69,0));z-index:3}
 
 /* a etiqueta do preco, pendurada por um fio e a balancar */
 .etiqueta{position:absolute;transform-origin:50% 0;animation:balanca 3.2s ease-in-out infinite;z-index:4;filter:drop-shadow(6px 6px 0 rgba(0,0,0,.38));text-align:center}
@@ -190,7 +194,7 @@ body[data-s=par] #peca{transform:none;opacity:1}
 </style></head>
 <body data-s="flores">
 <div class="mundo" id="m-flores"><div class="cone"></div><div class="poeira"></div></div>
-<div class="mundo" id="m-pit"><div id="arte"></div></div>
+<div class="mundo" id="m-pit"><video id="arte" muted loop playsinline></video></div>
 <div class="mundo" id="m-par"><div class="cone"></div><div class="poeira"></div></div>
 <div id="azulejo"></div>
 
@@ -200,14 +204,14 @@ body[data-s=par] #peca{transform:none;opacity:1}
 <div class="palco" id="p-flores"><div id="balcao"><div class="tampo"></div><div class="frente"></div></div></div>
 <div class="palco" id="p-pit"><div id="janela"><video id="v-pit" muted loop playsinline></video><div class="reflexo"></div></div>
   <div class="etiqueta" id="etq-pit"><i class="fio"></i><div class="tag"><b></b><small></small></div></div></div>
-<div class="palco" id="p-par"><div id="pedestal"><div class="lado"></div><div class="topo"></div></div>
-  <div id="peca"><video id="v-par" muted loop playsinline></video></div>
+<div class="palco" id="p-par"><div id="pedestal"><div class="lado"></div><div class="topo"></div><div class="sombra2"></div></div>
+  <div id="peca"><div class="boia" id="fotos"></div></div>
   <div class="etiqueta pousada" id="etq-par"><div class="tag"><b></b><small></small></div></div></div>
 
 <div id="caramelo">
-  <video id="c-flores" class="on" src="a/pose-acenar-5c5eee66.webm" muted loop autoplay playsinline></video>
-  <video id="c-piteiras" src="a/pose-apontar-2c885656.webm" muted loop playsinline></video>
-  <video id="c-par" src="a/pose-caixa-feca87b5.webm" muted loop playsinline></video>
+  <video id="c-flores" class="on" src="a/tv-apresenta.webm" muted loop autoplay playsinline></video>
+  <video id="c-piteiras" src="a/tv-mostra.webm" muted loop playsinline></video>
+  <video id="c-par" src="a/tv-acena.webm" muted loop playsinline></video>
 </div>
 
 <div id="ficha">
@@ -253,19 +257,22 @@ const FLORES = [
   {n:'Solero Cream', f:'solero-cream-tv.webp', tampa:'verde', p:'29,99 €'},
 ];
 const PITS = [
-  {n:'Fauna Brasileira', img:'piteira-vidro-fauna-brasileira-6mm.webp', giro:'piteira-vidro-fauna-brasileira-6mm.webm', arte:'arte-fauna.png', sub:'PITEIRA DE VIDRO · 6 mm', t:'Impressão a toda a volta',
+  {n:'Fauna Brasileira', img:'piteira-vidro-fauna-brasileira-6mm.webp', giro:'piteira-vidro-fauna-brasileira-6mm.webm', arte:'loop-fauna-brasileira.webm', sub:'PITEIRA DE VIDRO · 6 mm', t:'Impressão a toda a volta',
     specs:[['MATERIAL','Vidro'],['COMPRIMENTO','55 mm'],['DIÂMETRO','6 mm'],['ARTE','Fauna brasileira']], p:'15 €', pl:'UMA PITEIRA'},
-  {n:'Kit Fauna', img:'kit-piteiras-fauna.webp', giro:'kit-piteiras-fauna.webm', arte:'arte-fauna.png', sub:'KIT DE 3 PITEIRAS · 7 · 6 · 5 mm', t:'Três artes, uma coleção',
+  {n:'Kit Fauna', img:'kit-piteiras-fauna.webp', giro:'kit-piteiras-fauna.webm', arte:'loop-flora-brasileira.webm', sub:'KIT DE 3 PITEIRAS · 7 · 6 · 5 mm', t:'Três artes, uma coleção',
     specs:[['PEÇAS','3 piteiras de vidro'],['DIÂMETROS','7, 6 e 5 mm'],['ARTES','Flora, Fauna, Indígena'],['COMPRIMENTO','55 mm']], p:'35 €', pl:'O KIT'},
   {n:'Vira-lata', img:'piteira-vidro-vira-lata-caramelo-6mm.webp'}, {n:'Flora', img:'piteira-vidro-flora-brasileira-7mm.webp'},
   {n:'Futebol', img:'piteira-vidro-futebol-do-brasil-6mm.webp'}, {n:'Surfando', img:'piteira-vidro-surfando-a-onda-boa-5mm.webp'},
 ];
 const PARS = [
-  {n:'Grinder Premium', img:'p-grinder-azul.webp', giro:'giro-grinder-azul.webm', sub:'GRINDER · AZUL METALIZADO', t:'Alumínio anodizado',
+  {n:'Grinder Premium', img:'r-grinder-premium-aluminio-3.webp', sub:'GRINDER · 5 CORES', t:'Alumínio anodizado',
+    fotos:[['r-grinder-premium-aluminio-3.webp','AZUL'],['r-grinder-premium-aluminio-4.webp','VERMELHO'],['r-grinder-premium-aluminio-2.webp','VERDE'],['r-grinder-premium-aluminio-5.webp','ROXO'],['r-grinder-premium-aluminio-1.webp','DOURADO']],
     specs:[['MEDIDAS','55 × 20 mm'],['DENTES','Em diamante'],['TAMPA','Magnética, gravada'],['CORES','5 metalizadas']], p:'25 €', pl:'5 CORES'},
-  {n:'Cuia de silicone', img:'p-cuia-aurora.webp', giro:'giro-cuia-aurora.webm', sub:'CUIA · AURORA BOREAL', t:'Silicone, base antiderrapante',
+  {n:'Cuia de silicone', img:'r-cuia-silicone-aurora-boreal.webp', sub:'CUIA · 13 CORES', t:'Silicone, base antiderrapante',
+    fotos:[['r-cuia-silicone-aurora-boreal.webp','AURORA BOREAL'],['r-cuia-silicone-roxo.webp','ROXO'],['r-cuia-silicone-verde-limao.webp','VERDE-LIMÃO'],['r-cuia-silicone-laranja.webp','LARANJA'],['r-cuia-silicone-azul-piscina.webp','AZUL-PISCINA'],['r-cuia-silicone-rosa-chiclete.webp','ROSA-CHICLETE']],
     specs:[['MATERIAL','Silicone'],['BASE','Antiderrapante'],['CUIDADOS','Limpeza fácil'],['CORES','13 cores']], p:'4 €', pl:'13 CORES'},
-  {n:'Cinzeiro', img:'p-cinzeiro-amarelo.webp'}, {n:'Cinzeiro alumínio', img:'p-cinzeiro-alu-roxo.webp'}, {n:'Porta-joint', img:'p-porta-joint.webp'}, {n:'Grinder vermelho', img:'p-grinder-vermelho.webp'},
+  {n:'Cinzeiro', img:'r-cinzeiro-silicone-amarelo.webp'}, {n:'Cinzeiro alumínio', img:'r-cinzeiro-aluminio-roxo.webp'}, {n:'Grinder Boladão', img:'r-grinder-4-partes-boladao-roxo-metalizado.webp'},
+  {n:'Bandeja skate', img:'r-bandeja-metal-skate-1.webp'}, {n:'Porta-joint', img:'r-porta-joint-bio-preto.webp'},
 ];
 
 function frasco(f, l, rotulo){
@@ -330,6 +337,14 @@ function seccao(s){
   document.querySelectorAll('#caramelo video').forEach(v=>{ const on=v.id==='c-'+s; v.classList.toggle('on',on); if(on) v.play(); });
   const c=q('caramelo'); c.classList.remove('salta'); void c.offsetWidth; c.classList.add('salta');
 }
+let ciclo=null;
+function fotosEm(d){
+  clearInterval(ciclo); const caixa=q('fotos'); let k=0;
+  const poe=()=>{ const [f,cor]=d.fotos[k%d.fotos.length]; caixa.querySelectorAll('img').forEach(i=>{ i.classList.remove('entra'); i.classList.add('sai'); setTimeout(()=>i.remove(),650); });
+    const im=new Image(); im.src=A(f); im.className='entra'; caixa.appendChild(im);
+    const sub=q('olho').querySelector('span:last-child'); if(sub && k) sub.textContent=d.sub.split(' · ')[0]+' · '+cor; k++; };
+  poe(); ciclo=setInterval(poe,1500);
+}
 function tecla(t){ const e=q('tecla'); e.textContent=t; e.classList.remove('prime'); void e.offsetWidth; e.classList.add('prime'); }
 function video(id,src){ const v=q(id); v.style.opacity=0; setTimeout(()=>{ v.src=A(src); v.play(); v.oncanplay=()=>v.style.opacity=1; setTimeout(()=>v.style.opacity=1,350); },220); }
 
@@ -338,11 +353,11 @@ const passos = [
   [0,    ()=>{ poe(jarros[0],'centro'); poe(jarros[1],'dir'); poe(jarros[2],'fora',false); poe(jarros[3],'fora',false); jarros[0].classList.add('cai');
                ficha(FLORES[0]); foco('fl0'); }],
   [3800, ()=>{ tecla('▶'); poe(jarros[0],'esq'); poe(jarros[1],'centro'); poe(jarros[2],'dir'); poe(jarros[3],'fora',false); foco('fl1'); ficha(FLORES[1]); }],
-  [7600, ()=>{ tecla('▼'); seccao('piteiras'); q('arte').style.backgroundImage=`url(${A(PITS[0].arte)})`; video('v-pit',PITS[0].giro);
+  [7600, ()=>{ tecla('▼'); seccao('piteiras'); video('arte',PITS[0].arte); video('v-pit',PITS[0].giro);
                ficha({...PITS[0], s:'PITEIRAS', c:'var(--amarelo)', claro:true}); etiqueta('etq-pit',PITS[0]); foco('pt0'); }],
-  [11400,()=>{ tecla('▶'); video('v-pit',PITS[1].giro); ficha({...PITS[1], s:'PITEIRAS', c:'var(--amarelo)', claro:true}); etiqueta('etq-pit',PITS[1]); foco('pt1'); }],
-  [15200,()=>{ tecla('▼'); seccao('par'); video('v-par',PARS[0].giro); ficha({...PARS[0], s:'PARAFERNÁLIA', c:'var(--laranja)'}); etiqueta('etq-par',PARS[0]); foco('pa0'); }],
-  [19000,()=>{ tecla('▶'); video('v-par',PARS[1].giro); ficha({...PARS[1], s:'PARAFERNÁLIA', c:'var(--laranja)'}); etiqueta('etq-par',PARS[1]); foco('pa1'); }],
+  [11400,()=>{ tecla('▶'); video('v-pit',PITS[1].giro); video('arte',PITS[1].arte); ficha({...PITS[1], s:'PITEIRAS', c:'var(--amarelo)', claro:true}); etiqueta('etq-pit',PITS[1]); foco('pt1'); }],
+  [15200,()=>{ tecla('▼'); seccao('par'); fotosEm(PARS[0]); ficha({...PARS[0], s:'PARAFERNÁLIA', c:'var(--laranja)'}); etiqueta('etq-par',PARS[0]); foco('pa0'); }],
+  [19000,()=>{ tecla('▶'); fotosEm(PARS[1]); ficha({...PARS[1], s:'PARAFERNÁLIA', c:'var(--laranja)'}); etiqueta('etq-par',PARS[1]); foco('pa1'); }],
 ];
 window.correr = () => passos.forEach(([t,f])=>setTimeout(f,t));
 window.ir = k => { for(let i=0;i<=k;i++) passos[i][1](); };

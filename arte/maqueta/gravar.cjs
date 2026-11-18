@@ -11,7 +11,7 @@ const D = process.argv[2], semVideo = process.argv.includes("--sem-video");
   p.on("pageerror", (e) => console.log("erro:", e.message));
   await p.goto("file://" + path.join(D, "tv.html")); await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(1200);
   const t0 = Date.now(); await p.evaluate(() => window.correr());
-  for (const [t, n] of [[2900, "1-flor"], [6700, "2-flor"], [10600, "3-piteira"], [14400, "4-kit"], [18200, "5-grinder"], [22200, "6-cuia"]]) {
+  for (const [t, n] of [[2900, "1-flor"], [6700, "2-flor"], [10600, "3-piteira"], [14400, "4-kit"], [17900, "5-grinder"], [21900, "6-cuia"]]) {
     await p.waitForTimeout(Math.max(0, t - (Date.now() - t0)));
     await p.screenshot({ path: path.join(D, `quadro-${n}.png`) });
   }
