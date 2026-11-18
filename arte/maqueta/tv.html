@@ -1,196 +1,190 @@
 <!doctype html>
-<html lang="pt"><head><meta charset="utf-8"><title>TV nova, maqueta 2</title>
+<html lang="pt"><head><meta charset="utf-8"><title>TV nova, maqueta 4</title>
 <style>
 @font-face{font-family:Carbona;src:url(a/Carbona-Regular.woff2) format("woff2");font-weight:400}
 @font-face{font-family:Carbona;src:url(a/Carbona-Bold.woff2) format("woff2");font-weight:700}
 @font-face{font-family:Carbona;src:url(a/Carbona-ExtraBold.woff2) format("woff2");font-weight:800}
 @font-face{font-family:Carbona;src:url(a/Carbona-Black.otf) format("opentype");font-weight:900}
+/* A grelha (18/11/2026, "atencao a espacamentos e simetrias"): margens de 112 px dos dois lados; tres colunas no topo,
+   a ficha (112 a 832), o palco (872 a 1472, eixo nos 1172) e o Caramelo (1512 a 1808, eixo nos 1660), com 40 px entre elas;
+   a janela do palco comeca a mesma altura da ficha (160) e as filas comecam nos 736. */
 :root{--tinta:#072645;--papel:#F4EED6;--amarelo:#FFC20F;--laranja:#F58634;--verde:#00923F;--roxo:#7554A3;--vermelho:#E13831;--nicho:#082846;
   --acento:var(--roxo);--mola:cubic-bezier(.34,1.4,.5,1);--suave:cubic-bezier(.22,.8,.24,1)}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:1920px;height:1080px;overflow:hidden;background:var(--tinta);font-family:Carbona,sans-serif;color:var(--papel)}
 body[data-s=piteiras]{--acento:var(--amarelo)} body[data-s=par]{--acento:var(--laranja)}
 
-/* ---------- o mundo: um fundo por seccao, a trocar em fundido ---------- */
+/* ---------- o mundo de cada seccao ---------- */
 .mundo{position:absolute;inset:0;opacity:0;transition:opacity .9s var(--suave)}
 body[data-s=flores] #m-flores, body[data-s=piteiras] #m-pit, body[data-s=par] #m-par{opacity:1}
-#m-flores{background:radial-gradient(980px 720px at 62% 34%,#1d4d7c 0%,#0d3459 40%,var(--tinta) 74%)}
+#m-flores{background:radial-gradient(1000px 720px at 1172px 360px,#1d4d7c 0%,#0d3459 40%,var(--tinta) 74%)}
 #m-pit{background:#0a2c4d;overflow:hidden}
-#m-par{background:radial-gradient(900px 760px at 60% 30%,#173f66 0%,#0b2e4e 46%,#06213d 78%)}
-/* o azulejo do manual, quase invisivel e a derivar devagar */
+#m-par{background:radial-gradient(1000px 720px at 1172px 360px,#173f66 0%,#0b2e4e 46%,#06213d 78%)}
 #azulejo{position:absolute;inset:-220px 0 0 -220px;background:url(a/azulejos-bege.webp) 0 0/220px;opacity:.04;animation:deriva 60s linear infinite;
   -webkit-mask-image:linear-gradient(#000 0%,#000 58%,transparent 76%)}
 @keyframes deriva{to{transform:translate(220px,220px)}}
-
-/* flores: o foco quente e a poeira a dancar na luz */
-.cone{position:absolute;left:var(--cx);top:-40px;width:760px;height:760px;margin-left:-380px;
-  background:linear-gradient(180deg,rgba(255,214,120,.20),rgba(255,214,120,.06) 70%,rgba(255,214,120,0));
+.cone{position:absolute;left:1172px;top:-40px;width:760px;height:760px;margin-left:-380px;
+  background:linear-gradient(180deg,rgba(255,214,120,.2),rgba(255,214,120,.06) 70%,rgba(255,214,120,0));
   clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);filter:blur(14px);animation:respira 5s ease-in-out infinite}
 @keyframes respira{50%{opacity:.75}}
-#m-flores .cone{--cx:1186px} #m-par .cone{--cx:1160px;background:linear-gradient(180deg,rgba(255,237,190,.22),rgba(245,134,52,.07) 70%,rgba(245,134,52,0))}
-.poeira{position:absolute;left:var(--cx);top:80px;width:520px;height:560px;margin-left:-260px;pointer-events:none}
-#m-flores .poeira{--cx:1186px} #m-par .poeira{--cx:1160px}
+.poeira{position:absolute;left:1172px;top:80px;width:520px;height:560px;margin-left:-260px;pointer-events:none}
 .poeira i{position:absolute;width:var(--t);height:var(--t);border-radius:50%;background:#fff3c9;opacity:0;animation:pairar var(--d) ease-in-out var(--a) infinite}
 @keyframes pairar{0%{opacity:0;transform:translate(0,0)}25%{opacity:.55}75%{opacity:.4}100%{opacity:0;transform:translate(var(--x),-120px)}}
-
-/* piteiras: o loop do Flow da arte da piteira, a ecra inteiro por tras da janela */
-#arte{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:cover;transition:opacity .35s}
+/* piteiras: o loop do Flow da arte, a ecra inteiro, escurecido do lado da ficha e por baixo das filas */
+#arte{position:absolute;inset:0;width:1920px;height:1080px;object-fit:cover;transition:opacity .35s}
 #m-pit:after{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(7,38,69,.96) 0%,rgba(7,38,69,.9) 33%,rgba(7,38,69,.35) 50%,rgba(7,38,69,.05) 66%,rgba(7,38,69,.1) 100%),
-  linear-gradient(180deg,rgba(7,38,69,.9) 0%,rgba(7,38,69,0) 16%,rgba(7,38,69,0) 56%,rgba(7,38,69,.94) 68%,var(--tinta) 76%)}
+  linear-gradient(180deg,rgba(7,38,69,.96) 0%,rgba(7,38,69,.7) 9%,rgba(7,38,69,0) 22%,rgba(7,38,69,0) 56%,rgba(7,38,69,.94) 68%,var(--tinta) 76%)}
 
 /* ---------- cabecalho ---------- */
-header{position:absolute;left:110px;right:96px;top:40px;height:64px;display:flex;align-items:center;z-index:5}
+header{position:absolute;left:112px;right:112px;top:44px;height:64px;display:flex;align-items:center;z-index:5}
 header img.logo{height:56px} header img.letra{height:42px;margin-left:16px}
-nav{margin-left:auto;display:flex;gap:46px;align-items:center}
+nav{margin-left:auto;display:flex;gap:48px;align-items:center}
 nav span{font-weight:700;font-size:28px;opacity:.6;position:relative;padding-bottom:10px;transition:opacity .4s}
 nav span.on{opacity:1}
 nav span:after{content:"";position:absolute;left:50%;right:50%;bottom:0;height:5px;border-radius:3px;background:var(--acento);transition:left .5s var(--mola),right .5s var(--mola),background .5s}
 nav span.on:after{left:0;right:0}
 
-/* ---------- a ficha, em tipografia de revista ---------- */
-#ficha{position:absolute;left:110px;top:150px;width:730px;z-index:3}
-.olho{display:flex;gap:14px;align-items:center;font-weight:800;font-size:20px;letter-spacing:2.6px;white-space:nowrap}
-.chip{padding:8px 14px 7px;border-radius:8px;border:3px solid var(--tinta);box-shadow:4px 4px 0 rgba(0,0,0,.35);color:var(--papel);transition:background .5s}
+/* ---------- a ficha ---------- */
+#ficha{position:absolute;left:112px;top:160px;width:720px;z-index:3}
+.olho{display:flex;gap:14px;align-items:center;font-weight:800;font-size:20px;letter-spacing:2.6px;white-space:nowrap;height:42px}
+.chip{padding:8px 14px 7px;border-radius:8px;border:3px solid var(--tinta);box-shadow:4px 4px 0 rgba(0,0,0,.35);color:var(--papel);flex:none}
 .chip.claro{color:var(--tinta)}
-#nome{font-weight:900;line-height:.94;letter-spacing:-2px;margin-top:18px;white-space:nowrap;height:122px;display:flex;align-items:flex-end}
+#nome{font-weight:900;line-height:.94;letter-spacing:-2px;margin-top:16px;white-space:nowrap;height:122px;display:flex;align-items:flex-end}
 #nome span{display:inline-block;transform-origin:50% 100%}
 #nome.entra span{animation:letra .7s var(--mola) both}
 @keyframes letra{from{opacity:0;transform:translateY(46px) rotate(5deg) scale(.9)}}
-#tipo{font-weight:700;font-size:30px;color:var(--acento);margin-top:12px;transition:color .5s}
-.barra{margin-top:28px;width:560px}
+#tipo{font-weight:700;font-size:30px;color:var(--amarelo);margin-top:12px;height:38px;white-space:nowrap}
+.barra{margin-top:28px;width:600px}
 .barra .rot{display:flex;justify-content:space-between;font-weight:800;font-size:18px;letter-spacing:2px;margin-bottom:9px}
 .barra .rot b{font-size:24px;margin-left:8px}
 .barra .t{height:16px;border-radius:9px;background:var(--verde);overflow:hidden;border:3px solid var(--tinta);box-shadow:3px 3px 0 rgba(0,0,0,.3)}
 .barra .t i{display:block;height:100%;background:var(--amarelo);border-right:3px solid var(--tinta);transition:width 1s var(--mola)}
-#terp{margin-top:24px;display:grid;grid-template-columns:160px 1fr;gap:12px 18px;width:560px;align-items:center}
+#terp{margin-top:24px;display:grid;grid-template-columns:170px 1fr;gap:12px 18px;width:600px;align-items:center}
 #terp span{font-weight:700;font-size:21px;opacity:.92}
 #terp i{display:block;height:10px;border-radius:6px;background:linear-gradient(90deg,var(--amarelo),var(--laranja));transform-origin:left;transform:scaleX(0);transition:transform 1s var(--mola)}
-#aromas{display:flex;gap:30px;margin-top:26px}
-#aromas div{display:flex;flex-direction:column;align-items:center;gap:7px;font-weight:700;font-size:17px;opacity:.92;text-transform:capitalize}
+#aromas{display:flex;gap:32px;margin-top:26px}
+#aromas div{display:flex;flex-direction:column;align-items:center;gap:7px;font-weight:700;font-size:17px;opacity:.92;min-width:64px}
 #aromas svg{width:50px;height:50px}
 #aromas svg *{stroke-dasharray:80;stroke-dashoffset:80;animation:traca 1.1s var(--suave) forwards}
 #aromas div:nth-child(2) svg *{animation-delay:.15s} #aromas div:nth-child(3) svg *{animation-delay:.3s}
 @keyframes traca{to{stroke-dashoffset:0}}
-#specs{margin-top:28px;display:grid;grid-template-columns:repeat(2,300px);gap:14px}
-#specs div{border:3px solid rgba(244,238,214,.22);border-radius:14px;padding:12px 16px 13px;background:rgba(7,38,69,.55)}
+#specs{margin-top:28px;display:grid;grid-template-columns:repeat(2,293px);gap:14px}
+#specs div{border:3px solid rgba(244,238,214,.22);border-radius:14px;padding:12px 16px 13px;background:rgba(7,38,69,.55);height:78px}
 #specs small{display:block;font-weight:800;font-size:14px;letter-spacing:2.4px;opacity:.6;margin-bottom:5px}
-#specs b{font-weight:700;font-size:23px;line-height:1.15}
+#specs b{font-weight:700;font-size:23px;line-height:1.15;white-space:nowrap}
 .troca{transition:opacity .35s var(--suave),transform .55s var(--mola)}
 .sai{opacity:0;transform:translateY(22px)}
 
-/* ---------- palco das flores: o balcao e os frascos ---------- */
+/* ---------- palco das flores: o balcao centrado no eixo e os frascos ---------- */
 .palco{position:absolute;inset:0;pointer-events:none;transition:opacity .6s var(--suave),transform .8s var(--suave)}
 #p-flores{opacity:0;transform:translateY(40px)} body[data-s=flores] #p-flores{opacity:1;transform:none}
-#balcao{position:absolute;left:840px;top:604px;width:1120px;height:96px}
-#balcao .tampo{height:24px;background:#E3B97C;border:4px solid var(--tinta);border-radius:8px 8px 0 0;box-shadow:inset 0 5px 0 rgba(255,255,255,.25)}
-#balcao .frente{height:72px;background:linear-gradient(#C6955A,#A2733F);border:4px solid var(--tinta);border-top:0}
-#balcao .frente:before{content:"";display:block;height:100%;background:repeating-linear-gradient(90deg,transparent 0 136px,rgba(7,38,69,.32) 136px 140px)}
+#balcao{position:absolute;left:822px;top:610px;width:700px;height:90px}
+#balcao .tampo{height:24px;background:#E3B97C;border:4px solid var(--tinta);border-radius:10px 10px 0 0;box-shadow:inset 0 5px 0 rgba(255,255,255,.25)}
+#balcao .frente{height:66px;background:linear-gradient(#C6955A,#A2733F);border:4px solid var(--tinta);border-top:0;border-radius:0 0 6px 6px}
+#balcao .frente:before{content:"";display:block;height:100%;background:repeating-linear-gradient(90deg,transparent 0 136px,rgba(7,38,69,.32) 136px 140px);background-position:-8px 0}
 .frasco{position:absolute;width:var(--l);height:calc(var(--l) / .727);transform-origin:50% 100%}
 .frasco>img{position:absolute;inset:0;width:100%;height:100%}
-.frasco .flor{position:absolute;left:16.5%;top:24.5%;width:67%;height:60.5%;object-fit:contain;object-position:50% 100%}
+.frasco .flor{position:absolute;left:17%;top:26%;width:66%;height:58%;object-fit:contain;object-position:50% 100%}
 .frasco .brilho{position:absolute;left:16%;top:16%;width:68%;height:69%;overflow:hidden;border-radius:10% 10% 6% 6%}
 .frasco .brilho:after{content:"";position:absolute;top:-10%;bottom:-10%;width:26%;left:-40%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.4),rgba(255,255,255,0));animation:brilho 3.4s ease-in-out infinite}
 @keyframes brilho{0%{left:-40%}55%,100%{left:120%}}
-.frasco .rotulo{position:absolute;left:21%;width:58%;top:65.5%;height:15.5%;background:var(--papel);border:3px solid var(--tinta);border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--tinta);text-align:center;line-height:1;gap:.18em}
-.frasco .rotulo b{font-weight:900;letter-spacing:.04em;font-size:var(--fs)}
-.frasco .rotulo i{font-style:normal;font-weight:900;font-size:calc(var(--fs) * 1.25);color:var(--roxo)}
+.frasco .rotulo{position:absolute;left:21%;width:58%;top:65.5%;height:15.5%;background:var(--papel);border:3px solid var(--tinta);border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--tinta);text-align:center;line-height:1;gap:.2em;overflow:hidden}
+.frasco .rotulo b{font-weight:900;letter-spacing:.03em;font-size:var(--fs);white-space:nowrap}
+.frasco .rotulo i{font-style:normal;font-weight:900;font-size:calc(var(--fsp) * 1px);color:var(--cp)}
 #p-flores .frasco{transition:left .8s var(--suave),top .8s var(--suave),width .8s var(--suave),height .8s var(--suave),opacity .6s,filter .6s}
-#p-flores .frasco.lado{opacity:.4;filter:saturate(.55) brightness(.75)}
+#p-flores .frasco.lado{opacity:.42;filter:saturate(.55) brightness(.75)}
 #p-flores .frasco.lado .rotulo{opacity:0}
+#p-flores .frasco.fora{opacity:0}
 #p-flores .frasco.centro .tampa{animation:flutua 2.8s ease-in-out infinite}
-#p-flores .frasco.centro .flor{animation:assenta 4s ease-in-out infinite}
 @keyframes flutua{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px) rotate(-1.4deg)}}
-@keyframes assenta{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 #p-flores .frasco.cai{animation:cai 1s var(--mola) both}
 @keyframes cai{from{transform:translateY(-160px) rotate(-6deg);opacity:0}to{transform:none;opacity:1}}
-.sombra{position:absolute;height:28px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),rgba(0,0,0,0));transform:translateX(-50%)}
+.sombra{position:absolute;left:1172px;top:596px;width:320px;height:28px;margin-left:-160px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.5),rgba(0,0,0,0))}
 
-/* ---------- palco das piteiras: a janela da marca ---------- */
-#p-pit{opacity:0} body[data-s=piteiras] #p-pit{opacity:1}
-#janela{position:absolute;left:910px;top:150px;width:500px;height:500px;border-radius:28px;border:5px solid var(--papel);
-  box-shadow:0 0 0 5px var(--tinta),16px 16px 0 5px var(--amarelo);background:var(--nicho);overflow:hidden;
-  transform:scale(.8) rotate(-4deg);opacity:0;transition:transform 1s var(--mola),opacity .5s}
-body[data-s=piteiras] #janela{transform:none;opacity:1;animation:boia 5s ease-in-out 1s infinite}
-@keyframes boia{50%{transform:translateY(-8px) rotate(.6deg)}}
+/* ---------- a janela da marca, igual nas piteiras e na parafernalia ---------- */
+.janela{position:absolute;left:912px;top:160px;width:520px;height:500px;border-radius:28px;border:5px solid var(--papel);
+  box-shadow:0 0 0 5px var(--tinta),16px 16px 0 5px var(--acento);overflow:hidden;transform:scale(.8) rotate(-4deg);opacity:0;transition:transform 1s var(--mola),opacity .5s}
+body[data-s=piteiras] #janela, body[data-s=par] #estudio{transform:none;opacity:1;animation:boia 5s ease-in-out 1s infinite}
+@keyframes boia{50%{transform:translateY(-8px)}}
+.janela .reflexo{position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 32%);pointer-events:none;z-index:5}
+#janela{background:var(--nicho)}
 #janela video{width:100%;height:100%;object-fit:cover;transition:opacity .25s}
-#janela .reflexo{position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 32%);pointer-events:none}
+/* o estudio da parafernalia: fundo claro por tras das fotos reais, e o pedestal ao centro */
+#estudio{background:radial-gradient(420px 360px at 50% 38%,#FFFFFF 0%,#FAF6EA 45%,#EDE3C6 100%)}
+#estudio:before{content:"";position:absolute;left:0;right:0;top:66%;bottom:0;background:linear-gradient(180deg,rgba(7,38,69,0),rgba(7,38,69,.07))}
+#pedestal{position:absolute;left:95px;width:320px;top:362px;height:96px;z-index:2}
+#pedestal .topo{position:absolute;left:0;right:0;top:0;height:56px;border-radius:50%;background:radial-gradient(ellipse at 50% 38%,#FFB774,var(--laranja) 72%);border:4px solid var(--tinta);z-index:2}
+#pedestal .lado{position:absolute;left:0;right:0;top:28px;height:64px;border:4px solid var(--tinta);border-top:0;border-radius:0 0 50% 50% / 0 0 30px 30px;overflow:hidden;
+  background:linear-gradient(90deg,rgba(7,38,69,.4),rgba(7,38,69,0) 22%,rgba(7,38,69,0) 78%,rgba(7,38,69,.4)),repeating-linear-gradient(90deg,#C8641F 0 40px,#DE762E 40px 80px);
+  background-size:100% 100%,80px 100%;animation:tambor 2.4s linear infinite}
+@keyframes tambor{to{background-position:0 0,-80px 0}}
+#pedestal .contacto{position:absolute;left:50%;top:10px;width:220px;height:34px;margin-left:-105px;border-radius:50%;background:radial-gradient(closest-side,rgba(7,38,69,.42),rgba(7,38,69,0));z-index:3}
+/* a peca: a foto real recortada, com a base a assentar no centro do tampo do pedestal */
+#fotos{position:absolute;left:85px;width:340px;top:118px;height:272px;z-index:4}
+#fotos img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%}
+#fotos img.entra{animation:fotoEntra .9s var(--mola) both}
+#fotos img.sai{animation:fotoSai .55s var(--suave) both}
+@keyframes fotoEntra{from{opacity:0;transform:translateX(90px) rotate(6deg) scale(.9)}}
+@keyframes fotoSai{to{opacity:0;transform:translateX(-90px) rotate(-6deg) scale(.9)}}
 
-/* ---------- palco da parafernalia: o pedestal que roda ---------- */
-#p-par{opacity:0} body[data-s=par] #p-par{opacity:1}
-#pedestal{position:absolute;left:930px;top:556px;width:460px;height:110px}
-#pedestal .topo{position:absolute;left:0;right:0;top:0;height:64px;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,#FFB066,var(--laranja) 70%);border:4px solid var(--tinta);z-index:2}
-#pedestal .lado{position:absolute;left:0;right:0;top:32px;height:70px;border:4px solid var(--tinta);border-top:0;border-radius:0 0 50% 50% / 0 0 34px 34px;overflow:hidden;
-  background:linear-gradient(90deg,rgba(7,38,69,.45),rgba(7,38,69,0) 22%,rgba(7,38,69,0) 78%,rgba(7,38,69,.45)),repeating-linear-gradient(90deg,#C8641F 0 46px,#DE762E 46px 92px);
-  background-size:100% 100%,92px 100%;animation:tambor 2.4s linear infinite}
-@keyframes tambor{to{background-position:0 0,-92px 0}}
-#peca{position:absolute;left:940px;top:200px;width:440px;height:430px;transform:scale(.7);opacity:0;transition:transform 1s var(--mola),opacity .5s}
-body[data-s=par] #peca{transform:none;opacity:1}
-#peca .boia{position:absolute;inset:0;animation:boia2 4.6s ease-in-out infinite}
-@keyframes boia2{50%{transform:translateY(-12px)}}
-#peca img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%;filter:drop-shadow(0 18px 18px rgba(0,0,0,.45))}
-#peca img.entra{animation:fotoEntra .9s var(--mola) both}
-#peca img.sai{animation:fotoSai .6s var(--suave) both}
-@keyframes fotoEntra{from{opacity:0;transform:translateX(120px) rotate(8deg) scale(.86)}}
-@keyframes fotoSai{to{opacity:0;transform:translateX(-120px) rotate(-8deg) scale(.86)}}
-#pedestal .sombra2{position:absolute;left:90px;right:90px;top:10px;height:36px;border-radius:50%;background:radial-gradient(closest-side,rgba(7,38,69,.55),rgba(7,38,69,0));z-index:3}
-
-/* a etiqueta do preco, pendurada por um fio e a balancar */
-.etiqueta{position:absolute;transform-origin:50% 0;animation:balanca 3.2s ease-in-out infinite;z-index:4;filter:drop-shadow(6px 6px 0 rgba(0,0,0,.38));text-align:center}
+/* a etiqueta do preco: pendurada no canto de cima a direita da janela, no mesmo sitio nas duas seccoes */
+.etiqueta{position:absolute;left:1432px;top:112px;width:0;z-index:6;opacity:0;transition:opacity .4s}
+body[data-s=piteiras] #etq-pit, body[data-s=par] #etq-par{opacity:1}
+.etiqueta .pend{position:absolute;left:0;top:0;transform:translateX(-50%);transform-origin:50% 0;animation:balanca 3.2s ease-in-out infinite;filter:drop-shadow(6px 6px 0 rgba(0,0,0,.38));text-align:center}
 .etiqueta .fio{position:absolute;left:50%;top:0;width:3px;height:44px;margin-left:-1.5px;background:var(--papel)}
-.etiqueta .tag{position:relative;margin-top:40px;padding:26px 26px 14px;background:var(--papel);color:var(--tinta);border:4px solid var(--tinta);border-radius:14px;white-space:nowrap}
+.etiqueta .tag{position:relative;margin-top:40px;padding:26px 28px 14px;background:var(--papel);color:var(--tinta);border:4px solid var(--tinta);border-radius:14px;white-space:nowrap;min-width:176px}
 .etiqueta .tag:before{content:"";position:absolute;left:50%;top:7px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--tinta);box-shadow:inset 0 0 0 4px #b9b29a}
 .etiqueta b{font-weight:900;font-size:58px;letter-spacing:-1px;display:block;line-height:1}
 .etiqueta small{display:block;font-weight:800;font-size:15px;letter-spacing:2px;opacity:.7;margin-top:5px}
-@keyframes balanca{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(5deg)}}
-.etiqueta.pousada{transform-origin:50% 100%;animation:abana 4s ease-in-out infinite}
-.etiqueta.pousada .tag{margin-top:0;padding-top:14px}.etiqueta.pousada .tag:before{display:none}
-@keyframes abana{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(2deg)}}
-#etq-pit{left:1316px;top:108px} #etq-par{left:1352px;top:452px}
+@keyframes balanca{0%,100%{transform:translateX(-50%) rotate(-6deg)}50%{transform:translateX(-50%) rotate(5deg)}}
 .etiqueta.salta .tag{animation:pula .6s var(--mola)}
 @keyframes pula{0%{transform:scale(.6)}60%{transform:scale(1.08)}100%{transform:none}}
 
-/* ---------- o Caramelo, a apresentar ---------- */
-#caramelo{position:absolute;left:1560px;top:150px;width:300px;height:560px;z-index:2}
+/* ---------- o Caramelo, centrado na terceira coluna ---------- */
+#caramelo{position:absolute;left:1512px;top:150px;width:296px;height:540px;z-index:2}
 #caramelo video{position:absolute;bottom:0;left:50%;height:100%;transform:translateX(-50%);opacity:0;transition:opacity .45s}
 #caramelo video.on{opacity:1}
 #caramelo.salta{animation:salto .7s var(--mola)}
 @keyframes salto{40%{transform:translateY(-22px) scale(.98,1.03)}}
 
-/* ---------- as filas: flores, piteiras e parafernalia ao mesmo nivel ---------- */
-#filas{position:absolute;left:0;right:0;top:722px;bottom:0;overflow:hidden;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 66%,rgba(0,0,0,.35) 88%,transparent 100%);z-index:4}
+/* ---------- as filas ---------- */
+#filas{position:absolute;left:0;right:0;top:724px;bottom:0;overflow:hidden;z-index:4;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 66%,rgba(0,0,0,.35) 88%,transparent 100%),linear-gradient(90deg,transparent 0,transparent 40px,#000 112px,#000 calc(100% - 112px),transparent 100%);
+  -webkit-mask-composite:source-in;mask-composite:intersect}
 #trilho{position:absolute;left:0;right:0;top:0;transition:transform .8s var(--suave)}
-.fila{height:240px;padding:10px 0 0 110px;position:relative;transition:opacity .5s}
+.fila{height:240px;padding:12px 0 0 112px;position:relative;transition:opacity .5s}
 .fila:not(.on){opacity:.42}
-.fila h3{font-weight:800;font-size:24px;letter-spacing:2.4px;display:flex;gap:16px;align-items:baseline;margin-bottom:14px}
+.fila h3{font-weight:800;font-size:24px;letter-spacing:2.4px;display:flex;gap:16px;align-items:baseline;margin-bottom:14px;height:30px}
 .fila h3 small{font-weight:700;font-size:17px;letter-spacing:1.6px;opacity:.6}
 .fila h3 em{font-style:normal;width:12px;height:12px;border-radius:3px;background:var(--c);align-self:center;box-shadow:2px 2px 0 rgba(0,0,0,.35)}
-.itens{display:flex;gap:24px;align-items:flex-start}
+.itens{display:flex;gap:24px;align-items:flex-start;transition:transform .6s var(--suave);width:max-content}
 .cartao{position:relative;width:140px;flex:none}
-.cartao .caixa{position:relative;width:140px;height:146px;border-radius:16px;overflow:visible;transition:transform .5s var(--mola)}
-.cartao .nome{margin-top:17px;font-weight:700;font-size:16px;text-align:center;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .3s}
+.cartao .caixa{position:relative;width:140px;height:146px;border-radius:16px;transition:transform .5s var(--mola)}
+.cartao .nome{margin-top:17px;font-weight:700;font-size:16px;text-align:center;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .3s;height:20px}
 .cartao.on .caixa{transform:translateY(-4px) scale(1.06)}
 .cartao.on .nome{opacity:1}
 .cartao .frasco{left:50%;bottom:0;margin-left:calc(var(--l) / -2);--l:100px}
-.pit .caixa,.par .caixa{background:rgba(244,238,214,.07);border:3px solid rgba(244,238,214,.12)}
-.pit .caixa{background:var(--nicho)}
-.caixa>img.f{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);object-fit:contain}
-.fila.entra .cartao{animation:sobe .6s var(--mola) both}
-.fila.entra .cartao:nth-child(2){animation-delay:.04s}.fila.entra .cartao:nth-child(3){animation-delay:.08s}.fila.entra .cartao:nth-child(4){animation-delay:.12s}
-.fila.entra .cartao:nth-child(5){animation-delay:.16s}.fila.entra .cartao:nth-child(6){animation-delay:.2s}.fila.entra .cartao:nth-child(7){animation-delay:.24s}
+.cartao .breve{position:absolute;left:50%;top:62%;transform:translate(-50%,-50%) rotate(-8deg);background:var(--papel);color:var(--tinta);border:3px solid var(--tinta);border-radius:6px;font-weight:900;font-size:13px;letter-spacing:1.5px;padding:3px 7px;white-space:nowrap;z-index:2}
+.pit .caixa{background:var(--nicho);border:3px solid rgba(244,238,214,.16)}
+.par .caixa{background:radial-gradient(circle at 50% 40%,#FFFFFF 0%,#F7F1E0 55%,#E9DEBE 100%);border:3px solid var(--tinta);box-shadow:4px 4px 0 rgba(0,0,0,.3)}
+.caixa>img.f{position:absolute;inset:14px;width:calc(100% - 28px);height:calc(100% - 28px);object-fit:contain}
+/* o marcador de grupo dentro da fila das flores: CBD, Infusao, Hash */
+.sep{flex:none;width:40px;height:146px;position:relative}
+.sep:before{content:"";position:absolute;left:50%;top:8px;bottom:8px;width:4px;margin-left:-2px;border-radius:2px;background:var(--c);opacity:.9}
+.sep b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-90deg);font-weight:800;font-size:15px;letter-spacing:3px;white-space:nowrap;background:var(--tinta);color:var(--c);padding:2px 8px}
+.fila.entra .itens>*{animation:sobe .6s var(--mola) both}
 @keyframes sobe{from{transform:translateY(30px);opacity:0}}
-/* o anel do foco: um so, que desliza de cartao em cartao */
 #anel{position:absolute;border:4px solid var(--amarelo);border-radius:20px;box-shadow:0 0 0 7px rgba(255,194,15,.16),0 10px 28px rgba(0,0,0,.4);
-  transition:left .5s var(--mola),top .7s var(--mola),width .5s var(--mola),height .5s var(--mola);pointer-events:none;z-index:5}
-.dica{position:absolute;right:96px;top:10px;font-weight:700;font-size:17px;opacity:.5;letter-spacing:1px;z-index:6}
+  transition:left .45s var(--mola),top .7s var(--mola),width .45s var(--mola),height .45s var(--mola);pointer-events:none;z-index:5}
+.dica{position:absolute;right:112px;top:14px;font-weight:700;font-size:17px;opacity:.5;letter-spacing:1px;z-index:6}
 .dica b{display:inline-block;border:2px solid var(--papel);border-radius:6px;padding:0 8px;margin:0 5px 0 14px}
 
-/* a tecla do comando, so na maqueta, para se perceber o gesto */
-#tecla{position:absolute;right:120px;bottom:120px;width:96px;height:96px;border-radius:50%;background:var(--papel);color:var(--tinta);border:4px solid var(--tinta);
+#tecla{position:absolute;right:112px;bottom:112px;min-width:96px;height:96px;padding:0 18px;border-radius:48px;background:var(--papel);color:var(--tinta);border:4px solid var(--tinta);
   box-shadow:6px 6px 0 rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900;opacity:0;transform:scale(.6);z-index:9}
 #tecla.prime{animation:prime 1s var(--suave)}
-@keyframes prime{0%{opacity:0;transform:scale(.6)}18%{opacity:1;transform:scale(1)}30%{transform:scale(.88)}45%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(1)}}
+#tecla.longa{animation:prime 1.9s var(--suave)}
+@keyframes prime{0%{opacity:0;transform:scale(.6)}15%{opacity:1;transform:scale(1)}25%{transform:scale(.88)}40%{transform:scale(1)}85%{opacity:1}100%{opacity:0;transform:scale(1)}}
 </style></head>
 <body data-s="flores">
 <div class="mundo" id="m-flores"><div class="cone"></div><div class="poeira"></div></div>
@@ -201,12 +195,11 @@ body[data-s=par] #peca{transform:none;opacity:1}
 <header><img class="logo" src="a/logo_caramelo.png"><img class="letra" src="a/lettering_caramelo.png">
   <nav><span id="n-flores" class="on">Flores</span><span id="n-piteiras">Piteiras</span><span id="n-par">Parafernália</span><span>Análises</span></nav></header>
 
-<div class="palco" id="p-flores"><div id="balcao"><div class="tampo"></div><div class="frente"></div></div></div>
-<div class="palco" id="p-pit"><div id="janela"><video id="v-pit" muted loop playsinline></video><div class="reflexo"></div></div>
-  <div class="etiqueta" id="etq-pit"><i class="fio"></i><div class="tag"><b></b><small></small></div></div></div>
-<div class="palco" id="p-par"><div id="pedestal"><div class="lado"></div><div class="topo"></div><div class="sombra2"></div></div>
-  <div id="peca"><div class="boia" id="fotos"></div></div>
-  <div class="etiqueta pousada" id="etq-par"><div class="tag"><b></b><small></small></div></div></div>
+<div class="palco" id="p-flores"><div id="balcao"><div class="tampo"></div><div class="frente"></div></div><div class="sombra"></div></div>
+<div class="janela" id="janela"><video id="v-pit" muted loop playsinline></video><div class="reflexo"></div></div>
+<div class="janela" id="estudio"><div id="pedestal"><div class="lado"></div><div class="topo"></div><div class="contacto"></div></div><div id="fotos"></div><div class="reflexo"></div></div>
+<div class="etiqueta" id="etq-pit"><div class="pend"><i class="fio"></i><div class="tag"><b></b><small></small></div></div></div>
+<div class="etiqueta" id="etq-par"><div class="pend"><i class="fio"></i><div class="tag"><b></b><small></small></div></div></div>
 
 <div id="caramelo">
   <video id="c-flores" class="on" src="a/tv-apresenta.webm" muted loop autoplay playsinline></video>
@@ -229,7 +222,7 @@ body[data-s=par] #peca{transform:none;opacity:1}
   <div id="trilho">
     <div class="fila on" id="f-flores" style="--c:var(--roxo)"><h3><em></em>FLORES <small>16 frascos · CBD · Infusão · Hash</small></h3><div class="itens" id="i-flores"></div></div>
     <div class="fila" id="f-piteiras" style="--c:var(--amarelo)"><h3><em></em>PITEIRAS <small>15 artes · 5 kits</small></h3><div class="itens" id="i-piteiras"></div></div>
-    <div class="fila" id="f-par" style="--c:var(--laranja)"><h3><em></em>PARAFERNÁLIA <small>grinders · cuias · cinzeiros · porta-joint</small></h3><div class="itens" id="i-par"></div></div>
+    <div class="fila" id="f-par" style="--c:var(--laranja)"><h3><em></em>PARAFERNÁLIA <small>grinders · cuias · cinzeiros · bandejas</small></h3><div class="itens" id="i-par"></div></div>
   </div>
   <div id="anel"></div>
 </div>
@@ -241,20 +234,35 @@ const PIC = {
   tropical: '<path d="M12.5 21Q13.5 14 12 8.5M12 8.5Q7 6 3.5 9M12 8.5Q9 3.5 5 3.5M12 8.5Q15 3.5 19 4M12 8.5Q17 6.5 20.5 10M8.5 21H16.5"/>',
   uva: [[7.5,8],[12,8],[16.5,8],[9.8,12.5],[14.2,12.5],[12,17]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.4"/>`).join('')+'<path d="M12 5.6Q12 3 14.5 2.2"/>',
   fruta: '<path d="M12 8Q5 6.5 5 13.5Q5 20.5 12 20.5Q19 20.5 19 13.5Q19 6.5 12 8M12 8Q12 5 14 3.5M9 12Q8 14 9 16"/>',
+  manga: '<path d="M7 18Q3 13 7 8Q11 3.5 16.5 6Q21 9 18.5 14.5Q15.5 20.5 7 18Z"/><path d="M15 6Q16 3.5 18.5 3"/>',
   citrino: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6.5"/>'+[0,60,120,180,240,300].map(a=>{const r=a*Math.PI/180;return `<path d="M12 12L${(12+6.5*Math.cos(r)).toFixed(2)} ${(12+6.5*Math.sin(r)).toFixed(2)}"/>`}).join(''),
+  creme: '<path d="M12 3Q6 10.5 6 14.5A6 6 0 0 0 18 14.5Q18 10.5 12 3Z"/><path d="M9.5 15Q10 17.3 12.3 17.8"/>',
   terra: '<path d="M3 10Q7.5 7 12 10Q16.5 13 21 10M3 15Q7.5 12 12 15Q16.5 18 21 15M3 20H21"/><circle cx="8" cy="4.8" r="1.6"/><circle cx="15" cy="5.4" r="1.1"/>',
   incenso: '<path d="M12 4L8 18H16L12 4M6 20.5H18"/><circle cx="12" cy="4" r=".9"/>',
 };
-const COR = {tropical:'#00923F',uva:'#9B7FD0',fruta:'#E13831',citrino:'#F58634',terra:'#F4EED6',incenso:'#9B7FD0'};
+const COR = {tropical:'#00923F',uva:'#9B7FD0',fruta:'#E13831',manga:'#F58634',citrino:'#F58634',creme:'#F4EED6',terra:'#F4EED6',incenso:'#9B7FD0'};
 const svg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="${COR[k]}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${PIC[k]}</svg>`;
+const GRUPO = {cbd:{nome:'CBD', c:'var(--verde)', tampa:'verde', cp:'#00923F', claro:false},
+               inf:{nome:'INFUSÃO', c:'var(--roxo)', tampa:'roxo', cp:'#7554A3', claro:false},
+               hash:{nome:'HASH', c:'var(--laranja)', tampa:'laranja', cp:'#072645', claro:true}};
 
-// os dados sao os do catalogo da TV de hoje (/api/tv/catalogo, 18/11/2026)
+// os dados sao os do catalogo da TV de hoje (/api/tv/catalogo, 18/11/2026); as fotos recortadas sem margens (t-*.webp)
 const FLORES = [
-  {n:'Skittles', f:'skittles-tv-2.webp', tampa:'roxo', s:'INFUSÃO', c:'var(--roxo)', sub:'FLOR · 3,5 g · LOTE SKT-TR-001', t:'Índica-dominante', i:70, terp:[['Cariofileno',1],['Humuleno',.74],['Linalol',.52]], ar:[['tropical','Fruta tropical'],['uva','Uva fresca'],['fruta','Frutado']], p:'38 €'},
-  {n:'Amnesia', f:'amnesia-hy-pro-tv-2.webp', tampa:'roxo', s:'INFUSÃO', c:'var(--roxo)', sub:'FLOR · 3,5 g · LOTE AM-TR-001', t:'Sativa-dominante', i:25, terp:[['Limoneno',1],['Terpinoleno',.7],['Cariofileno',.48]], ar:[['citrino','Cítricos'],['terra','Terra'],['incenso','Incenso']], p:'38 €'},
-  {n:'Sky', f:'sky-tv.webp', tampa:'roxo', p:'38 €'}, {n:'White Banger', f:'white-banger-tv.webp', tampa:'roxo', p:'38 €'},
-  {n:'No Milk', f:'no-milk-tv.webp', tampa:'roxo', p:'38 €'}, {n:'Peanut Butter', f:'peanut-butter-tv.webp', tampa:'roxo', p:'38 €'},
-  {n:'Solero Cream', f:'solero-cream-tv.webp', tampa:'verde', p:'29,99 €'},
+  {n:'Mars', f:'t-prensadinho.webp', g:'cbd', p:'38 €'},
+  {n:'Solero Cream', f:'t-solero-cream-tv.webp', g:'cbd', p:'29,99 €', sub:'FLOR · 3,5 g · CULTIVO INDOOR', t:'Híbrida', i:50,
+    terp:[['Mirceno',1],['Cariofileno',.72],['Pineno',.5]], ar:[['tropical','Fruta tropical'],['citrino','Cítrico cremoso']]},
+  {n:'Skittles', f:'t-skittles-tv-2.webp', g:'inf', p:'38 €', sub:'FLOR · 3,5 g · LOTE SKT-TR-001', t:'Índica-dominante', i:70,
+    terp:[['Cariofileno',1],['Humuleno',.74],['Linalol',.52]], ar:[['tropical','Fruta tropical'],['uva','Uva fresca'],['fruta','Frutado']]},
+  {n:'Amnesia', f:'t-amnesia-hy-pro-tv-2.webp', g:'inf', p:'38 €', sub:'FLOR · 3,5 g · LOTE AM-TR-001', t:'Sativa-dominante', i:25,
+    terp:[['Limoneno',1],['Terpinoleno',.7],['Cariofileno',.48]], ar:[['citrino','Cítricos'],['terra','Terra'],['incenso','Incenso']]},
+  {n:'Sky', f:'t-sky-tv.webp', g:'inf', p:'38 €'}, {n:'White Banger', f:'t-white-banger-tv.webp', g:'inf', p:'38 €'},
+  {n:'No Milk', f:'t-no-milk-tv.webp', g:'inf', p:'38 €'}, {n:'Peanut Butter', f:'t-peanut-butter-tv.webp', g:'inf', p:'38 €'},
+  {n:'Pulsar', f:'t-pulsar-tv.webp', g:'inf', p:'38 €'}, {n:'Forbidden Fruit', f:'t-forbidden-fruit.webp', g:'inf', p:'38 €'},
+  {n:'Berry Pie', f:'t-berry-pie-tv.webp', g:'inf', p:'33 €'}, {n:'Blueberry', f:'t-blueberry-small-tv.webp', g:'inf', p:'33 €'},
+  {n:'Prensadinho', f:'', g:'inf', p:'', breve:true},
+  {n:'Mango Melt', f:'t-mango-melt-tv.webp', g:'hash', p:'25 €', sub:'HASH PIATTELLA · LOTE PT-H', t:'Com infusão aromática', i:50,
+    terp:[['Mirceno',1],['Ocimeno',.7],['Limoneno',.52]], ar:[['manga','Manga'],['tropical','Tropical'],['creme','Creme']]},
+  {n:'OG Ivory Dry', f:'t-og-ivory-dry-1.webp', g:'hash', p:'15 €'}, {n:'Sticky Peach', f:'t-sticky-peach-piattella-tv.webp', g:'hash', p:'25 €'},
 ];
 const PITS = [
   {n:'Fauna Brasileira', img:'piteira-vidro-fauna-brasileira-6mm.webp', giro:'piteira-vidro-fauna-brasileira-6mm.webm', arte:'loop-fauna-brasileira.webm', sub:'PITEIRA DE VIDRO · 6 mm', t:'Impressão a toda a volta',
@@ -265,40 +273,47 @@ const PITS = [
   {n:'Futebol', img:'piteira-vidro-futebol-do-brasil-6mm.webp'}, {n:'Surfando', img:'piteira-vidro-surfando-a-onda-boa-5mm.webp'},
 ];
 const PARS = [
-  {n:'Grinder Premium', img:'r-grinder-premium-aluminio-3.webp', sub:'GRINDER · 5 CORES', t:'Alumínio anodizado',
-    fotos:[['r-grinder-premium-aluminio-3.webp','AZUL'],['r-grinder-premium-aluminio-4.webp','VERMELHO'],['r-grinder-premium-aluminio-2.webp','VERDE'],['r-grinder-premium-aluminio-5.webp','ROXO'],['r-grinder-premium-aluminio-1.webp','DOURADO']],
+  {n:'Grinder Premium', img:'t-r-grinder-premium-aluminio-3.webp', sub:'GRINDER · 5 CORES', t:'Alumínio anodizado',
+    fotos:[['t-r-grinder-premium-aluminio-3.webp','AZUL'],['t-r-grinder-premium-aluminio-4.webp','VERMELHO'],['t-r-grinder-premium-aluminio-2.webp','VERDE'],['t-r-grinder-premium-aluminio-5.webp','ROXO'],['t-r-grinder-premium-aluminio-1.webp','DOURADO']],
     specs:[['MEDIDAS','55 × 20 mm'],['DENTES','Em diamante'],['TAMPA','Magnética, gravada'],['CORES','5 metalizadas']], p:'25 €', pl:'5 CORES'},
-  {n:'Cuia de silicone', img:'r-cuia-silicone-aurora-boreal.webp', sub:'CUIA · 13 CORES', t:'Silicone, base antiderrapante',
-    fotos:[['r-cuia-silicone-aurora-boreal.webp','AURORA BOREAL'],['r-cuia-silicone-roxo.webp','ROXO'],['r-cuia-silicone-verde-limao.webp','VERDE-LIMÃO'],['r-cuia-silicone-laranja.webp','LARANJA'],['r-cuia-silicone-azul-piscina.webp','AZUL-PISCINA'],['r-cuia-silicone-rosa-chiclete.webp','ROSA-CHICLETE']],
+  {n:'Cuia de silicone', img:'t-r-cuia-silicone-aurora-boreal.webp', sub:'CUIA · 13 CORES', t:'Silicone, base antiderrapante',
+    fotos:[['t-r-cuia-silicone-aurora-boreal.webp','AURORA BOREAL'],['t-r-cuia-silicone-roxo.webp','ROXO'],['t-r-cuia-silicone-verde-limao.webp','VERDE-LIMÃO'],['t-r-cuia-silicone-laranja.webp','LARANJA'],['t-r-cuia-silicone-azul-piscina.webp','AZUL-PISCINA'],['t-r-cuia-silicone-rosa-chiclete.webp','ROSA-CHICLETE']],
     specs:[['MATERIAL','Silicone'],['BASE','Antiderrapante'],['CUIDADOS','Limpeza fácil'],['CORES','13 cores']], p:'4 €', pl:'13 CORES'},
-  {n:'Cinzeiro', img:'r-cinzeiro-silicone-amarelo.webp'}, {n:'Cinzeiro alumínio', img:'r-cinzeiro-aluminio-roxo.webp'}, {n:'Grinder Boladão', img:'r-grinder-4-partes-boladao-roxo-metalizado.webp'},
-  {n:'Bandeja skate', img:'r-bandeja-metal-skate-1.webp'}, {n:'Porta-joint', img:'r-porta-joint-bio-preto.webp'},
+  {n:'Cinzeiro', img:'t-r-cinzeiro-silicone-amarelo.webp'}, {n:'Cinzeiro alumínio', img:'t-r-cinzeiro-aluminio-roxo.webp'}, {n:'Grinder Boladão', img:'t-r-grinder-4-partes-boladao-roxo-metalizado.webp'},
+  {n:'Bandeja skate', img:'t-r-bandeja-metal-skate-1.webp'}, {n:'Porta-joint', img:'t-r-porta-joint-bio-preto.webp'},
 ];
 
+// o rotulo do frasco: o nome encolhe para caber na largura do papel, o preco na cor da seccao
+const fsNome = (l, n) => Math.min(l*0.066, (l*0.58-l*0.09)/(Math.max(6,n.length)*0.74));
 function frasco(f, l, rotulo){
-  return `<div class="frasco" style="--l:${l}px;--fs:${Math.round(l*0.072)}px"><img src="${A('frasco_tras.webp')}"><img class="flor" src="${A(f.f)}"><img src="${A('frasco_frente.webp')}"><div class="brilho"></div><img class="tampa" src="${A('frasco_tampa_'+f.tampa+'.webp')}">${rotulo?`<div class="rotulo"><b>${f.n.toUpperCase()}</b><i>${f.p}</i></div>`:''}</div>`;
+  const G=GRUPO[f.g];
+  const flor = f.breve ? '' : `<img class="flor" src="${A(f.f)}">`;
+  const preco = f.breve ? 'EM BREVE' : f.p;
+  return `<div class="frasco" style="--l:${l}px;--fs:${fsNome(l,f.n).toFixed(1)}px;--fsp:${(l*0.09).toFixed(1)};--cp:${G.cp}"><img src="${A('frasco_tras.webp')}">${flor}<img src="${A('frasco_frente.webp')}"><div class="brilho"></div><img class="tampa" src="${A('frasco_tampa_'+G.tampa+'.webp')}">${rotulo?`<div class="rotulo"><b>${f.n.toUpperCase()}</b><i>${preco}</i></div>`:''}</div>`;
 }
 const cartao = (id, cls, dentro, nome) => `<div class="cartao ${cls}" id="${id}"><div class="caixa">${dentro}</div><div class="nome">${nome}</div></div>`;
-q('i-flores').innerHTML = FLORES.map((f,k)=>cartao('fl'+k,'flor',frasco(f,100,false),f.n)).join('');
+let h='', ult='';
+FLORES.forEach((f,k)=>{ if(f.g!==ult){ const G=GRUPO[f.g]; h+=`<div class="sep" style="--c:${G.c}"><b>${G.nome}</b></div>`; ult=f.g; } h+=cartao('fl'+k,'flor',frasco(f,100,false)+(f.breve?'<span class="breve">EM BREVE</span>':''),f.n); });
+q('i-flores').innerHTML = h;
 q('i-piteiras').innerHTML = PITS.map((p,k)=>cartao('pt'+k,'pit',`<img class="f" src="${A(p.img)}">`,p.n)).join('');
 q('i-par').innerHTML = PARS.map((p,k)=>cartao('pa'+k,'par',`<img class="f" src="${A(p.img)}">`,p.n)).join('');
+document.querySelectorAll('.poeira').forEach(e=>{ let s=''; for(let k=0;k<26;k++){ s+=`<i style="left:${(Math.random()*100).toFixed(1)}%;top:${(30+Math.random()*70).toFixed(1)}%;--t:${(2+Math.random()*4).toFixed(1)}px;--d:${(5+Math.random()*6).toFixed(1)}s;--a:-${(Math.random()*8).toFixed(1)}s;--x:${(Math.random()*60-30).toFixed(0)}px"></i>`; } e.innerHTML=s; });
 
-// a poeira na luz
-document.querySelectorAll('.poeira').forEach(e=>{ let h=''; for(let k=0;k<26;k++){ h+=`<i style="left:${(Math.random()*100).toFixed(1)}%;top:${(30+Math.random()*70).toFixed(1)}%;--t:${(2+Math.random()*4).toFixed(1)}px;--d:${(5+Math.random()*6).toFixed(1)}s;--a:-${(Math.random()*8).toFixed(1)}s;--x:${(Math.random()*60-30).toFixed(0)}px"></i>`; } e.innerHTML=h; });
-
-// o palco dos frascos: o do centro grande no balcao, os vizinhos a recuar
+// o palco dos frascos: um frasco por flor; o do foco ao centro do eixo (1172), os vizinhos a 275 px para cada lado, os outros fora
 const pf = q('p-flores');
-const POS = {esq:{x:930,l:150,c:'lado'}, centro:{x:1186,l:330,c:'centro'}, dir:{x:1440,l:150,c:'lado'}, fora:{x:1640,l:120,c:'lado'}, antes:{x:760,l:120,c:'lado'}};
-const jarros = FLORES.slice(0,4).map(f=>{ const d=document.createElement('div'); d.innerHTML=frasco(f,330,true); const e=d.firstChild; pf.appendChild(e); return e; });
-const sombra = document.createElement('div'); sombra.className='sombra'; pf.appendChild(sombra);
-function poe(e,pos,vis=true){ const p=POS[pos]; e.style.setProperty('--l',p.l+'px'); e.style.setProperty('--fs',Math.round(p.l*0.072)+'px');
-  e.style.left=(p.x-p.l/2)+'px'; e.style.top=(610-p.l/.727)+'px'; e.className='frasco '+p.c; e.style.opacity=vis?'':'0'; }
-sombra.style.cssText='left:1186px;top:592px;width:320px';
+const jarros = FLORES.map(f=>{ const d=document.createElement('div'); d.innerHTML=frasco(f,330,true); const e=d.firstChild; pf.appendChild(e); return e; });
+const POS = {esq:{x:897,l:140,c:'lado'}, centro:{x:1172,l:330,c:'centro'}, dir:{x:1447,l:140,c:'lado'}, foraE:{x:720,l:110,c:'fora'}, foraD:{x:1624,l:110,c:'fora'}};
+function palcoFlores(k, cai){
+  jarros.forEach((e,i)=>{ const d=i-k, p=POS[d===0?'centro':d===-1?'esq':d===1?'dir':d<0?'foraE':'foraD'];
+    e.style.setProperty('--l',p.l+'px'); e.style.setProperty('--fs',fsNome(p.l,FLORES[i].n).toFixed(1)+'px'); e.style.setProperty('--fsp',(p.l*0.09).toFixed(1));
+    e.style.left=(p.x-p.l/2)+'px'; e.style.top=(614-p.l/.727)+'px'; e.className='frasco '+p.c+(cai&&d===0?' cai':''); });
+}
 
-// o nome entra letra a letra, e encolhe para caber na coluna
+// a ficha: o olho e o nome encolhem para caber nos 720 px da coluna
+function caber(el, max, de, ate){ let fs=de; el.style.fontSize=fs+'px'; while(el.scrollWidth>max && fs>ate){ fs-=1; el.style.fontSize=fs+'px'; } return fs; }
 function nomeEm(txt){
-  const n=q('nome'); let fs=124; n.style.fontSize=fs+'px'; n.textContent=txt;
-  while(n.scrollWidth>730 && fs>70){ fs-=4; n.style.fontSize=fs+'px'; }
+  const n=q('nome'); n.textContent=txt; let fs=124; n.style.fontSize=fs+'px';
+  while(n.scrollWidth>720 && fs>70){ fs-=4; n.style.fontSize=fs+'px'; }
   n.innerHTML=[...txt].map((c,k)=>`<span style="animation-delay:${k*28}ms">${c===' '?'&nbsp;':c}</span>`).join('');
   n.classList.remove('entra'); void n.offsetWidth; n.classList.add('entra');
 }
@@ -306,29 +321,32 @@ function ficha(d){
   const blocos=['olho','nome','tipo','barra','terp','aromas','specs'];
   blocos.forEach((b,k)=>setTimeout(()=>q(b).classList.add('sai'),k*22));
   setTimeout(()=>{
-    q('olho').innerHTML=`<span class="chip${d.claro?' claro':''}" style="background:${d.c}">${d.s}</span><span>${d.sub}</span>`;
+    q('olho').innerHTML=`<span class="chip${d.claro?' claro':''}" style="background:${d.c}">${d.s}</span><span>${d.sub}</span>`; caber(q('olho'),720,20,15);
     nomeEm(d.n); q('tipo').textContent=d.t;
-    const flor = d.i!=null;
+    const flor=d.i!=null;
     ['barra','terp','aromas'].forEach(b=>q(b).style.display=flor?'':'none'); q('specs').style.display=flor?'none':'';
     if(flor){ q('ind').textContent=d.i; q('sat').textContent=100-d.i; q('barra-i').style.width='50%';
       q('terp').innerHTML=d.terp.map(([n])=>`<span>${n}</span><i></i>`).join('');
       q('aromas').innerHTML=d.ar.map(([k,t])=>`<div>${svg(k)}${t}</div>`).join('');
-      setTimeout(()=>{ q('barra-i').style.width=d.i+'%'; q('terp').querySelectorAll('i').forEach((e,k)=>e.style.transform=`scaleX(${d.terp[k][1]})`); }, 420);
+      setTimeout(()=>{ q('barra-i').style.width=d.i+'%'; q('terp').querySelectorAll('i').forEach((e,k)=>e.style.transform=`scaleX(${d.terp[k][1]})`); },420);
     } else q('specs').innerHTML=d.specs.map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join('');
     blocos.forEach((b,k)=>setTimeout(()=>q(b).classList.remove('sai'),50+k*70));
   },320);
 }
+const fichaFlor = f => ficha({...f, s:GRUPO[f.g].nome, c:GRUPO[f.g].c, claro:GRUPO[f.g].claro});
 function etiqueta(id,d){ const e=q(id); e.querySelector('b').textContent=d.p; e.querySelector('small').textContent=d.pl; e.classList.remove('salta'); void e.offsetWidth; e.classList.add('salta'); }
 
-// o foco: um anel so, que desliza; a fila activa sobe para o topo da faixa
-const LINHA={flores:0,piteiras:1,par:2};
-function foco(id){ const c=q(id), cx=c.querySelector('.caixa'), t=q('trilho');
-  // a posicao vem dos offsets (sem transformacoes) mais o deslocamento final do trilho, para o anel ir direito ao destino
+// o foco: um anel so; a fila activa sobe ao topo e desliza na horizontal para o foco nunca passar da terceira peca a contar do fim
+const LINHA={flores:0,piteiras:1,par:2}, DESLIZE={flores:0,piteiras:0,par:0}, VISIVEL=1696, PASSO=164;
+function foco(id){
+  const c=q(id), cx=c.querySelector('.caixa'), t=q('trilho'), fila=c.closest('.fila').id.slice(2);
   let x=0,y=0; for(let e=cx; e && e!==t; e=e.offsetParent){ x+=e.offsetLeft; y+=e.offsetTop; }
-  y -= 240*LINHA[c.closest('.fila').id.slice(2)];
-  const a=q('anel'), w=cx.offsetWidth, h=cx.offsetHeight, e=1.06; // a caixa em foco cresce 6 % e sobe 4 px
-  a.style.left=(x-w*(e-1)/2-9)+'px'; a.style.top=(y-h*(e-1)/2-4-9)+'px'; a.style.width=(w*e+18)+'px'; a.style.height=(h*e+18)+'px';
-  document.querySelectorAll('.cartao.on').forEach(x=>x.classList.remove('on')); c.classList.add('on'); }
+  const lim=112+VISIVEL-3*PASSO; DESLIZE[fila]=Math.max(0, x-lim); q('i-'+fila).style.transform=`translateX(${-DESLIZE[fila]}px)`;
+  x-=DESLIZE[fila]; y-=240*LINHA[fila];
+  const a=q('anel'), w=cx.offsetWidth, hh=cx.offsetHeight, e=1.06;
+  a.style.left=(x-w*(e-1)/2-9)+'px'; a.style.top=(y-hh*(e-1)/2-4-9)+'px'; a.style.width=(w*e+18)+'px'; a.style.height=(hh*e+18)+'px';
+  document.querySelectorAll('.cartao.on').forEach(z=>z.classList.remove('on')); c.classList.add('on');
+}
 function seccao(s){
   document.body.dataset.s=s; q('trilho').style.transform=`translateY(${-240*LINHA[s]}px)`;
   document.querySelectorAll('.fila').forEach(f=>f.classList.toggle('on',f.id==='f-'+s));
@@ -337,30 +355,31 @@ function seccao(s){
   document.querySelectorAll('#caramelo video').forEach(v=>{ const on=v.id==='c-'+s; v.classList.toggle('on',on); if(on) v.play(); });
   const c=q('caramelo'); c.classList.remove('salta'); void c.offsetWidth; c.classList.add('salta');
 }
+function tecla(t,longa){ const e=q('tecla'); e.textContent=t; e.className=''; void e.offsetWidth; e.className=longa?'longa':'prime'; }
+function video(id,src){ const v=q(id); v.style.opacity=0; setTimeout(()=>{ v.src=A(src); v.play(); setTimeout(()=>v.style.opacity=1,350); },220); }
+// a parafernalia: as fotos reais da peca a trocar de cor no pedestal, com a cor escrita no olho
 let ciclo=null;
 function fotosEm(d){
   clearInterval(ciclo); const caixa=q('fotos'); let k=0;
-  const poe=()=>{ const [f,cor]=d.fotos[k%d.fotos.length]; caixa.querySelectorAll('img').forEach(i=>{ i.classList.remove('entra'); i.classList.add('sai'); setTimeout(()=>i.remove(),650); });
+  const poe=()=>{ const [f,cor]=d.fotos[k%d.fotos.length]; caixa.querySelectorAll('img').forEach(i=>{ i.classList.remove('entra'); i.classList.add('sai'); setTimeout(()=>i.remove(),600); });
     const im=new Image(); im.src=A(f); im.className='entra'; caixa.appendChild(im);
     const sub=q('olho').querySelector('span:last-child'); if(sub && k) sub.textContent=d.sub.split(' · ')[0]+' · '+cor; k++; };
   poe(); ciclo=setInterval(poe,1500);
 }
-function tecla(t){ const e=q('tecla'); e.textContent=t; e.classList.remove('prime'); void e.offsetWidth; e.classList.add('prime'); }
-function video(id,src){ const v=q(id); v.style.opacity=0; setTimeout(()=>{ v.src=A(src); v.play(); v.oncanplay=()=>v.style.opacity=1; setTimeout(()=>v.style.opacity=1,350); },220); }
 
-// a linha do tempo da maqueta (24 s)
+// a linha do tempo da maqueta (29 s)
 const passos = [
-  [0,    ()=>{ poe(jarros[0],'centro'); poe(jarros[1],'dir'); poe(jarros[2],'fora',false); poe(jarros[3],'fora',false); jarros[0].classList.add('cai');
-               ficha(FLORES[0]); foco('fl0'); }],
-  [3800, ()=>{ tecla('▶'); poe(jarros[0],'esq'); poe(jarros[1],'centro'); poe(jarros[2],'dir'); poe(jarros[3],'fora',false); foco('fl1'); ficha(FLORES[1]); }],
-  [7600, ()=>{ tecla('▼'); seccao('piteiras'); video('arte',PITS[0].arte); video('v-pit',PITS[0].giro);
+  [0,    ()=>{ palcoFlores(1,true); fichaFlor(FLORES[1]); foco('fl1'); }],
+  [3600, ()=>{ tecla('▶'); palcoFlores(2); foco('fl2'); fichaFlor(FLORES[2]); }],
+  [7200, ()=>{ tecla('▶'); palcoFlores(3); foco('fl3'); fichaFlor(FLORES[3]); }],
+  [10800,()=>{ tecla('▶ ▶',true); for(let i=4;i<=13;i++) setTimeout(()=>{ palcoFlores(i); foco('fl'+i); }, (i-4)*150); setTimeout(()=>fichaFlor(FLORES[13]), 9*150+250); }],
+  [14400,()=>{ tecla('▼'); seccao('piteiras'); video('arte',PITS[0].arte); video('v-pit',PITS[0].giro);
                ficha({...PITS[0], s:'PITEIRAS', c:'var(--amarelo)', claro:true}); etiqueta('etq-pit',PITS[0]); foco('pt0'); }],
-  [11400,()=>{ tecla('▶'); video('v-pit',PITS[1].giro); video('arte',PITS[1].arte); ficha({...PITS[1], s:'PITEIRAS', c:'var(--amarelo)', claro:true}); etiqueta('etq-pit',PITS[1]); foco('pt1'); }],
-  [15200,()=>{ tecla('▼'); seccao('par'); fotosEm(PARS[0]); ficha({...PARS[0], s:'PARAFERNÁLIA', c:'var(--laranja)'}); etiqueta('etq-par',PARS[0]); foco('pa0'); }],
-  [19000,()=>{ tecla('▶'); fotosEm(PARS[1]); ficha({...PARS[1], s:'PARAFERNÁLIA', c:'var(--laranja)'}); etiqueta('etq-par',PARS[1]); foco('pa1'); }],
+  [18000,()=>{ tecla('▶'); video('v-pit',PITS[1].giro); video('arte',PITS[1].arte); ficha({...PITS[1], s:'PITEIRAS', c:'var(--amarelo)', claro:true}); etiqueta('etq-pit',PITS[1]); foco('pt1'); }],
+  [21600,()=>{ tecla('▼'); seccao('par'); fotosEm(PARS[0]); ficha({...PARS[0], s:'PARAFERNÁLIA', c:'var(--laranja)', claro:true}); etiqueta('etq-par',PARS[0]); foco('pa0'); }],
+  [25200,()=>{ tecla('▶'); fotosEm(PARS[1]); ficha({...PARS[1], s:'PARAFERNÁLIA', c:'var(--laranja)', claro:true}); etiqueta('etq-par',PARS[1]); foco('pa1'); }],
 ];
 window.correr = () => passos.forEach(([t,f])=>setTimeout(f,t));
-window.ir = k => { for(let i=0;i<=k;i++) passos[i][1](); };
 if (!navigator.webdriver) correr();
 </script>
 </body></html>
