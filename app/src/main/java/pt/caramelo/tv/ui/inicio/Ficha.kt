@@ -42,7 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Text
 import pt.caramelo.tv.data.model.Especificacao
+import pt.caramelo.tv.data.model.MenuItem
+import pt.caramelo.tv.data.model.Parafernalia
+import pt.caramelo.tv.data.model.Section
+import pt.caramelo.tv.ui.components.precoCurto
+import pt.caramelo.tv.ui.theme.corDaSeccao
 import pt.caramelo.tv.ui.animation.Entrada
+import pt.caramelo.tv.ui.animation.hero
 import pt.caramelo.tv.ui.components.Aroma
 import pt.caramelo.tv.ui.components.DesenhoDeAroma
 import pt.caramelo.tv.ui.i18n.tr
@@ -71,29 +77,75 @@ data class ConteudoFicha(
     val especificacoes: List<Especificacao> = emptyList(),
 )
 
+/** O conteudo da ficha de uma flor: o grupo, o lote (ou o cultivo), o tipo, a barra, os terpenos e os aromas. */
+@Composable
+internal fun fichaDaFlor(item: MenuItem): ConteudoFicha {
+    val s = item.strain
+    val chip = when (item.section) { Section.CBD -> "CBD"; Section.INFUSAO -> tr("INFUSÃO", "INFUSED"); Section.HASH -> "HASH" }
+    val base = if (item.section == Section.HASH) "HASH" else tr("FLOR", "FLOWER")
+    val lote = item.analise?.lote?.takeIf { it.isNotBlank() }
+    val olho = when {
+        lote != null -> "$base · ${tr("LOTE", "BATCH")} $lote"
+        s.cultivation.isNotBlank() -> "$base · ${s.cultivation.uppercase()}"
+        else -> base
+    }
+    return ConteudoFicha(
+        chave = "f:" + item.id, chip = chip, corChip = corDaSeccao(item.section), chipClaro = item.section == Section.HASH,
+        olho = olho, nome = item.displayTitle,
+        tipo = Inicio.tipoSemInfusao(s.type).ifBlank { s.genetics },
+        indica = s.indicaEfectiva.takeIf { it in 0..100 },
+        terpenos = Inicio.terpenosDe(s.terpenes, s.terpenesPct),
+        aromas = Aroma.de(s.aroma, 3),
+    )
+}
+
+@Composable
+internal fun fichaDoArtigo(p: Parafernalia, s: Seccao): ConteudoFicha {
+    val piteira = s == Seccao.PITEIRAS
+    return ConteudoFicha(
+        chave = "p:" + p.slug,
+        chip = if (piteira) tr("PITEIRAS", "TIPS") else tr("PARAFERNÁLIA", "ACCESSORIES"),
+        corChip = if (piteira) Amarelo else Laranja, chipClaro = true,
+        olho = Inicio.olhoDe(p), nome = Inicio.nomeDe(p), tipo = Inicio.tipoDe(p),
+        especificacoes = Inicio.especificacoesDe(p).ifEmpty { listOf(pt.caramelo.tv.data.model.Especificacao(tr("Preço", "Price"), precoCurto(p.preco))) },
+    )
+}
+
 /**
  * A ficha do produto em foco, em tipografia de revista, na primeira coluna (360 dp). O nome encolhe para caber numa
  * linha e entra letra a letra; os blocos entram em cascata. Trocar de produto refaz a entrada (key pela chave).
  * [olho] vem a parte porque na parafernalia muda com a cor que esta no pedestal, sem refazer a entrada.
  */
 @Composable
-fun Ficha(c: ConteudoFicha, olho: String, modifier: Modifier = Modifier) {
-    Box(modifier.offset(Grelha.fichaX, Grelha.fichaY).width(Grelha.fichaLargura)) {
+fun Ficha(
+    c: ConteudoFicha, olho: String, modifier: Modifier = Modifier,
+    /**
+     * Falso desenha a ficha ja assente, sem a entrada (as letras a cair, os blocos em cascata, as barras a crescer). E' o
+     * que as paginas que abrem pedem na primeira vez: a ficha ja estava no ecra inicial, no mesmo sitio, e a pagina so
+     * cresce a volta dela; se voltasse a entrar, parecia outro ecra.
+     */
+    entrada: Boolean = true,
+    /** O que a pagina acrescenta por baixo (a genetica, os botoes): entra na mesma coluna, depois dos dados. */
+    depois: @Composable () -> Unit = {},
+) {
+    // partilhada com a pagina que abre (hero, pela chave do produto): na passagem a ficha fica onde esta, sem piscar
+    Box(modifier.offset(Grelha.fichaX, Grelha.fichaY).width(Grelha.fichaLargura).hero("ficha-" + c.chave)) {
         key(c.chave) {
             Column {
-                Entrada(0) { Olho(c, olho) }
+                Entrada(0, activa = entrada) { Olho(c, olho) }
                 Spacer(Modifier.height(8.dp))
-                NomeQueCabe(c.nome)
-                Entrada(2) {
+                NomeQueCabe(c.nome, entrada)
+                Entrada(2, activa = entrada) {
                     Text(c.tipo, color = Amarelo, fontSize = 15.sp, fontWeight = FontWeight.Bold, fontFamily = Carbona, maxLines = 1, softWrap = false, modifier = Modifier.padding(top = 6.dp))
                 }
                 if (c.especificacoes.isNotEmpty()) {
-                    Entrada(3) { Especificacoes(c.especificacoes, Modifier.padding(top = 14.dp)) }
+                    Entrada(3, activa = entrada) { Especificacoes(c.especificacoes, Modifier.padding(top = 14.dp)) }
                 } else {
-                    c.indica?.let { Entrada(3) { BarraIndica(it, Modifier.padding(top = 14.dp)) } }
-                    if (c.terpenos.isNotEmpty()) Entrada(4) { Terpenos(c.terpenos, Modifier.padding(top = 12.dp)) }
-                    if (c.aromas.isNotEmpty()) Entrada(5) { AromasDaFicha(c.aromas, Modifier.padding(top = 13.dp)) }
+                    c.indica?.let { Entrada(3, activa = entrada) { BarraIndica(it, Modifier.padding(top = 14.dp), entrada) } }
+                    if (c.terpenos.isNotEmpty()) Entrada(4, activa = entrada) { Terpenos(c.terpenos, Modifier.padding(top = 12.dp), entrada) }
+                    if (c.aromas.isNotEmpty()) Entrada(5, activa = entrada) { AromasDaFicha(c.aromas, Modifier.padding(top = 13.dp)) }
                 }
+                depois()
             }
         }
     }
@@ -141,7 +193,7 @@ private fun LinhaQueCabe(texto: String, largura: Dp, de: Float, ate: Float, esti
  * desenho de cada letra: sem recompor a cada fotograma).
  */
 @Composable
-private fun NomeQueCabe(nome: String) {
+private fun NomeQueCabe(nome: String, entrada: Boolean = true) {
     val medidor = rememberTextMeasurer()
     val densidade = androidx.compose.ui.platform.LocalDensity.current
     val max = with(densidade) { Grelha.fichaLargura.roundToPx() }
@@ -153,8 +205,8 @@ private fun NomeQueCabe(nome: String) {
     }
     val passo = 28; val dura = 700
     val total = (nome.length * passo + dura).toFloat()
-    val t = remember(nome) { Animatable(0f) }
-    LaunchedEffect(nome) { t.animateTo(total, tween(total.toInt(), easing = LinearEasing)) }
+    val t = remember(nome) { Animatable(if (entrada) 0f else total) }
+    LaunchedEffect(nome) { if (entrada) t.animateTo(total, tween(total.toInt(), easing = LinearEasing)) }
     Row(Modifier.height(61.dp), verticalAlignment = Alignment.Bottom) {
         nome.forEachIndexed { i, ch ->
             Text(
@@ -173,9 +225,9 @@ private fun NomeQueCabe(nome: String) {
 
 /** A barra indica / sativa: amarelo a indica, verde a sativa, com o contorno tinta da marca; cresce ao entrar. */
 @Composable
-private fun BarraIndica(indica: Int, modifier: Modifier = Modifier) {
-    val alvo = remember { Animatable(0.5f) }
-    LaunchedEffect(indica) { kotlinx.coroutines.delay(420); alvo.animateTo(indica / 100f, spring(0.6f, 200f)) }
+private fun BarraIndica(indica: Int, modifier: Modifier = Modifier, entrada: Boolean = true) {
+    val alvo = remember { Animatable(if (entrada) 0.5f else indica / 100f) }
+    LaunchedEffect(indica) { if (entrada) kotlinx.coroutines.delay(420); alvo.animateTo(indica / 100f, spring(0.6f, 200f)) }
     Column(modifier.width(Grelha.dadosLargura)) {
         Row(Modifier.fillMaxWidth()) {
             Text(tr("ÍNDICA ", "INDICA ") + indica, color = Papel, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp, fontFamily = Carbona)
@@ -196,9 +248,9 @@ private fun BarraIndica(indica: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun Terpenos(terpenos: List<Pair<String, Float>>, modifier: Modifier = Modifier) {
-    val cresce = remember { Animatable(0f) }
-    LaunchedEffect(Unit) { kotlinx.coroutines.delay(420); cresce.animateTo(1f, spring(0.6f, 200f)) }
+private fun Terpenos(terpenos: List<Pair<String, Float>>, modifier: Modifier = Modifier, entrada: Boolean = true) {
+    val cresce = remember { Animatable(if (entrada) 0f else 1f) }
+    LaunchedEffect(Unit) { if (entrada) { kotlinx.coroutines.delay(420); cresce.animateTo(1f, spring(0.6f, 200f)) } }
     Column(modifier.width(Grelha.dadosLargura), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         terpenos.forEach { (nome, f) ->
             Row(verticalAlignment = Alignment.CenterVertically) {

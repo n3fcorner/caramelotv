@@ -228,14 +228,15 @@ private fun ScreenContent(screen: Screen, catalog: Catalog, viewModel: MainViewM
             onBack = { viewModel.pop() },
         )
 
-        is Screen.Parafernalia -> ParafernaliaScreen(
-            parafernalia = catalog.parafernalia,
-            imagemDe = { catalog.imagemDe(it) },
-            giroDe = { catalog.giroDe(it) },
-            onInteracao = viewModel::registarInteracao,
-            abrir = screen.slug,
-            onSair = { viewModel.pop() },
-        )
+        is Screen.Parafernalia -> {
+            val peca = catalog.parafernalia.firstOrNull { it.slug == screen.slug }
+            ParafernaliaScreen(
+                item = peca,
+                giroUrl = peca?.let { catalog.giroDe(it) }.orEmpty(),
+                fotos = peca?.let { catalog.fotosDe(it) }.orEmpty(),
+                onSair = { viewModel.pop() },
+            )
+        }
 
         is Screen.Details -> WithItem(catalog, screen.id, viewModel) { item ->
             DetailsScreen(

@@ -2,10 +2,6 @@
 
 package pt.caramelo.tv.ui.player
 
-import pt.caramelo.tv.data.CacheDeMedia
-import pt.caramelo.tv.ui.components.AromasIlustrados
-import pt.caramelo.tv.ui.i18n.termo
-import pt.caramelo.tv.ui.i18n.tr
 import android.view.LayoutInflater
 import android.view.TextureView
 import androidx.annotation.OptIn
@@ -16,30 +12,18 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Air
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -52,30 +36,23 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -84,7 +61,6 @@ import androidx.media3.common.MediaItem as ExoMediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -93,26 +69,35 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import pt.caramelo.tv.R
+import pt.caramelo.tv.data.CacheDeMedia
 import pt.caramelo.tv.data.model.MenuItem
-import pt.caramelo.tv.ui.animation.Entrada
 import pt.caramelo.tv.ui.animation.LocalSharedTransition
 import pt.caramelo.tv.ui.animation.hero
-import pt.caramelo.tv.ui.animation.heroBounds
-import pt.caramelo.tv.ui.components.FundoDePapel
-import pt.caramelo.tv.ui.theme.PapelTheme
-import pt.caramelo.tv.ui.theme.Papel
-import pt.caramelo.tv.ui.theme.Tinta
-import pt.caramelo.tv.ui.components.PerfilIndicaSativa
-import pt.caramelo.tv.ui.components.TerpenosDominantes
-import pt.caramelo.tv.ui.components.formatarTempo
+import pt.caramelo.tv.ui.components.precoCurto
+import pt.caramelo.tv.ui.i18n.tr
+import pt.caramelo.tv.ui.inicio.BarraDeTempo
+import pt.caramelo.tv.ui.inicio.Estado
+import pt.caramelo.tv.ui.inicio.Etiqueta
+import pt.caramelo.tv.ui.inicio.Ficha
+import pt.caramelo.tv.ui.inicio.FundoDaPagina
+import pt.caramelo.tv.ui.inicio.Grelha
+import pt.caramelo.tv.ui.inicio.GrelhaPagina
+import pt.caramelo.tv.ui.inicio.LocalComVideo
+import pt.caramelo.tv.ui.inicio.LuzDasFlores
+import pt.caramelo.tv.ui.inicio.MolduraJanela
+import pt.caramelo.tv.ui.inicio.Nicho
+import pt.caramelo.tv.ui.inicio.NichoDaJanela
+import pt.caramelo.tv.ui.inicio.PeDaPagina
+import pt.caramelo.tv.ui.inicio.TopoDaPagina
+import pt.caramelo.tv.ui.inicio.fichaDaFlor
 import pt.caramelo.tv.ui.theme.Amarelo
-import pt.caramelo.tv.ui.theme.Creme
+import pt.caramelo.tv.ui.theme.CarameloTheme
 import pt.caramelo.tv.ui.theme.Espaco
 import pt.caramelo.tv.ui.theme.Laranja
+import pt.caramelo.tv.ui.theme.Papel
+import pt.caramelo.tv.ui.theme.Tinta
+import pt.caramelo.tv.ui.theme.Verde
 import pt.caramelo.tv.ui.theme.corDaSeccao
-import pt.caramelo.tv.ui.theme.Overscan
-import pt.caramelo.tv.ui.theme.RoxoProfundo
-import pt.caramelo.tv.ui.theme.VerdeClaro
 
 private const val SALTO_MS = 10_000L
 
@@ -123,16 +108,16 @@ private class Fotograma(val id: String, val imagem: ImageBitmap)
  * Leitor da marca. O controlador do Media3 sai por completo — era cinzento, generico
  * e nao respondia bem ao D-pad.
  *
- *   +---------------+----------------+
- *   | [linha]       |  NOME          |
- *   |    VÍDEO      |  formato…      |
- *   |   quadrado    |  [ ] CULTIVO   |
- *   | ▌▌▌░░  0:12   |  [ ] AROMA     |
- *   +---------------+----------------+
+ *   [logo]                         OK pausa  ◀▶ 10 s  ▲▼ outra flor
+ *   [chip] FLOR · LOTE        +------------------+ etiqueta
+ *   NOME                      |                  |  38 €
+ *   tipo                      |      VÍDEO       |
+ *   indica / sativa           |     quadrado     |
+ *   terpenos, aromas          +------------------+
+ *   ● a reproduzir            0:12 ▬▬▬▬░░░░ 0:52
  *
- * O quadrado deixa uma coluna livre num ecra 16:9. E ai que vive a ficha, e no fundo
- * a mascote em contorno lilas — pouco contraste de proposito, para ser textura da
- * marca e nao mais uma coisa a disputar a atencao.
+ * E' o ecra inicial com a janela maior (ver ui/inicio/Pagina.kt): a ficha fica onde estava, e no
+ * lugar do frasco esta a janela da marca com o video quadrado la dentro.
  *
  * D-pad: OK pausa, esquerda/direita saltam 10s, cima/baixo mudam de produto.
  *
@@ -177,6 +162,7 @@ fun PlayerScreen(
     var progresso by remember { mutableFloatStateOf(0f) }
     var vista by remember { mutableStateOf<PlayerView?>(null) }
     var fotogramaDeSaida by remember { mutableStateOf<Fotograma?>(null) }
+    val primeiroId = remember { item.id }
 
     // Sempre sem som (18/11/2026): a TV e uma montra numa loja, e 5 dos clipes traziam faixa de audio (AUDITORIA, ponto 2).
     val player = remember { CacheDeMedia.leitor(context).apply { volume = 0f } }
@@ -210,9 +196,7 @@ fun PlayerScreen(
     // Os cartazes dos vizinhos vao para a cache do Coil ja ao tamanho do painel:
     // ler e descodificar um JPEG de 720px demora um quarto de segundo nesta TV, e
     // nesse tempo o painel novo entrava vazio.
-    val ladoDoPainel = with(LocalDensity.current) {
-        (LocalConfiguration.current.screenHeightDp.dp - Overscan.vertical * 2).roundToPx()
-    }
+    val ladoDoPainel = with(LocalDensity.current) { GrelhaPagina.janela.roundToPx() }
     LaunchedEffect(cartazesVizinhos) {
         val loader = context.imageLoader
         cartazesVizinhos.filter { it.isNotBlank() }.forEach { url ->
@@ -260,7 +244,8 @@ fun PlayerScreen(
         }
     }
 
-    // 250ms chega para a barra parecer continua sem acordar a composicao a cada frame.
+    // 250ms chega para a barra parecer continua. Os tres valores so se leem no desenho da barra e nos dois textos
+    // dos minutos (BarraDeTempo): o leitor nao recompoe com eles.
     LaunchedEffect(player) {
         while (true) {
             posicao = player.currentPosition
@@ -282,13 +267,16 @@ fun PlayerScreen(
     val foco = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { foco.requestFocus() } }
 
-    // O leitor no papel, como a lista e a ficha (1/10/2026, "os videos ainda estao no tema antigo azul"): bege e tinta,
-    // o video pousado sem moldura, e as etiquetas sobre o video a tinta, que se le em cima de qualquer fotograma.
-    PapelTheme {
+    // O leitor no mundo do ecra inicial (22/11/2026, Francisco, na TV da loja: "o player e a expansao das paginas ainda esta no
+    // tema antigo, preciso que coloques tudo consistente"). Era o papel bege de 1/10; agora e' o azul das flores com o foco de
+    // luz, a mesma ficha de revista no mesmo sitio, e o video na janela da marca, maior, com a etiqueta do preco no canto.
+    // Nada mexe alem do video (a luz parada, a etiqueta parada): quem acorda o ecra e' so o fotograma do video.
+    val progressoActual = { progresso }
+    CarameloTheme {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Tinta)
             .focusRequester(foco)
             .focusable()
             .onPreviewKeyEvent { evento ->
@@ -312,41 +300,30 @@ fun PlayerScreen(
                     Key.DirectionUp -> { guardarFotograma(); onSkip(-1); true }
                     Key.DirectionDown -> { guardarFotograma(); onSkip(1); true }
                     // O voltar segue para o BackHandler da raiz; aqui so se guarda o
-                    // fotograma que o painel leva no voo de regresso ao mosaico.
+                    // fotograma que o painel leva no voo de regresso ao frasco.
                     Key.Back, Key.Escape -> { guardarFotograma(); false }
                     else -> false
                 }
             },
     ) {
-        FundoDePapel()
-
-        // A vista de video, na geometria exacta do painel (a mesma Row que o Leitor
-        // usa), por baixo de tudo o que anima. Enquanto um ecra voa para o outro, ou
-        // um produto desliza para o seguinte, esta escondida: o que se ve e' o painel
-        // a levar o cartaz ou o ultimo fotograma, sobre o fundo da marca. Se ficasse
-        // visivel, aparecia por entre os dois paineis meio transparentes.
+        // A vista de video, na geometria exacta da janela, por baixo de tudo o que anima. Enquanto um ecra voa para o
+        // outro, ou um produto da lugar ao seguinte, esta escondida: o que se ve e' o cartaz ou o ultimo fotograma,
+        // dentro da mesma janela. Se ficasse visivel, aparecia por entre os dois cartazes meio transparentes.
         val transicaoProduto = updateTransition(targetState = item, label = "produto")
         val transicaoActiva = transicao?.isTransitionActive == true
         val aAnimar = transicaoActiva || transicaoProduto.isRunning
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = Overscan.horizontal, vertical = Overscan.vertical)
-                .graphicsLayer { alpha = if (aAnimar) 0f else 1f },
-            horizontalArrangement = Arrangement.spacedBy(Espaco.seccao),
-        ) {
-            Box(
-                modifier = Modifier.weight(0.55f).fillMaxHeight(),
-                contentAlignment = Alignment.Center,
-            ) {
+        PaginaDoLeitor(
+            item = item, atrator = atrator, aReproduzir = aReproduzir,
+            progresso = progressoActual, posicao = { posicao }, duracao = { duracao },
+            video = {
                 AndroidView(
-                    modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                    modifier = Modifier.fillMaxSize().graphicsLayer { alpha = if (aAnimar) 0f else 1f },
                     factory = { ctx ->
                         (LayoutInflater.from(ctx).inflate(R.layout.player_view_texture, null) as PlayerView).apply {
                             this.player = player
                             keepScreenOn = true
-                            setShutterBackgroundColor(Papel.toArgb())
-                            setBackgroundColor(Papel.toArgb())
+                            setShutterBackgroundColor(Nicho.toArgb())
+                            setBackgroundColor(Nicho.toArgb())
                             vista = this
                         }
                     },
@@ -356,377 +333,155 @@ fun PlayerScreen(
                         vista = null
                     },
                 )
-            }
-            Spacer(Modifier.weight(0.45f))
-        }
-
-        transicaoProduto.AnimatedContent(
-            contentKey = { it.id },
-            transitionSpec = {
-                // Sem o deslize para cima (4/10/2026, Francisco: "o swipe up nao e' o que adoro, e esta mal desenhado"): o
-                // produto que sai esbate-se em 160 ms, e o seguinte aparece depois dele, com um nada de escala, como os ecras.
-                // Os dois nunca se sobrepoem; no intervalo ve-se o papel, que e' o fundo de todos.
-                (fadeIn(tween(280, delayMillis = 140)) + scaleIn(tween(320, delayMillis = 140), initialScale = 0.985f))
-                    .togetherWith(fadeOut(tween(160)))
             },
-        ) { alvo ->
-            // `item` e' sempre o alvo mais recente; o `alvo` de um conteudo a sair ja
-            // nao lhe e' igual. O cartaz so se levanta quando este painel esta
-            // assente (nem a deslizar nem a voar) e o video ja tem fotograma: antes
-            // disso, levantar o cartaz mostrava um buraco onde o video ainda nao esta.
-            val activo = alvo.id == item.id
-            val assente = !transicaoProduto.isRunning
-            val fotograma = fotogramaDeSaida?.takeIf { it.id == alvo.id }
-            // O fotograma de saida morre com o painel que o levou.
-            DisposableEffect(alvo.id) {
-                onDispose { if (fotogramaDeSaida?.id == alvo.id) fotogramaDeSaida = null }
-            }
-            Leitor(
-                item = alvo,
-                videoUrl = videoUrlOf(alvo),
-                posterUrl = posterUrlOf(alvo),
-                fotograma = fotograma?.imagem,
-                mostrarVideo = activo && assente && !aAnimar && primeiroFotograma && fotograma == null,
-                progresso = progresso,
-                posicao = posicao,
-                duracao = duracao,
-                erro = erro,
-                aReproduzir = aReproduzir,
-                atrator = atrator,
-            )
-        }
-    }
-    }
-}
-
-/** Um produto no leitor: o painel a esquerda e a ficha ao lado. So desenho; o video esta por baixo. */
-@Composable
-private fun Leitor(
-    item: MenuItem,
-    videoUrl: String,
-    posterUrl: String,
-    fotograma: ImageBitmap?,
-    mostrarVideo: Boolean,
-    progresso: Float,
-    posicao: Long,
-    duracao: Long,
-    erro: String?,
-    aReproduzir: Boolean,
-    atrator: Boolean,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Overscan.horizontal, vertical = Overscan.vertical),
-        horizontalArrangement = Arrangement.spacedBy(Espaco.seccao),
-    ) {
-        Box(
-            modifier = Modifier.weight(0.55f).fillMaxHeight(),
-            contentAlignment = Alignment.Center,
         ) {
-            PainelDeVideo(
-                item = item,
-                progresso = progresso,
-                posicao = posicao,
-                duracao = duracao,
-                erro = erro,
-                videoUrl = videoUrl,
-                posterUrl = posterUrl,
-                fotograma = fotograma,
-                mostrarVideo = mostrarVideo,
-            )
-        }
-
-        FichaDoProduto(
-            item = item,
-            aReproduzir = aReproduzir,
-            atrator = atrator,
-            modifier = Modifier.weight(0.45f).fillMaxHeight(),
-        )
-    }
-}
-
-@Composable
-private fun PainelDeVideo(
-    item: MenuItem,
-    progresso: Float,
-    posicao: Long,
-    duracao: Long,
-    erro: String?,
-    videoUrl: String,
-    posterUrl: String,
-    fotograma: ImageBitmap?,
-    mostrarVideo: Boolean,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxHeight()
-            .aspectRatio(1f)
-            // A mesma chave do mosaico e do cartaz: a foto voa ate aqui e o video
-            // aparece por baixo dela, em vez de o quadrado surgir do nada.
-            .hero(item.id)
-            // O contorno de tinta dos cartoes (4/10/2026), tambem a volta do video.
-            .border(2.dp, Tinta),
-    ) {
-        // O cartaz tapa o video ate haver um fotograma para mostrar e o painel estar
-        // assente, e depois esbate-se. E' a mesma imagem que veio a voar do mosaico:
-        // o quadrado nunca esta vazio, nem no arranque do clipe, nem ao mudar de erva.
-        val veuDoCartaz by animateFloatAsState(
-            targetValue = if (mostrarVideo) 0f else 1f,
-            animationSpec = tween(360),
-            label = "cartaz",
-        )
-        if (fotograma != null) {
-            // A sair: leva o ultimo fotograma do video, e nao o cartaz.
-            Image(
-                bitmap = fotograma,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
-        } else if (posterUrl.isNotBlank() && veuDoCartaz > 0.01f) {
-            AsyncImage(
-                model = posterUrl,
-                contentDescription = null,
-                // O recorte do site pousado no papel: inteiro, sem cortar a flor.
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize().graphicsLayer { alpha = veuDoCartaz },
-            )
-        }
-
-        // A linha do produto fica sobre o video, como uma etiqueta de montra.
-        Row(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(Espaco.medio)
-                .background(Tinta.copy(alpha = 0.88f))
-                .padding(horizontal = Espaco.medio, vertical = Espaco.curto),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(Modifier.width(18.dp).height(3.dp).background(Amarelo))
-            Text(
-                text = termo(item.section.label).uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = Amarelo,
-                letterSpacing = 3.sp,
-                modifier = Modifier.padding(start = Espaco.curto),
-            )
-        }
-
-        // Progresso dentro do painel, como no leitor de referencia.
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .background(Tinta.copy(alpha = 0.88f))
-                .padding(horizontal = Espaco.medio, vertical = Espaco.curto),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = formatarTempo(posicao),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Creme,
-                )
-                Box(
-                    Modifier
-                        .weight(1f)
-                        .padding(horizontal = Espaco.medio)
-                        .height(4.dp)
-                        .background(Creme.copy(alpha = 0.22f)),
-                ) {
-                    Box(Modifier.fillMaxWidth(progresso).height(4.dp).background(Amarelo))
+            transicaoProduto.AnimatedContent(
+                contentKey = { it.id },
+                transitionSpec = {
+                    // Sem o deslize para cima (4/10/2026, Francisco: "o swipe up nao e' o que adoro, e esta mal desenhado"): o
+                    // produto que sai esbate-se em 160 ms, e o seguinte aparece depois dele. Os dois nunca se sobrepoem; no
+                    // intervalo ve-se o fundo e a janela vazia, que sao de todos.
+                    fadeIn(tween(280, delayMillis = 140)).togetherWith(fadeOut(tween(160)))
+                },
+            ) { alvo ->
+                // `item` e' sempre o alvo mais recente; o `alvo` de um conteudo a sair ja
+                // nao lhe e' igual. O cartaz so se levanta quando este painel esta
+                // assente (nem a trocar nem a voar) e o video ja tem fotograma: antes
+                // disso, levantar o cartaz mostrava um buraco onde o video ainda nao esta.
+                val activo = alvo.id == item.id
+                val assente = !transicaoProduto.isRunning
+                val fotograma = fotogramaDeSaida?.takeIf { it.id == alvo.id }
+                // O fotograma de saida morre com o painel que o levou.
+                DisposableEffect(alvo.id) {
+                    onDispose { if (fotogramaDeSaida?.id == alvo.id) fotogramaDeSaida = null }
                 }
-                Text(
-                    text = formatarTempo(duracao),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Creme,
+                Leitor(
+                    item = alvo,
+                    videoUrl = videoUrlOf(alvo),
+                    posterUrl = posterUrlOf(alvo),
+                    fotograma = fotograma?.imagem,
+                    mostrarVideo = activo && assente && !aAnimar && primeiroFotograma && fotograma == null,
+                    erro = erro,
+                    // a primeira ficha ja estava no ecra inicial, no mesmo sitio: nao volta a entrar. As seguintes (▲▼) entram.
+                    entrada = alvo.id != primeiroId,
                 )
             }
         }
-
-        erro?.let { codigo ->
-            ErroDeLeitura(
-                codigo = codigo,
-                url = videoUrl,
-                modifier = Modifier.align(Alignment.Center),
-            )
-        }
     }
-}
-
-@Composable
-private fun FichaDoProduto(
-    item: MenuItem,
-    aReproduzir: Boolean,
-    atrator: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    // A ficha em cima, centrada no espaco que sobra, e a assinatura agarrada ao
-    // fundo. Antes era tudo uma coluna centrada: nos artigos com cultivo entra
-    // mais um cartao, a coluna cresce, e o que estava em baixo saia do ecra — a
-    // frase aparecia nuns artigos e noutros nao.
-    Column(modifier) {
-    Column(
-        modifier = Modifier.weight(1f),
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.width(22.dp).height(3.dp).background(corDaSeccao(item.section)))
-            Text(
-                text = termo(item.section.label).uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = corDaSeccao(item.section),
-                letterSpacing = 3.sp,
-                modifier = Modifier.padding(start = Espaco.curto),
-            )
-        }
-
-        Text(
-            text = item.title,
-            style = MaterialTheme.typography.displayMedium,
-            color = Tinta,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(top = Espaco.curto)
-                // O nome do detalhe e o do leitor sao a mesma caixa a voar.
-                .heroBounds("titulo-${item.id}"),
-        )
-
-        val infundidoTxt = tr("Infundido", "Infused")
-        val resumo = listOfNotNull(
-            item.strain.format.takeIf { it.isNotBlank() }?.let { termo(it) },
-            item.strain.cultivation.takeIf { it.isNotBlank() }?.let { termo(it) },
-            infundidoTxt.takeIf { item.strain.infused },
-        )
-        if (resumo.isNotEmpty()) {
-            Text(
-                text = resumo.joinToString(" · "),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = Espaco.minimo),
-            )
-        }
-
-        Column(
-            modifier = Modifier.padding(top = Espaco.largo),
-            verticalArrangement = Arrangement.spacedBy(Espaco.curto),
-        ) {
-            // Os cartoes entram em cascata, um atras do outro, em vez de aparecerem
-            // todos de uma vez com o resto do ecra.
-            // O cultivo ja vai na linha de resumo e no ponto do mosaico: aqui o
-            // espaco e' para o aroma, o perfil e os terpenos, como no telemovel.
-            if (item.strain.aroma.isNotBlank()) {
-                Entrada(ordem = 1) {
-                    // Os aromas em desenhos de traco (pedido do Leo, 29/9/2026), no mesmo cartao que a ficha.
-                    AromasIlustrados(
-                        item.strain.aroma,
-                        termo(item.strain.aroma),
-                        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(Espaco.medio),
-                        tamanho = 38.dp,
-                    )
-                }
-            }
-            Entrada(ordem = 2) { PerfilIndicaSativa(item.strain) }
-            Entrada(ordem = 3) { TerpenosDominantes(item.strain.terpenes, item.strain.terpenesPct, Modifier.padding(top = Espaco.minimo)) }
-        }
-
-    }
-
-        Text(
-            text = when {
-                atrator -> tr("Montra automática · carrega numa tecla", "Automatic showcase · press any key")
-                aReproduzir -> tr("● A reproduzir", "● Playing")
-                else -> tr("❚❚ Em pausa", "❚❚ Paused")
-            },
-            style = MaterialTheme.typography.labelMedium,
-            color = if (aReproduzir && !atrator) Laranja else MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = Espaco.medio),
-        )
-
-        Assinatura(Modifier.padding(top = Espaco.curto))
     }
 }
 
 /**
- * A assinatura da marca, copiada do estendarte da loja.
- *
- * Aparece em todos os artigos, agarrada ao fundo da coluna. Comecou por ser so
- * na montra automatica, mas assim so se via em parte deles — e uma assinatura
- * que aparece a alternar nao se le como assinatura, le-se como falha.
- *
- * O "Caramelos" vai a laranja como no estendarte — e' a unica palavra que la
- * muda de cor, e a marca ja tem esse laranja na paleta.
+ * A pagina do leitor, do fundo para cima: o azul das flores com a luz parada, o nicho da janela, o [video], o [produto]
+ * (o cartaz na janela e a ficha, que trocam quando se muda de flor) e, por cima, o que e' de todos os produtos: a moldura
+ * da janela com a sombra na cor da seccao, a etiqueta do preco (salta quando o preco muda), a barra do tempo, o estado e
+ * a assinatura, e o topo. `internal` para os testes de imagem a desenharem sem ExoPlayer.
  */
 @Composable
-private fun Assinatura(modifier: Modifier = Modifier) {
-    val inicio = tr("Afinal, somos todos ", "After all, we're all ")
-    val frase = buildAnnotatedString {
-        withStyle(SpanStyle(color = Tinta)) { append(inicio) }
-        withStyle(SpanStyle(color = Laranja)) { append("Caramelos.") }
-    }
-    Column(modifier) {
-        Box(Modifier.width(28.dp).height(2.dp).background(Laranja))
-        Text(
-            text = frase,
-            style = MaterialTheme.typography.titleMedium,
-            fontStyle = FontStyle.Italic,
-            modifier = Modifier.padding(top = Espaco.curto),
+internal fun PaginaDoLeitor(
+    item: MenuItem,
+    atrator: Boolean,
+    aReproduzir: Boolean,
+    progresso: () -> Float,
+    posicao: () -> Long,
+    duracao: () -> Long,
+    video: @Composable () -> Unit,
+    produto: @Composable () -> Unit,
+) {
+    Box(Modifier.fillMaxSize()) {
+        FundoDaPagina(LuzDasFlores, vivo = false)
+        NichoDaJanela()
+        Box(Modifier.offset(GrelhaPagina.janelaX, GrelhaPagina.janelaY).size(GrelhaPagina.janela).clip(RoundedCornerShape(Grelha.janelaCanto))) { video() }
+        produto()
+        MolduraJanela(
+            corDaSeccao(item.section), x = GrelhaPagina.janelaX, y = GrelhaPagina.janelaY, largura = GrelhaPagina.janela, altura = GrelhaPagina.janela, reflexo = false,
+        )
+        precoCurto(item.preco).takeIf { it.isNotBlank() }?.let { Etiqueta(it, "", GrelhaPagina.etiquetaX, GrelhaPagina.etiquetaY, balanca = false) }
+        BarraDeTempo(progresso, posicao, duracao)
+        PeDaPagina {
+            when {
+                atrator -> Estado(tr("Montra automática · carrega numa tecla", "Automatic showcase · press any key"), Amarelo)
+                aReproduzir -> Estado(tr("A reproduzir", "Playing"), Verde)
+                else -> Estado(tr("Em pausa", "Paused"), Laranja)
+            }
+        }
+        TopoDaPagina(
+            listOf("OK" to tr("pausa", "pause"), "◀ ▶" to "10 s", "▲ ▼" to tr("outra flor", "next flower"), "↩" to tr("voltar", "back")),
         )
     }
 }
 
+/**
+ * Um produto no leitor: o cartaz dentro da janela e a ficha na primeira coluna. So desenho; o video esta por baixo e a
+ * moldura por cima. `internal` para os testes de imagem o desenharem sem ExoPlayer.
+ */
 @Composable
-private fun CartaoDeFicha(icone: ImageVector, titulo: String, valor: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(Espaco.medio),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
+internal fun Leitor(
+    item: MenuItem,
+    videoUrl: String,
+    posterUrl: String,
+    fotograma: ImageBitmap?,
+    mostrarVideo: Boolean,
+    erro: String?,
+    entrada: Boolean = true,
+) {
+    Box(Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
-                .size(38.dp)
-                .background(RoxoProfundo.copy(alpha = 0.8f)),
-            contentAlignment = Alignment.Center,
+                .offset(GrelhaPagina.janelaX, GrelhaPagina.janelaY)
+                .size(GrelhaPagina.janela)
+                // A mesma chave da flor dentro do frasco: a foto voa do frasco ate aqui e o video
+                // aparece por baixo dela, em vez de a janela surgir do nada.
+                .hero(item.id)
+                .clip(RoundedCornerShape(Grelha.janelaCanto)),
         ) {
-            Image(
-                imageVector = icone,
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(VerdeClaro),
-                modifier = Modifier.size(20.dp),
+            // O cartaz tapa o video ate haver um fotograma para mostrar e o painel estar
+            // assente, e depois esbate-se. E' a mesma imagem que veio a voar do frasco:
+            // a janela nunca esta vazia, nem no arranque do clipe, nem ao mudar de flor.
+            val veuDoCartaz by animateFloatAsState(
+                targetValue = if (mostrarVideo) 0f else 1f,
+                animationSpec = tween(360),
+                label = "cartaz",
             )
+            if (fotograma != null) {
+                // A sair: leva o ultimo fotograma do video, e nao o cartaz.
+                Image(
+                    bitmap = fotograma,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else if (posterUrl.isNotBlank() && veuDoCartaz > 0.01f) {
+                AsyncImage(
+                    model = posterUrl,
+                    contentDescription = null,
+                    // O recorte do site pousado no nicho: inteiro, sem cortar a flor.
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize().padding(34.dp).graphicsLayer { alpha = veuDoCartaz },
+                )
+            }
+            erro?.let { codigo ->
+                ErroDeLeitura(codigo = codigo, url = videoUrl, modifier = Modifier.align(Alignment.Center))
+            }
         }
-        Column(Modifier.padding(start = Espaco.medio)) {
-            Text(
-                text = titulo.uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = Amarelo,
-                letterSpacing = 2.sp,
-            )
-            Text(
-                text = valor,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Creme,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
+        Ficha(fichaDaFlor(item), fichaDaFlor(item).olho, entrada = entrada)
     }
 }
 
 @Composable
 private fun ErroDeLeitura(codigo: String, url: String, modifier: Modifier = Modifier) {
+    val caixa = RoundedCornerShape(8.dp)
     Column(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.surface)
+            .padding(24.dp)
+            .background(Tinta.copy(alpha = 0.85f), caixa)
+            .border(1.5.dp, Papel.copy(alpha = 0.22f), caixa)
             .padding(Espaco.largo),
     ) {
         Text(
             text = tr("Não foi possível reproduzir", "Could not play"),
             style = MaterialTheme.typography.titleMedium,
-            color = Tinta,
+            color = Papel,
         )
         Text(
             text = codigo,
@@ -737,7 +492,7 @@ private fun ErroDeLeitura(codigo: String, url: String, modifier: Modifier = Modi
         Text(
             text = url,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = Papel.copy(alpha = 0.6f),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = Espaco.minimo),

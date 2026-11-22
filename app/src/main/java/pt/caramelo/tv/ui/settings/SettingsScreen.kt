@@ -1,11 +1,18 @@
 package pt.caramelo.tv.ui.settings
 
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import pt.caramelo.tv.ui.inicio.FundoDaPagina
+import pt.caramelo.tv.ui.inicio.Grelha
+import pt.caramelo.tv.ui.inicio.GrelhaPagina
+import pt.caramelo.tv.ui.inicio.LuzDasFlores
+import pt.caramelo.tv.ui.inicio.TopoDaPagina
+import pt.caramelo.tv.ui.theme.CarameloTheme
+import pt.caramelo.tv.ui.theme.Carbona
+import pt.caramelo.tv.ui.theme.Papel
 import androidx.compose.foundation.layout.Box
 import pt.caramelo.tv.ui.theme.corDaSeccao
-import pt.caramelo.tv.ui.theme.TintaFraca
 import pt.caramelo.tv.ui.theme.Tinta
-import pt.caramelo.tv.ui.components.FundoDePapel
-import pt.caramelo.tv.ui.theme.PapelTheme
 import pt.caramelo.tv.ui.i18n.Idioma
 import pt.caramelo.tv.ui.i18n.LocalIdioma
 import pt.caramelo.tv.ui.i18n.termo
@@ -35,12 +42,10 @@ import pt.caramelo.tv.data.model.Catalog
 import pt.caramelo.tv.data.model.ItemState
 import pt.caramelo.tv.data.model.MenuItem
 import pt.caramelo.tv.data.model.PanelSettings
-import pt.caramelo.tv.ui.animation.heroBounds
 import pt.caramelo.tv.ui.components.SectionHeader
 import pt.caramelo.tv.ui.components.SelectableRow
 import pt.caramelo.tv.ui.components.ToggleRow
 import pt.caramelo.tv.ui.components.TvButton
-import pt.caramelo.tv.ui.theme.Overscan
 
 /**
  * Definicoes: lista dos 15 slots a esquerda, opcoes globais a direita.
@@ -61,37 +66,22 @@ fun SettingsScreen(
         runCatching { firstRow.requestFocus() }
     }
 
-    // No papel, como a lista e a ficha (4/10/2026, Francisco: "as definicoes nao tao top"): era o ultimo ecra no azul antigo.
-    PapelTheme {
-    Box(Modifier.fillMaxSize()) {
-    FundoDePapel()
+    // No mundo do ecra inicial (22/11/2026, "preciso que coloques tudo consistente"): era o papel bege de 4/10. O azul com a
+    // luz parada, o logotipo e o titulo no topo como nas outras paginas, e as linhas e os botoes no traco novo (Controls.kt).
+    CarameloTheme {
+    Box(Modifier.fillMaxSize().background(Tinta)) {
+    FundoDaPagina(LuzDasFlores, eixo = 480.dp, vivo = false)
+    TopoDaPagina(listOf("OK" to tr("escolher", "select"), "↩" to tr("voltar", "back")), titulo = tr("Definições", "Settings"))
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = Overscan.horizontal, vertical = Overscan.vertical),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .padding(start = Grelha.margem, end = Grelha.margem, top = Grelha.fichaY, bottom = GrelhaPagina.margemDeBaixo),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column {
-                Text(
-                    tr("Definições", "Settings"),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Tinta,
-                    // A mesma caixa que o botao do menu: e' ele que cresce ate aqui.
-                    modifier = Modifier.heroBounds("ecra-definicoes"),
-                )
-                Text(
-                    tr("Os produtos, as fotos, os vídeos e os preços vêm do painel da loja, de 5 em 5 minutos.", "Products, photos, videos and prices come from the shop panel every 5 minutes."),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = TintaFraca,
-                )
-            }
-            TvButton(text = tr("Voltar", "Back"), onClick = onBack)
-        }
+        Text(
+            tr("Os produtos, as fotos, os vídeos e os preços vêm do painel da loja, de 5 em 5 minutos.", "Products, photos, videos and prices come from the shop panel every 5 minutes."),
+            color = Papel.copy(alpha = 0.65f), fontSize = 10.5.sp, fontWeight = FontWeight.Bold, fontFamily = Carbona,
+        )
 
         Row(
             modifier = Modifier.fillMaxWidth().weight(1f),

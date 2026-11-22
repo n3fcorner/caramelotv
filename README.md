@@ -21,6 +21,53 @@ e é **editável dentro da própria app**.
 > ponta a ponta, mas o conteúdo são placeholders e cada ecrã está no mínimo necessário —
 > a ideia é ser fácil de estender, não estar acabado.
 
+## A app nova: um tema só em todos os ecrãs (22/11/2026)
+
+O ecrã inicial novo (`ui/inicio/`, maqueta 4) define o tema: o azul da marca com um foco de luz, a ficha em
+tipografia de revista na primeira coluna, o palco ao meio e o Caramelo curador à direita. **Todos os outros
+ecrãs usam as mesmas peças, nos mesmos sítios** (Francisco, na TV da loja: "o player e a expansão das páginas
+ainda está no tema antigo, preciso que coloques tudo consistente"). O papel bege de outubro já não aparece
+em ecrã nenhum.
+
+| Ecrã | Ficheiro | O que tem |
+|---|---|---|
+| Leitor de uma flor | `ui/player/PlayerScreen.kt` | A ficha onde estava e o vídeo quadrado na janela da marca, maior. Barra do tempo por baixo |
+| Peça aberta | `ui/parafernalia/ParafernaliaScreen.kt` | A ficha técnica e, na janela, o giro a 360° ou as fotos das cores no pedestal |
+| Flor sem vídeo | `ui/details/DetailsScreen.kt` | A mesma página do leitor, com a foto na janela |
+| Análises | `ui/coa/CoaScreen.kt` | A lista, o boletim numa caixa e o Caramelo com a lupa |
+| Definições e edição | `ui/settings/` | O mesmo fundo e o mesmo topo; linhas e botões no traço novo |
+
+As peças comuns estão em `ui/inicio/Pagina.kt` (`GrelhaPagina`, `TopoDaPagina`, `FundoDaPagina`, `BarraDeTempo`,
+`PeDaPagina`) e em `ui/inicio/Palcos.kt` (`MolduraJanela`, `Etiqueta`, `Estudio`, que aceitam posição e tamanho).
+Os botões e as linhas (`ui/components/Controls.kt`) têm um desenho só. Ao abrir uma página, o logótipo e a
+ficha ficam onde estão (peças partilhadas, `hero`) e a janela cresce a partir do tamanho que tem no ecrã inicial.
+
+**Ver os ecrãs sem TV:** `./gradlew :app:testDebugUnitTest --tests '*EcrasTest*' -Proborazzi.test.record=true`
+desenha-os todos a 1920 × 1080 em `app/build/ecras/`, incluindo uma passagem a meio.
+
+### Desempenho: o que não se faz
+
+Regras que ficam do pedido "vê se dá para otimizar performance" (22/11/2026). A TCL da loja é fraca: o que custa
+é redesenhar muitos píxeis muitas vezes.
+
+- **Nada a ecrã inteiro que mexa sempre.** O fundo com a luz era um desenho só, a ecrã inteiro, a ler duas
+  animações sem fim: a TV redesenhava os 1920 × 1080 sessenta vezes por segundo com tudo parado. Agora o azul é
+  fixo e só o cone e a poeira mexem, numa camada do tamanho do cone, 15 vezes por segundo (`relogioLento`).
+- **Nada de alfa em camadas grandes.** Uma camada com alfa é um buffer fora do ecrã redesenhado em cada fotograma.
+  As trocas de secção deixaram o `Crossfade` e o `AnimatedVisibility` a ecrã inteiro: usam `ModulateAlpha`
+  (`Mundo` e `Aparece`, em `Palcos.kt`).
+- **Com um vídeo no ecrã, mais nada mexe.** No leitor e na peça com giro a luz e a etiqueta ficam paradas.
+- **O que muda muitas vezes lê-se no desenho.** A barra do tempo lê a posição dentro do `drawBehind`; antes o
+  leitor inteiro recompunha de 250 em 250 ms.
+- **As imagens que se repetem descodificam-se uma vez.** As três camadas do frasco são iguais em todos os frascos
+  (`CamadasDoFrasco`, em `ui/colecao/Frasco.kt`); antes, cada frasco que entrava no ecrã podia voltar a descodificá-las
+  na linha principal, a meio da animação.
+- **Depois de instalar por ADB, compilar na TV:** `adb shell cmd package compile -m speed -f <pacote>`. Sem isso
+  a app corre interpretada nos primeiros dias. O `scripts/install-tv.sh` já o faz.
+
+Nada disto foi medido na TV: daqui não há TV. Para medir, com a app aberta e depois de a usar um minuto:
+`adb shell dumpsys gfxinfo pt.caramelo.tv.nova | grep -A3 "Janky frames"`.
+
 ## Identidade
 
 A interface segue a marca **Caramelo do Brasil** (caramelodobrasil.com). A paleta foi

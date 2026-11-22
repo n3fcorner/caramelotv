@@ -46,6 +46,12 @@ adb -s "$TV" wait-for-device
 echo "==> Instalar"
 adb -s "$TV" install -r "$APK"
 
+# A app toda em codigo nativo, ja (22/11/2026, Francisco, com a app nova na TV da loja: "ve se da para otimizar performance").
+# Uma app instalada por ADB corre interpretada e vai compilando aos bocados enquanto se usa; a TV so a compila de vez quando
+# esta parada, ao fim de um dia ou dois. No Compose isso sente-se em cada movimento do foco. Demora cerca de um minuto.
+echo "==> Compilar na TV (cerca de um minuto)"
+adb -s "$TV" shell cmd package compile -m speed -f "$PACOTE" || echo "    A TV nao deixou compilar ja; a app funciona na mesma e a TV compila-a sozinha quando estiver parada."
+
 echo "==> Arrancar"
 # O nome inteiro da classe: com o sufixo .nova, ".MainActivity" apontava para pt.caramelo.tv.nova.MainActivity, que nao existe.
 adb -s "$TV" shell am start -n "$PACOTE/pt.caramelo.tv.MainActivity"

@@ -1,17 +1,10 @@
 package pt.caramelo.tv.ui.inicio
 
 import android.view.KeyEvent as AndroidKeyEvent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -153,17 +146,23 @@ fun InicioScreen(
             ativo = ativo,
         )
 
-        // os palcos de cada seccao, em fundido com a troca de fila
-        AnimatedVisibility(seccao == Seccao.FLORES, enter = fadeIn(tween(600)) + slideInVertically(tween(800)) { it / 14 }, exit = fadeOut(tween(400)) + slideOutVertically(tween(600)) { it / 14 }) {
+        // os palcos de cada seccao, em fundido com a troca de fila (Aparece: sem buffer a ecra inteiro, ver Palcos.kt)
+        Aparece(seccao == Seccao.FLORES, entra = 700, sai = 400, forma = { p -> translationY = (1f - p) * size.height / 14 }) {
             PalcoFlores(flores, flores.indexOf(flor).coerceAtLeast(0)) { catalog.imageUrlOf(it) }
         }
-        AnimatedVisibility(seccao == Seccao.PITEIRAS, enter = fadeIn(tween(500)) + scaleIn(spring(0.6f, Spring.StiffnessLow), 0.86f), exit = fadeOut(tween(300))) {
+        // a janela cresce de 86 % com um nada de mola (passa 3 % e assenta), como na maqueta
+        val janelaCresce: androidx.compose.ui.graphics.GraphicsLayerScope.(Float) -> Unit = { p ->
+            val e = 0.86f + 0.14f * p + 0.12f * p * (1f - p)
+            scaleX = e; scaleY = e
+            transformOrigin = androidx.compose.ui.graphics.TransformOrigin((Grelha.eixo.toPx()) / size.width, (Grelha.janelaY + Grelha.janelaAltura / 2).toPx() / size.height)
+        }
+        Aparece(seccao == Seccao.PITEIRAS, entra = 500, sai = 300, forma = janelaCresce) {
             Box(Modifier.fillMaxSize()) {
                 MolduraJanela(SombraPiteiras)
                 artigo?.let { Etiqueta(precoCurto(it.preco), Inicio.etiquetaDe(it)) }
             }
         }
-        AnimatedVisibility(seccao == Seccao.PARAFERNALIA, enter = fadeIn(tween(500)) + scaleIn(spring(0.6f, Spring.StiffnessLow), 0.86f), exit = fadeOut(tween(300)) + scaleOut(tween(300), 0.92f)) {
+        Aparece(seccao == Seccao.PARAFERNALIA, entra = 500, sai = 300, forma = janelaCresce) {
             Box(Modifier.fillMaxSize()) {
                 MolduraJanela(SombraParafernalia, boia = true) { Estudio(fotos, indiceFoto) }
                 artigo?.let { Etiqueta(precoCurto(it.preco), Inicio.etiquetaDe(it)) }
@@ -199,40 +198,6 @@ fun InicioScreen(
     }
 }
 
-/** O conteudo da ficha de uma flor: o grupo, o lote (ou o cultivo), o tipo, a barra, os terpenos e os aromas. */
-@Composable
-private fun fichaDaFlor(item: MenuItem): ConteudoFicha {
-    val s = item.strain
-    val chip = when (item.section) { Section.CBD -> "CBD"; Section.INFUSAO -> tr("INFUSÃO", "INFUSED"); Section.HASH -> "HASH" }
-    val base = if (item.section == Section.HASH) "HASH" else tr("FLOR", "FLOWER")
-    val lote = item.analise?.lote?.takeIf { it.isNotBlank() }
-    val olho = when {
-        lote != null -> "$base · ${tr("LOTE", "BATCH")} $lote"
-        s.cultivation.isNotBlank() -> "$base · ${s.cultivation.uppercase()}"
-        else -> base
-    }
-    return ConteudoFicha(
-        chave = "f:" + item.id, chip = chip, corChip = corDaSeccao(item.section), chipClaro = item.section == Section.HASH,
-        olho = olho, nome = item.displayTitle,
-        tipo = Inicio.tipoSemInfusao(s.type).ifBlank { s.genetics },
-        indica = s.indicaEfectiva.takeIf { it in 0..100 },
-        terpenos = Inicio.terpenosDe(s.terpenes, s.terpenesPct),
-        aromas = Aroma.de(s.aroma, 3),
-    )
-}
-
-@Composable
-private fun fichaDoArtigo(p: Parafernalia, s: Seccao): ConteudoFicha {
-    val piteira = s == Seccao.PITEIRAS
-    return ConteudoFicha(
-        chave = "p:" + p.slug,
-        chip = if (piteira) tr("PITEIRAS", "TIPS") else tr("PARAFERNÁLIA", "ACCESSORIES"),
-        corChip = if (piteira) Amarelo else Laranja, chipClaro = true,
-        olho = Inicio.olhoDe(p), nome = Inicio.nomeDe(p), tipo = Inicio.tipoDe(p),
-        especificacoes = Inicio.especificacoesDe(p).ifEmpty { listOf(pt.caramelo.tv.data.model.Especificacao(tr("Preço", "Price"), precoCurto(p.preco))) },
-    )
-}
-
 /** O Caramelo curador na terceira coluna: apresenta as flores, mostra a piteira, acena na parafernalia; salta ao mudar. */
 @Composable
 private fun CarameloDoInicio(s: Seccao, ativo: Boolean) {
@@ -258,8 +223,7 @@ private fun Cabecalho(s: Seccao, barra: FocusRequester, foco: FocoDasFilas, onAn
         Modifier.padding(start = Grelha.margem, end = Grelha.margem, top = 22.dp).fillMaxWidth().height(32.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(painterResource(R.drawable.logo_caramelo), "Caramelo do Brasil", Modifier.height(28.dp))
-        Image(painterResource(R.drawable.lettering_caramelo), null, Modifier.padding(start = 8.dp).height(21.dp))
+        Marca()
         Spacer(Modifier.weight(1f))
         val itens = listOf(
             Triple(tr("Flores", "Flowers"), Seccao.FLORES, corDaFila(Seccao.FLORES)),

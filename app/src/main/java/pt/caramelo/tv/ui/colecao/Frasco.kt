@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -28,10 +29,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -82,6 +86,25 @@ fun Modifier.naFracao(f: Fracao): Modifier = layout { m, c ->
     layout(c.maxWidth, c.maxHeight) { p.place((c.maxWidth * f.x0).roundToInt(), (c.maxHeight * f.y0).roundToInt()) }
 }
 
+/**
+ * As camadas do frasco, descodificadas uma vez para a app inteira (22/11/2026, Francisco: "ve se da para otimizar
+ * performance"). Cada frasco sao tres imagens de 400 x 550 (o vidro de tras, o da frente e a tampa), iguais em todos, e
+ * ha uns quinze no ecra inicial. Com o `painterResource`, cada frasco que entrava na composicao (ao correr a fila, ao
+ * mudar o do palco) ia buscar as suas a's resources: o Android so as guarda por referencia fraca, por isso com pouca
+ * memoria, que e' o caso da TCL, voltava a descodificar os WebP na linha principal, a meio da animacao. Aqui ficam
+ * cinco bitmaps (4 MB) presos enquanto a app vive.
+ */
+private object CamadasDoFrasco {
+    private val guardadas = HashMap<Int, ImageBitmap>()
+    fun de(res: android.content.res.Resources, id: Int): ImageBitmap = guardadas.getOrPut(id) { ImageBitmap.imageResource(res, id) }
+}
+
+@Composable
+private fun camada(id: Int): BitmapPainter {
+    val res = LocalContext.current.resources
+    return remember(id) { BitmapPainter(CamadasDoFrasco.de(res, id)) }
+}
+
 fun tampaDe(s: Section): Int = when (s) {
     Section.CBD -> R.drawable.frasco_tampa_verde
     Section.INFUSAO -> R.drawable.frasco_tampa_roxo
@@ -118,7 +141,7 @@ fun Frasco(
                 transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 1f)
             },
     ) {
-        Image(painterResource(R.drawable.frasco_tras), null, Modifier.fillMaxSize(), contentScale = ContentScale.FillBounds)
+        Image(camada(R.drawable.frasco_tras), null, Modifier.fillMaxSize(), contentScale = ContentScale.FillBounds)
 
         // A flor, dentro do vidro. O brevemente e' o frasco vazio, so com o rotulo.
         if (!item.brevemente && fotoUrl.isNotBlank()) {
@@ -134,12 +157,12 @@ fun Frasco(
         }
 
         Image(
-            painterResource(R.drawable.frasco_frente), null,
+            camada(R.drawable.frasco_frente), null,
             Modifier.fillMaxSize().brilho(focado),
             contentScale = ContentScale.FillBounds,
         )
         Image(
-            painterResource(tampaDe(item.section)), null,
+            camada(tampaDe(item.section)), null,
             Modifier.fillMaxSize().graphicsLayer {
                 val a = abertura()
                 translationY = -size.height * 0.18f * a

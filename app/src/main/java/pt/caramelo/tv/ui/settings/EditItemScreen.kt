@@ -30,8 +30,17 @@ import pt.caramelo.tv.ui.components.SectionHeader
 import pt.caramelo.tv.ui.components.TvButton
 import pt.caramelo.tv.ui.theme.Amarelo
 import pt.caramelo.tv.ui.theme.Creme
-import pt.caramelo.tv.ui.theme.Roxo
-import pt.caramelo.tv.ui.theme.Overscan
+import pt.caramelo.tv.ui.theme.Tinta
+import pt.caramelo.tv.ui.theme.Papel
+import pt.caramelo.tv.ui.theme.Carbona
+import pt.caramelo.tv.ui.inicio.FundoDaPagina
+import pt.caramelo.tv.ui.inicio.Grelha
+import pt.caramelo.tv.ui.inicio.GrelhaPagina
+import pt.caramelo.tv.ui.inicio.LuzDasFlores
+import pt.caramelo.tv.ui.inicio.TopoDaPagina
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 /**
  * Formulario de um slot.
@@ -50,16 +59,20 @@ fun EditItemScreen(
     var videoUrl by rememberSaveable(item.id) { mutableStateOf(item.videoUrl) }
     var imageUrl by rememberSaveable(item.id) { mutableStateOf(item.imageUrl) }
 
+    // No mundo do ecra inicial (22/11/2026): o azul com a luz parada e o topo das outras paginas; o nome do produto em
+    // grande, como na ficha, e os campos com o contorno bege fino.
+    Box(Modifier.fillMaxSize().background(Tinta)) {
+    FundoDaPagina(LuzDasFlores, eixo = 480.dp, vivo = false)
+    TopoDaPagina(listOf("OK" to tr("escrever", "type"), "↩" to tr("cancelar", "cancel")), titulo = tr("Editar produto", "Edit product"))
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = Overscan.horizontal, vertical = Overscan.vertical)
+            .padding(start = Grelha.margem, end = Grelha.margem, top = Grelha.fichaY, bottom = GrelhaPagina.margemDeBaixo)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         SectionHeader(termo(item.section.label))
-        Text(tr("Editar produto", "Edit product"), style = MaterialTheme.typography.headlineMedium)
+        Text(item.displayTitle, color = Papel, fontSize = 38.sp, lineHeight = 42.sp, fontWeight = FontWeight.Black, letterSpacing = (-0.6).sp, fontFamily = Carbona, maxLines = 1)
 
         M3Theme(colorScheme = editorColors()) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -89,6 +102,7 @@ fun EditItemScreen(
             TvButton(text = tr("Cancelar", "Cancel"), onClick = onCancel)
         }
     }
+    }
 }
 
 @Composable
@@ -112,9 +126,9 @@ private fun Field(
 private fun editorColors() = remember {
     darkColorScheme(
         primary = Amarelo,
-        surface = Roxo,
+        surface = Tinta,
         onSurface = Creme,
-        onSurfaceVariant = Creme,
-        outline = Amarelo,
+        onSurfaceVariant = Creme.copy(alpha = 0.7f),
+        outline = Creme.copy(alpha = 0.35f),
     )
 }

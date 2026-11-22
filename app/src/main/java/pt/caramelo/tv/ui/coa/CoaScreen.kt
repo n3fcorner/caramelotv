@@ -15,11 +15,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -42,35 +44,41 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Border
 import androidx.tv.material3.ClickableSurfaceDefaults
-import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import pt.caramelo.tv.data.model.Analise
 import pt.caramelo.tv.data.model.MenuItem
 import pt.caramelo.tv.data.model.Section
-import pt.caramelo.tv.ui.animation.heroBounds
-import pt.caramelo.tv.ui.components.FundoDePapel
-import pt.caramelo.tv.ui.components.TvButton
+import pt.caramelo.tv.ui.caramelo.Caramelo
+import pt.caramelo.tv.ui.caramelo.Pose
 import pt.caramelo.tv.ui.i18n.termo
 import pt.caramelo.tv.ui.i18n.tr
+import pt.caramelo.tv.ui.inicio.FundoDaPagina
+import pt.caramelo.tv.ui.inicio.Grelha
+import pt.caramelo.tv.ui.inicio.GrelhaPagina
+import pt.caramelo.tv.ui.inicio.LuzDasFlores
+import pt.caramelo.tv.ui.inicio.TopoDaPagina
 import pt.caramelo.tv.ui.theme.Amarelo
-import pt.caramelo.tv.ui.theme.Espaco
-import pt.caramelo.tv.ui.theme.Overscan
-import pt.caramelo.tv.ui.theme.PapelTheme
+import pt.caramelo.tv.ui.theme.CarameloTheme
+import pt.caramelo.tv.ui.theme.Carbona
+import pt.caramelo.tv.ui.theme.Papel
 import pt.caramelo.tv.ui.theme.Tinta
-import pt.caramelo.tv.ui.theme.TintaFraca
 import pt.caramelo.tv.ui.theme.Verde
+import pt.caramelo.tv.ui.theme.VerdeClaro
+import pt.caramelo.tv.ui.theme.Vermelho
 import pt.caramelo.tv.ui.theme.corDaSeccao
 
 /**
@@ -79,15 +87,22 @@ import pt.caramelo.tv.ui.theme.corDaSeccao
  * escritos a mao no codigo. Agora sao os numeros do boletim publico de cada lote, que chegam do painel com o catalogo (os mesmos
  * da pagina /lote do site): uma flor nova com boletim aparece aqui sozinha.
  *
- *   +---------------------+-------------------------------------------+
- *   | as flores com       |  NOME                  [secao] Lote X     |
- *   | boletim, por        |  THC total  0,21 %  [====|.....] 0,3 %    |
- *   | seccao              |  tabela: CBD, CBG, D9-THC, THC total      |
- *   +---------------------+-------------------------------------------+
+ *   [logo]                                        Analises   ▲▼ escolher
+ *   as flores com    +--------------------------------+
+ *   boletim, por     | [secao] BOLETIM · LOTE X       |   o Caramelo
+ *   seccao           | NOME                           |   com a lupa
+ *                    | THC total 0,21 % [===|..] 0,3 %|
+ *                    | tabela: THC, D9-THC, CBD, CBG  |
+ *                    +--------------------------------+
  *
  * Cima e baixo escolhem a flor; Voltar sai. Os numeros sao os do laboratorio, sem leitura nem comparacao (regra de copy).
  */
 private const val LIMITE_THC = 0.3
+
+/** As medidas da pagina, na grelha do ecra inicial: a lista na primeira coluna, o boletim no lugar do palco e o Caramelo com a lupa na terceira. */
+private val LISTA_LARGURA = 250.dp
+private val BOLETIM_X = 326.dp
+private val BOLETIM_LARGURA = 410.dp
 
 @Composable
 fun CoaScreen(
@@ -102,66 +117,56 @@ fun CoaScreen(
     val primeiro = remember { FocusRequester() }
     LaunchedEffect(Unit) { withFrameNanos { }; runCatching { primeiro.requestFocus() } }
 
-    PapelTheme {
-        Box(Modifier.fillMaxSize()) {
-            FundoDePapel()
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = Overscan.horizontal, vertical = Overscan.vertical)
-                    .onPreviewKeyEvent { e ->
-                        if (e.type == KeyEventType.KeyUp && e.key == Key.Back) { onBack(); true } else false
-                    },
-                verticalArrangement = Arrangement.spacedBy(Espaco.largo),
-            ) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Column {
-                        Text(
-                            tr("Análises", "Lab reports"),
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = Tinta,
-                            modifier = Modifier.heroBounds("ecra-analises"),
-                        )
-                        Text(
-                            tr("O boletim do laboratório de cada lote, o mesmo do QR do rótulo.", "Each batch's laboratory certificate, the same as the QR on the label."),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = TintaFraca,
-                        )
-                    }
-                    TvButton(text = tr("Voltar", "Back"), onClick = onBack)
-                }
+    // No mundo do ecra inicial (22/11/2026, "preciso que coloques tudo consistente"): era o papel bege. O azul das flores com
+    // a luz sobre o boletim, a lista na primeira coluna, o boletim numa caixa do traco da ficha tecnica e, na terceira
+    // coluna, o Caramelo curador a ler com a lupa (a pose que ja existia para as analises).
+    CarameloTheme {
+        Box(
+            Modifier.fillMaxSize().background(Tinta)
+                .onPreviewKeyEvent { e -> if (e.type == KeyEventType.KeyUp && e.key == Key.Back) { onBack(); true } else false },
+        ) {
+            // a luz parada: a poeira via-se por tras da caixa do boletim, que e' meio transparente, e parecia sujidade nos numeros
+            FundoDaPagina(LuzDasFlores, eixo = BOLETIM_X + BOLETIM_LARGURA / 2, vivo = false)
 
-                if (comBoletim.isEmpty()) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(tr("Ainda não há boletins publicados.", "No certificates published yet."), style = MaterialTheme.typography.titleMedium, color = TintaFraca)
-                    }
-                    return@Column
+            if (comBoletim.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(tr("Ainda não há boletins publicados.", "No certificates published yet."), color = Papel.copy(alpha = 0.7f), fontSize = 17.sp, fontWeight = FontWeight.Bold, fontFamily = Carbona)
                 }
-
-                Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(Espaco.seccao)) {
-                    Column(
-                        // Folga em cima e em baixo: o cartao em foco cresce 2 % e a orla nao fica cortada no limite do scroll.
-                        Modifier.weight(0.34f).fillMaxHeight().focusGroup().verticalScroll(rememberScrollState()).padding(vertical = 6.dp, horizontal = 4.dp),
-                        verticalArrangement = Arrangement.spacedBy(Espaco.curto),
-                    ) {
-                        comBoletim.forEachIndexed { i, item ->
-                            Linha(
-                                item = item,
-                                activa = i == escolhido,
-                                onFoco = { escolhido = i },
-                                modifier = if (i == 0) Modifier.focusRequester(primeiro) else Modifier,
-                            )
-                        }
+            } else {
+                Column(
+                    // Folga em cima e em baixo: a linha em foco cresce 2 % e a orla nao fica cortada no limite do scroll.
+                    Modifier.offset(Grelha.fichaX - 4.dp, Grelha.fichaY - 6.dp).width(LISTA_LARGURA + 8.dp).height(540.dp - Grelha.fichaY - GrelhaPagina.margemDeBaixo + 12.dp)
+                        .focusGroup().verticalScroll(rememberScrollState()).padding(vertical = 6.dp, horizontal = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(7.dp),
+                ) {
+                    comBoletim.forEachIndexed { i, item ->
+                        Linha(
+                            item = item,
+                            activa = i == escolhido,
+                            onFoco = { escolhido = i },
+                            modifier = if (i == 0) Modifier.focusRequester(primeiro) else Modifier,
+                        )
                     }
-                    AnimatedContent(
-                        targetState = comBoletim.getOrNull(escolhido) ?: comBoletim.first(),
-                        transitionSpec = { fadeIn(tween(200, delayMillis = 60)).togetherWith(fadeOut(tween(90))) },
-                        contentKey = { it.id },
-                        label = "boletim",
-                        modifier = Modifier.weight(0.66f).fillMaxHeight(),
-                    ) { item -> Ficha(item, item.analise!!) }
                 }
+                AnimatedContent(
+                    targetState = comBoletim.getOrNull(escolhido) ?: comBoletim.first(),
+                    transitionSpec = { fadeIn(tween(200, delayMillis = 60)).togetherWith(fadeOut(tween(90))) },
+                    contentKey = { it.id },
+                    label = "boletim",
+                    modifier = Modifier.offset(BOLETIM_X, Grelha.fichaY).width(BOLETIM_LARGURA).height(540.dp - Grelha.fichaY - GrelhaPagina.margemDeBaixo),
+                ) { item -> Boletim(item, item.analise!!) }
             }
+
+            Caramelo(Pose.Lupa, Modifier.offset(Grelha.carameloX, Grelha.carameloY).size(Grelha.carameloLargura, Grelha.carameloAltura))
+            Text(
+                tr("O boletim do laboratório de cada lote, o mesmo do QR do rótulo.", "Each batch's laboratory certificate, the same as the QR on the label."),
+                color = Papel.copy(alpha = 0.6f), fontSize = 9.sp, lineHeight = 13.sp, fontWeight = FontWeight.Bold, fontFamily = Carbona, textAlign = TextAlign.Center,
+                modifier = Modifier.offset(Grelha.carameloX, Grelha.carameloY + Grelha.carameloAltura + 14.dp).width(Grelha.carameloLargura),
+            )
+            TopoDaPagina(
+                listOf("▲ ▼" to tr("escolher", "choose"), "↩" to tr("voltar", "back")),
+                titulo = tr("Análises", "Lab reports"),
+            )
         }
     }
 }
@@ -170,71 +175,72 @@ fun CoaScreen(
 @Composable
 private fun Linha(item: MenuItem, activa: Boolean, onFoco: () -> Unit, modifier: Modifier = Modifier) {
     val forma = RoundedCornerShape(8.dp)
+    var focada by remember { mutableStateOf(false) }
     Surface(
         onClick = {},
-        modifier = modifier.fillMaxWidth().onFocusChanged { if (it.isFocused) onFoco() },
+        modifier = modifier.fillMaxWidth().onFocusChanged { focada = it.isFocused; if (it.isFocused) onFoco() },
         shape = ClickableSurfaceDefaults.shape(shape = forma),
         colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (activa) Color.White.copy(alpha = 0.85f) else Color.White.copy(alpha = 0.45f),
-            contentColor = Tinta,
+            containerColor = Papel.copy(alpha = if (activa) 0.14f else 0.06f),
+            contentColor = Papel,
             focusedContainerColor = Amarelo,
             focusedContentColor = Tinta,
         ),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
-        border = ClickableSurfaceDefaults.border(border = Border(BorderStroke(2.dp, Tinta), shape = forma), focusedBorder = Border(BorderStroke(3.dp, Tinta), shape = forma)),
+        border = ClickableSurfaceDefaults.border(border = Border(BorderStroke(1.5.dp, Papel.copy(alpha = 0.18f)), shape = forma), focusedBorder = Border(BorderStroke(2.dp, Papel), shape = forma)),
     ) {
-        Row(Modifier.padding(horizontal = Espaco.medio, vertical = Espaco.curto), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.width(4.dp).height(30.dp).background(corDaSeccao(item.section), RoundedCornerShape(2.dp)))
-            Column(Modifier.padding(start = Espaco.medio).weight(1f)) {
-                Text(item.displayTitle, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Row(Modifier.padding(horizontal = 10.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.width(4.dp).height(26.dp).background(corDaSeccao(item.section), RoundedCornerShape(2.dp)))
+            Column(Modifier.padding(start = 10.dp).weight(1f)) {
+                Text(item.displayTitle, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, fontFamily = Carbona, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(
-                    listOfNotNull(termo(item.section.label), item.analise?.lote?.takeIf { it.isNotBlank() }?.let { "${tr("Lote", "Batch")} $it" }).joinToString(" · "),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = TintaFraca,
-                    maxLines = 1,
+                    listOfNotNull(termo(item.section.label), item.analise?.lote?.takeIf { it.isNotBlank() }?.let { "${tr("Lote", "Batch")} $it" }).joinToString(" · ").uppercase(),
+                    color = (if (focada) Tinta else Papel).copy(alpha = 0.65f), fontSize = 7.5.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp, fontFamily = Carbona, maxLines = 1,
                 )
             }
         }
     }
 }
 
-/** A ficha de analise de uma flor: o cabecalho, o THC contra o limite, e a tabela dos canabinoides medidos. */
+/** O boletim de uma flor: o chip e o nome como na ficha do ecra inicial, o THC contra o limite, e a tabela dos canabinoides medidos. */
 @Composable
-private fun Ficha(item: MenuItem, a: Analise) {
+private fun Boletim(item: MenuItem, a: Analise) {
     val cor = corDaSeccao(item.section)
+    val caixa = RoundedCornerShape(12.dp)
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color.White.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
-            .border(2.dp, Tinta, RoundedCornerShape(8.dp))
-            .padding(horizontal = Espaco.seccao, vertical = Espaco.largo),
-        verticalArrangement = Arrangement.spacedBy(Espaco.medio),
+            .background(Tinta.copy(alpha = 0.55f), caixa)
+            .border(1.5.dp, Papel.copy(alpha = 0.22f), caixa)
+            .padding(horizontal = 22.dp, vertical = 18.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(item.displayTitle, style = MaterialTheme.typography.displaySmall, color = Tinta, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            val chip = RoundedCornerShape(4.dp)
             Text(
-                termo(item.section.label).uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.White,
-                letterSpacing = 2.sp,
-                modifier = Modifier.background(cor, RoundedCornerShape(6.dp)).padding(horizontal = 10.dp, vertical = 4.dp),
+                when (item.section) { Section.CBD -> "CBD"; Section.INFUSAO -> tr("INFUSÃO", "INFUSED"); Section.HASH -> "HASH" },
+                color = if (item.section == Section.HASH) Tinta else Papel, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.3.sp, fontFamily = Carbona, maxLines = 1,
+                modifier = Modifier.background(cor, chip).border(1.5.dp, Tinta, chip).padding(horizontal = 7.dp, vertical = 3.dp),
+            )
+            Text(
+                listOfNotNull(tr("BOLETIM", "CERTIFICATE"), a.lote.takeIf { it.isNotBlank() }?.let { "${tr("LOTE", "BATCH")} $it" }).joinToString(" · "),
+                color = Papel, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.3.sp, fontFamily = Carbona, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(start = 7.dp),
             )
         }
+        Text(item.displayTitle, color = Papel, fontSize = 38.sp, lineHeight = 42.sp, fontWeight = FontWeight.Black, letterSpacing = (-0.6).sp, fontFamily = Carbona, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp))
         Text(
             listOfNotNull(
-                a.lote.takeIf { it.isNotBlank() }?.let { "${tr("Lote", "Batch")} $it" },
                 a.laboratorio.takeIf { it.isNotBlank() },
                 a.numero.takeIf { it.isNotBlank() }?.let { tr("boletim n.º ", "certificate no. ") + it },
                 a.data.takeIf { it.isNotBlank() },
             ).joinToString("  ·  "),
-            style = MaterialTheme.typography.labelMedium,
-            color = TintaFraca,
-            maxLines = 2,
+            color = Papel.copy(alpha = 0.65f), fontSize = 10.5.sp, lineHeight = 15.sp, fontWeight = FontWeight.Bold, fontFamily = Carbona, maxLines = 2, overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 2.dp),
         )
 
         a.thc?.let { ReguaThc(it) }
 
-        Column(Modifier.padding(top = Espaco.curto)) {
+        Column(Modifier.padding(top = 16.dp)) {
             Cabeca()
             val linhas = listOfNotNull(
                 a.thc?.let { tr("THC total", "Total THC") to it },
@@ -243,37 +249,39 @@ private fun Ficha(item: MenuItem, a: Analise) {
                 a.cbg?.let { tr("CBG total", "Total CBG") to it },
             )
             linhas.forEachIndexed { i, (nome, v) -> LinhaTabela(nome, v, i % 2 == 0) }
-            if (linhas.isEmpty()) Text(tr("O boletim não traz valores transcritos.", "The certificate has no transcribed values."), color = TintaFraca, style = MaterialTheme.typography.labelMedium)
+            if (linhas.isEmpty()) Text(tr("O boletim não traz valores transcritos.", "The certificate has no transcribed values."), color = Papel.copy(alpha = 0.65f), fontSize = 11.sp, fontWeight = FontWeight.Bold, fontFamily = Carbona)
         }
         Spacer(Modifier.weight(1f))
         if (a.metodo.isNotBlank()) {
-            Text("${tr("Método", "Method")}: ${a.metodo}", style = MaterialTheme.typography.labelSmall, color = TintaFraca, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text("${tr("MÉTODO", "METHOD")} · ${a.metodo}", color = Papel.copy(alpha = 0.6f), fontSize = 8.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp, fontFamily = Carbona, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
 
-/** THC total contra o limite legal de 0,3 %: a barra enche-se ate ao valor e o traco marca o limite. */
+/** THC total contra o limite legal de 0,3 %: a barra enche-se ate ao valor e o traco marca o limite. No traco das barras da ficha. */
 @Composable
 private fun ReguaThc(thc: Double) {
     val dentro = thc <= LIMITE_THC
     val fracao by animateFloatAsState((thc / (LIMITE_THC * 1.25)).toFloat().coerceIn(0f, 1f), tween(520), label = "thc")
-    Column(Modifier.fillMaxWidth().padding(top = Espaco.curto), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(Modifier.fillMaxWidth().padding(top = 16.dp)) {
         Row(verticalAlignment = Alignment.Bottom) {
-            Text(tr("THC total", "Total THC"), style = MaterialTheme.typography.labelMedium, color = TintaFraca, modifier = Modifier.weight(1f))
-            Text(pct(thc), style = MaterialTheme.typography.headlineSmall, color = Tinta, fontWeight = FontWeight.Bold)
+            Text(tr("THC TOTAL", "TOTAL THC"), color = Papel, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp, fontFamily = Carbona, modifier = Modifier.weight(1f).padding(bottom = 4.dp))
+            Text(pct(thc), color = Papel, fontSize = 24.sp, fontWeight = FontWeight.Black, fontFamily = Carbona)
             Text(
-                if (dentro) tr("  conforme · limite 0,3 %", "  compliant · limit 0.3 %") else tr("  acima do limite", "  above the limit"),
-                style = MaterialTheme.typography.labelMedium,
-                color = if (dentro) Verde else Color(0xFFE13831),
+                (if (dentro) tr("conforme · limite 0,3 %", "compliant · limit 0.3 %") else tr("acima do limite", "above the limit")).uppercase(),
+                color = if (dentro) VerdeClaro else Vermelho, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp, fontFamily = Carbona,
+                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp),
             )
         }
         Box(
-            Modifier.fillMaxWidth().height(14.dp).drawBehind {
+            Modifier.padding(top = 5.dp).fillMaxWidth().height(9.dp).drawBehind {
                 val r = CornerRadius(size.height / 2)
-                drawRoundRect(Tinta.copy(alpha = 0.08f), cornerRadius = r)
-                drawRoundRect(if (dentro) Verde else Color(0xFFE13831), size = Size(size.width * fracao, size.height), cornerRadius = r)
+                drawRoundRect(Color.Black.copy(alpha = 0.3f), Offset(1.5.dp.toPx(), 1.5.dp.toPx()), size, r)
+                drawRoundRect(Color(0xFF12365A), Offset.Zero, size, r)
+                drawRoundRect(if (dentro) Verde else Vermelho, Offset.Zero, Size((size.width * fracao).coerceAtLeast(size.height), size.height), r)
+                drawRoundRect(Tinta, Offset.Zero, size, r, style = Stroke(1.5.dp.toPx()))
                 val x = size.width / 1.25f
-                drawLine(Tinta, Offset(x, -6f), Offset(x, size.height + 6f), strokeWidth = 3f)
+                drawLine(Papel, Offset(x, -4.dp.toPx()), Offset(x, size.height + 4.dp.toPx()), strokeWidth = 2.dp.toPx())
             },
         )
     }
@@ -281,9 +289,9 @@ private fun ReguaThc(thc: Double) {
 
 @Composable
 private fun Cabeca() {
-    Row(Modifier.fillMaxWidth().padding(horizontal = Espaco.medio, vertical = 6.dp)) {
-        Text(tr("CANABINOIDE", "CANNABINOID"), style = MaterialTheme.typography.labelSmall, color = TintaFraca, letterSpacing = 2.sp, modifier = Modifier.weight(1f))
-        Text(tr("% EM MASSA", "% BY WEIGHT"), style = MaterialTheme.typography.labelSmall, color = TintaFraca, letterSpacing = 2.sp)
+    Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp)) {
+        Text(tr("CANABINOIDE", "CANNABINOID"), color = Papel.copy(alpha = 0.6f), fontSize = 7.5.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.2.sp, fontFamily = Carbona, modifier = Modifier.weight(1f))
+        Text(tr("% EM MASSA", "% BY WEIGHT"), color = Papel.copy(alpha = 0.6f), fontSize = 7.5.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.2.sp, fontFamily = Carbona)
     }
 }
 
@@ -292,12 +300,12 @@ private fun LinhaTabela(nome: String, v: Double, par: Boolean) {
     Row(
         Modifier
             .fillMaxWidth()
-            .background(if (par) Tinta.copy(alpha = 0.045f) else Color.Transparent, RoundedCornerShape(6.dp))
-            .padding(horizontal = Espaco.medio, vertical = 10.dp),
+            .background(if (par) Papel.copy(alpha = 0.06f) else Color.Transparent, RoundedCornerShape(6.dp))
+            .padding(horizontal = 10.dp, vertical = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(nome, style = MaterialTheme.typography.titleSmall, color = Tinta, modifier = Modifier.weight(1f))
-        Text(pct(v), style = MaterialTheme.typography.titleSmall, color = Tinta, fontWeight = FontWeight.Bold)
+        Text(nome, color = Papel, fontSize = 13.sp, fontWeight = FontWeight.Bold, fontFamily = Carbona, modifier = Modifier.weight(1f))
+        Text(pct(v), color = Papel, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, fontFamily = Carbona)
     }
 }
 
