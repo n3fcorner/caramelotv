@@ -59,6 +59,12 @@ enum class Pose(val ficheiro: String, @DrawableRes val cartaz: Int) {
     Carta("curador-espera", R.drawable.caramelo_curador_espera),
 }
 
+/**
+ * Para o filme da app feito no computador (FilmeTest): o Robolectric nao anima o WebP, por isso o filme da ao Caramelo
+ * os fotogramas do proprio loop, um a um. Nulo na app a serio.
+ */
+val LocalCarameloFalso = androidx.compose.runtime.staticCompositionLocalOf<(@Composable (pose: Pose, modifier: Modifier) -> Unit)?> { null }
+
 /** Um ImageLoader so para o Caramelo: o de omissao do Coil nao sabe animar WebP, e as fotos dos produtos nao precisam disso. */
 private object CarameloLoader {
     @Volatile private var loader: ImageLoader? = null
@@ -88,7 +94,10 @@ fun Caramelo(
     Crossfade(targetState = pose, animationSpec = tween(280), label = "caramelo", modifier = modifier) { p ->
         val espelho = Modifier.fillMaxSize().graphicsLayer { if (espelhar) scaleX = -1f }
         Box(Modifier.fillMaxSize(), contentAlignment = alinhamento) {
-            if (semAnimacao) {
+            val falso = LocalCarameloFalso.current
+            if (falso != null && !parado) {
+                falso(p, espelho)
+            } else if (semAnimacao) {
                 Image(painterResource(p.cartaz), contentDescription = null, contentScale = ContentScale.Fit, alignment = alinhamento, modifier = espelho)
             } else {
                 AsyncImage(

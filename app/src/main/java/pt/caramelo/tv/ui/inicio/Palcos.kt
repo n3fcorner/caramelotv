@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -67,6 +68,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -88,6 +92,7 @@ import pt.caramelo.tv.data.model.MenuItem
 import pt.caramelo.tv.ui.colecao.Frasco
 import pt.caramelo.tv.ui.colecao.FrascoGeo
 import pt.caramelo.tv.ui.theme.Amarelo
+import pt.caramelo.tv.ui.theme.Carbona
 import pt.caramelo.tv.ui.theme.Laranja
 import pt.caramelo.tv.ui.theme.Papel
 import pt.caramelo.tv.ui.theme.Tinta
@@ -97,6 +102,12 @@ import kotlin.math.sin
 
 /** Falso nos testes de imagem (Robolectric): nada de ExoPlayer, fica o cartaz. */
 val LocalComVideo = staticCompositionLocalOf { true }
+
+/**
+ * Para o filme da app feito no computador (FilmeTest, 22/11/2026: "da-me um video para mostrar, nao estou na loja"): o que
+ * se desenha no lugar de um video, a partir de fotogramas ja tirados do proprio video. Nulo na app a serio.
+ */
+val LocalVideoFalso = staticCompositionLocalOf<(@Composable (url: String, modifier: Modifier) -> Unit)?> { null }
 
 internal val Nicho = Color(0xFF0A2C4D)
 private val AzulFoco = Color(0xFF1D4D7C)
@@ -227,7 +238,9 @@ internal fun Aparece(visivel: Boolean, entra: Int, sai: Int, forma: GraphicsLaye
 @Composable
 private fun CenaDaPiteira(url: String, cartaz: String, ativo: Boolean) {
     Box(Modifier.fillMaxSize().background(Nicho)) {
-        if (LocalComVideo.current && url.isNotBlank()) LeitorDaCena(url, cartaz, ativo)
+        val falso = LocalVideoFalso.current
+        if (falso != null && url.isNotBlank()) falso(url, Modifier.fillMaxSize())
+        else if (LocalComVideo.current && url.isNotBlank()) LeitorDaCena(url, cartaz, ativo)
         else AsyncImage(cartaz, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
         // o lado da ficha escuro, o topo escuro para o menu se ler, e o fundo a fechar por baixo das filas
         Box(Modifier.fillMaxSize().drawBehind {
@@ -330,6 +343,15 @@ fun Etiqueta(
     } else remember { mutableStateOf(4f) }
     val salto = remember { Animatable(1f) }
     LaunchedEffect(preco, sub) { salto.snapTo(0.6f); salto.animateTo(1f, spring(0.45f, Spring.StiffnessMediumLow)) }
+    // O preco encolhe para caber (22/11/2026): a etiqueta foi desenhada para "38 €", e um "29,99 €" saia cortado em "29,9".
+    val medidor = rememberTextMeasurer()
+    val densidade = LocalDensity.current
+    val letra = remember(preco, densidade) {
+        val max = with(densidade) { 72.dp.roundToPx() }
+        var t = 29f
+        while (t > 14f && medidor.measure(preco, TextStyle(fontSize = t.sp, fontWeight = FontWeight.Black, fontFamily = Carbona, letterSpacing = (-0.5).sp), maxLines = 1, softWrap = false).size.width > max) t -= 1f
+        t
+    }
     Box(
         Modifier.offset(x, y)
             // centrada no ponto de onde pende
@@ -351,8 +373,8 @@ fun Etiqueta(
                     .padding(start = 14.dp, end = 14.dp, top = 13.dp, bottom = 7.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(60.dp)) {
-                    Text(preco, color = Tinta, fontSize = 29.sp, fontWeight = FontWeight.Black, maxLines = 1, softWrap = false, letterSpacing = (-0.5).sp)
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.widthIn(min = 60.dp, max = 72.dp)) {
+                    Text(preco, color = Tinta, fontSize = letra.sp, fontWeight = FontWeight.Black, fontFamily = Carbona, maxLines = 1, softWrap = false, letterSpacing = (-0.5).sp)
                     if (sub.isNotBlank()) Text(sub, color = Tinta.copy(alpha = 0.7f), fontSize = 7.5.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp, maxLines = 1, softWrap = false)
                 }
             }

@@ -52,6 +52,24 @@ class InicioTest {
         assertEquals("Kit Fauna", Inicio.nomeDe(Parafernalia(slug = "kit-piteiras-fauna", nome = "Kit Piteiras de Vidro Fauna")))
     }
 
+    // 22/11/2026, vistos no filme com o catalogo da loja: "Cinzeiro de" e "Cuia de" no nome, e a cor a repetir o nome da peca.
+    @Test
+    fun o_nome_nao_acaba_numa_preposicao_e_a_cor_nao_repete_o_nome_da_peca() {
+        val cinzeiro = Parafernalia(slug = "cinzeiro-aluminio", nome = "Cinzeiro de alumínio anodizado", categoria = "cinzeiros",
+            ficha = listOf(Especificacao("Material", "Alumínio anodizado")), fotos = listOf(FotoDeCor("Cinzeiro de alumínio Rosa"), FotoDeCor("Azul")))
+        assertEquals("Cinzeiro", Inicio.nomeDe(cinzeiro))
+        assertEquals("Cuia", Inicio.nomeDe(Parafernalia(slug = "cuia-silicone", nome = "Cuia de silicone", ficha = listOf(Especificacao("Material", "Silicone")))))
+        assertEquals("Rosa", Inicio.corLimpa(cinzeiro, "Cinzeiro de alumínio Rosa"))
+        assertEquals("CINZEIRO · ROSA", Inicio.olhoComCor(cinzeiro, "Cinzeiro de alumínio Rosa"))
+        assertEquals("Azul", Inicio.corLimpa(cinzeiro, "Azul"))
+        val boladao = Parafernalia(slug = "grinder-4-partes-boladao", nome = "Grinder alumínio 4 partes Boladão")
+        assertEquals("Azul", Inicio.corLimpa(boladao, "Grinder de alumínio 4 partes Boladão Azul"))
+        assertEquals("Roxo metalizado", Inicio.corLimpa(boladao, "Roxo metalizado"))
+        assertEquals("cru", Inicio.corLimpa(Parafernalia(slug = "porta-joint-bio", nome = "Estojo Tubular Bio"), "Porta-Joint Bio cru"))
+        // o que e' so o nome da peca fica como veio, em vez de ficar vazio
+        assertEquals("Cuia de silicone", Inicio.corLimpa(Parafernalia(slug = "cuia-silicone", nome = "Cuia de silicone"), "Cuia de silicone"))
+    }
+
     @Test
     fun a_fila_desliza_para_o_foco_ficar_entre_a_margem_e_a_terceira_peca_do_fim() {
         val m = 56f; val p = 82f; val w = 960f

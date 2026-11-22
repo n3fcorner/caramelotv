@@ -83,6 +83,8 @@ android {
     testOptions {
         // Os testes de imagem desenham os ecras com os recursos da app (letras, cartazes do Caramelo).
         unitTests.isIncludeAndroidResources = true
+        // O filme da app (FilmeTest) desenha mais de mil fotogramas de 1920 x 1080 seguidos: os 512 MB de omissao nao chegam.
+        unitTests.all { it.maxHeapSize = "3g" }
     }
 
     packaging {

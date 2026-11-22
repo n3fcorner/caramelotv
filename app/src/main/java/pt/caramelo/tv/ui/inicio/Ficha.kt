@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -198,10 +200,28 @@ private fun NomeQueCabe(nome: String, entrada: Boolean = true) {
     val densidade = androidx.compose.ui.platform.LocalDensity.current
     val max = with(densidade) { Grelha.fichaLargura.roundToPx() }
     val estilo = { s: Float -> TextStyle(fontSize = s.sp, fontWeight = FontWeight.Black, fontFamily = Carbona, letterSpacing = (-1).sp, color = Papel) }
-    val tam = remember(nome, max) {
+    // Numa linha, de 62 a 35 sp. O que nem a 35 cabe ("Cinzeiro de silicone redondo", "Grinder aluminio 4 partes Boladao")
+    // passa a duas linhas, de 30 a 22 sp: antes ficava cortado a meio da palavra (22/11/2026).
+    val (tam, duas) = remember(nome, max) {
+        fun largura(s: Float) = medidor.measure(nome, estilo(s), maxLines = 1, softWrap = false).size.width
         var s = 62f
-        while (s > 35f && medidor.measure(nome, estilo(s), maxLines = 1, softWrap = false).size.width > max) s -= 2f
-        s
+        while (s > 35f && largura(s) > max) s -= 2f
+        if (largura(s) <= max) s to false
+        else {
+            fun cabeEmDuas(d: Float) = medidor.measure(nome, estilo(d), maxLines = 2, constraints = androidx.compose.ui.unit.Constraints(maxWidth = max)).let { !it.hasVisualOverflow }
+            var d = 30f
+            while (d > 22f && !cabeEmDuas(d)) d -= 1f
+            d to true
+        }
+    }
+    if (duas) {
+        Entrada(1, activa = entrada) {
+            Text(
+                nome, style = estilo(tam).copy(lineHeight = (tam * 1.02f).sp, letterSpacing = (-0.5).sp), maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.width(Grelha.fichaLargura).heightIn(min = 61.dp).wrapContentHeight(Alignment.Bottom),
+            )
+        }
+        return
     }
     val passo = 28; val dura = 700
     val total = (nome.length * passo + dura).toFloat()

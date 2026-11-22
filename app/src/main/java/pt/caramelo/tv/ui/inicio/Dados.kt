@@ -53,7 +53,7 @@ object Inicio {
 
     /** A linha do olho com a cor que esta no pedestal: "GRINDER · AZUL METALIZADO". */
     fun olhoComCor(p: Parafernalia, cor: String): String =
-        if (cor.isBlank() || p.fotos.size < 2) olhoDe(p) else olhoDe(p).substringBefore(" · ") + " · " + cor.uppercase()
+        if (cor.isBlank() || p.fotos.size < 2) olhoDe(p) else olhoDe(p).substringBefore(" · ") + " · " + corLimpa(p, cor).uppercase()
 
     /** O que vai por baixo do preco na etiqueta. */
     fun etiquetaDe(p: Parafernalia): String = when {
@@ -73,8 +73,27 @@ object Inicio {
             .replace(Regex("^Kit Piteiras de Vidro\\s+", RegexOption.IGNORE_CASE), "Kit ")
             .replace(Regex("\\s+\\d+\\s*mm$", RegexOption.IGNORE_CASE), "")
         val tipo = tipoDe(p)
-        if (tipo.isNotBlank() && n.endsWith(tipo, ignoreCase = true) && n.length > tipo.length + 3) n = n.dropLast(tipo.length).trim()
+        if (tipo.isNotBlank() && n.endsWith(tipo, ignoreCase = true) && n.length > tipo.length + 3) {
+            // sem o material e sem a preposicao que o ligava: "Cinzeiro de aluminio anodizado" fica "Cinzeiro", nao "Cinzeiro de"
+            n = n.dropLast(tipo.length).trim().replace(Regex("\\s+(de|do|da|em|com)$", RegexOption.IGNORE_CASE), "")
+        }
         return n
+    }
+
+    private fun chave(s: String) = java.text.Normalizer.normalize(s.lowercase(), java.text.Normalizer.Form.NFD).replace(Regex("[^a-z0-9]"), "")
+
+    /**
+     * A cor de uma foto, sem o nome da peca la dentro (22/11/2026). O painel manda a cor como o nome da variante, e em
+     * tres artigos esse nome repete o do produto: "Cinzeiro de aluminio Rosa", "Grinder de aluminio 4 partes Boladao Azul",
+     * "Porta-Joint Bio cru". Tiram-se as palavras que ja estao no nome ou no slug da peca (e as preposicoes que sobram
+     * a frente); se nao sobrar nada, fica a cor como veio.
+     */
+    fun corLimpa(p: Parafernalia, cor: String): String {
+        val partes = (p.nome.split(Regex("[\\s-]+")) + p.slug.split('-')).map(::chave).filter { it.isNotBlank() }
+        val conhecidas = (partes + partes.zipWithNext { a, b -> a + b }).toSet()
+        val resto = cor.trim().split(Regex("\\s+")).filter { chave(it) !in conhecidas }
+            .dropWhile { it.lowercase() in setOf("de", "do", "da", "em", "com") }
+        return resto.joinToString(" ").ifBlank { cor.trim() }
     }
 
     /** O tipo de um artigo (a linha amarela por baixo do nome): o material, quando a ficha o tem. */

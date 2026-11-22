@@ -45,6 +45,11 @@ ficha ficam onde estão (peças partilhadas, `hero`) e a janela cresce a partir 
 **Ver os ecrãs sem TV:** `./gradlew :app:testDebugUnitTest --tests '*EcrasTest*' -Proborazzi.test.record=true`
 desenha-os todos a 1920 × 1080 em `app/build/ecras/`, incluindo uma passagem a meio.
 
+**Um vídeo da app sem TV:** `./scripts/filme-tv.sh` faz `entrega/tv-nova.mp4` (uns 45 s, 1920 × 1080). A app
+desenha-se no computador fotograma a fotograma (`FilmeTest`), com o catálogo que a loja tem nesse momento, as fotos
+do site e os fotogramas dos vídeos verdadeiros; as setas são teclas a sério, por isso o foco anda como na TV. Não
+mede desempenho: mostra o desenho e o movimento, não a velocidade da TV. O guião está no fim do `FilmeTest`.
+
 ### Desempenho: o que não se faz
 
 Regras que ficam do pedido "vê se dá para otimizar performance" (22/11/2026). A TCL da loja é fraca: o que custa
