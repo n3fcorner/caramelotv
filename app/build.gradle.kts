@@ -27,6 +27,9 @@ android {
         val compilacao = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
         versionCode = compilacao
         versionName = "1.0.$compilacao"
+        // A variante "nova" (22/11/2026) desliga estas duas coisas: ver o build type abaixo.
+        buildConfigField("boolean", "ATUALIZA", "true")
+        manifestPlaceholders["arranque"] = "true"
     }
 
     signingConfigs {
@@ -49,6 +52,17 @@ android {
             // por ADB, mas com o R8 e sem as verificacoes de debug do Compose, que numa
             // TCL fazem a diferenca entre fluido e aos solavancos (29/9/2026).
             signingConfig = if (chave.isNotEmpty()) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+        }
+        // A app nova ao lado da antiga, para experimentar na TV sem a apagar (22/11/2026, Francisco: "por a app nova na TV, sem
+        // apagar a antiga"). Outro pacote (pt.caramelo.tv.nova) e outro nome no ecra inicial; nao se atualiza pelo site (instalava
+        // a antiga por cima de si) nem abre quando a TV liga (essa e' a antiga). Compila-se com ./scripts/install-tv.sh <IP> --nova.
+        create("nova") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".nova"
+            versionNameSuffix = "-nova"
+            matchingFallbacks += listOf("release")
+            buildConfigField("boolean", "ATUALIZA", "false")
+            manifestPlaceholders["arranque"] = "false"
         }
     }
 

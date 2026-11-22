@@ -54,7 +54,7 @@
         <!-- Abre a montra quando a TV arranca. -->
         <receiver
             android:name=".ArranqueAutomatico"
-            android:enabled="true"
+            android:enabled="${arranque}"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

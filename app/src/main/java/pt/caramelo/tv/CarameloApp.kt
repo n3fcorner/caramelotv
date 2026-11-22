@@ -13,8 +13,9 @@ class CarameloApp : Application(), ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
-        // A app procura versoes novas sozinha (4/10/2026): ver Atualizacao.kt. No build de debug nao, para nao substituir o que se testa.
-        if (!BuildConfig.DEBUG) Atualizacao.comecar(this)
+        // A app procura versoes novas sozinha (4/10/2026): ver Atualizacao.kt. No build de debug nao, para nao substituir o que se testa,
+        // nem na variante "nova", que esta ao lado da antiga (a atualizacao do site e' a antiga).
+        if (!BuildConfig.DEBUG && BuildConfig.ATUALIZA) Atualizacao.comecar(this)
     }
 
     /**

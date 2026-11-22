@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A variante "nova" (22/11/2026): o nome no ecra inicial da TV, para nao se confundir com a app antiga. -->
+<resources>
+    <string name="app_name">Caramelo TV nova</string>
+</resources>
