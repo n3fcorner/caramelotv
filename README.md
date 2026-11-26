@@ -21,6 +21,58 @@ e é **editável dentro da própria app**.
 > ponta a ponta, mas o conteúdo são placeholders e cada ecrã está no mínimo necessário —
 > a ideia é ser fácil de estender, não estar acabado.
 
+## A app nova: um tema só em todos os ecrãs (22/11/2026)
+
+O ecrã inicial novo (`ui/inicio/`, maqueta 4) define o tema: o azul da marca com um foco de luz, a ficha em
+tipografia de revista na primeira coluna, o palco ao meio e o Caramelo curador à direita. **Todos os outros
+ecrãs usam as mesmas peças, nos mesmos sítios** (Francisco, na TV da loja: "o player e a expansão das páginas
+ainda está no tema antigo, preciso que coloques tudo consistente"). O papel bege de outubro já não aparece
+em ecrã nenhum.
+
+| Ecrã | Ficheiro | O que tem |
+|---|---|---|
+| Leitor de uma flor | `ui/player/PlayerScreen.kt` | A ficha onde estava e o vídeo quadrado na janela da marca, maior. Barra do tempo por baixo |
+| Peça aberta | `ui/parafernalia/ParafernaliaScreen.kt` | A ficha técnica e, na janela, o giro a 360° ou as fotos das cores no pedestal |
+| Flor sem vídeo | `ui/details/DetailsScreen.kt` | A mesma página do leitor, com a foto na janela |
+| Análises | `ui/coa/CoaScreen.kt` | A lista, o boletim numa caixa e o Caramelo com a lupa |
+| Definições e edição | `ui/settings/` | O mesmo fundo e o mesmo topo; linhas e botões no traço novo |
+
+As peças comuns estão em `ui/inicio/Pagina.kt` (`GrelhaPagina`, `TopoDaPagina`, `FundoDaPagina`, `BarraDeTempo`,
+`PeDaPagina`) e em `ui/inicio/Palcos.kt` (`MolduraJanela`, `Etiqueta`, `Estudio`, que aceitam posição e tamanho).
+Os botões e as linhas (`ui/components/Controls.kt`) têm um desenho só. Ao abrir uma página, o logótipo e a
+ficha ficam onde estão (peças partilhadas, `hero`) e a janela cresce a partir do tamanho que tem no ecrã inicial.
+
+**Ver os ecrãs sem TV:** `./gradlew :app:testDebugUnitTest --tests '*EcrasTest*' -Proborazzi.test.record=true`
+desenha-os todos a 1920 × 1080 em `app/build/ecras/`, incluindo uma passagem a meio.
+
+**Um vídeo da app sem TV:** `./scripts/filme-tv.sh` faz `entrega/tv-nova.mp4` (uns 45 s, 1920 × 1080). A app
+desenha-se no computador fotograma a fotograma (`FilmeTest`), com o catálogo que a loja tem nesse momento, as fotos
+do site e os fotogramas dos vídeos verdadeiros; as setas são teclas a sério, por isso o foco anda como na TV. Não
+mede desempenho: mostra o desenho e o movimento, não a velocidade da TV. O guião está no fim do `FilmeTest`.
+
+### Desempenho: o que não se faz
+
+Regras que ficam do pedido "vê se dá para otimizar performance" (22/11/2026). A TCL da loja é fraca: o que custa
+é redesenhar muitos píxeis muitas vezes.
+
+- **Nada a ecrã inteiro que mexa sempre.** O fundo com a luz era um desenho só, a ecrã inteiro, a ler duas
+  animações sem fim: a TV redesenhava os 1920 × 1080 sessenta vezes por segundo com tudo parado. Agora o azul é
+  fixo e só o cone e a poeira mexem, numa camada do tamanho do cone, 15 vezes por segundo (`relogioLento`).
+- **Nada de alfa em camadas grandes.** Uma camada com alfa é um buffer fora do ecrã redesenhado em cada fotograma.
+  As trocas de secção deixaram o `Crossfade` e o `AnimatedVisibility` a ecrã inteiro: usam `ModulateAlpha`
+  (`Mundo` e `Aparece`, em `Palcos.kt`).
+- **Com um vídeo no ecrã, mais nada mexe.** No leitor e na peça com giro a luz e a etiqueta ficam paradas.
+- **O que muda muitas vezes lê-se no desenho.** A barra do tempo lê a posição dentro do `drawBehind`; antes o
+  leitor inteiro recompunha de 250 em 250 ms.
+- **As imagens que se repetem descodificam-se uma vez.** As três camadas do frasco são iguais em todos os frascos
+  (`CamadasDoFrasco`, em `ui/colecao/Frasco.kt`); antes, cada frasco que entrava no ecrã podia voltar a descodificá-las
+  na linha principal, a meio da animação.
+- **Depois de instalar por ADB, compilar na TV:** `adb shell cmd package compile -m speed -f <pacote>`. Sem isso
+  a app corre interpretada nos primeiros dias. O `scripts/install-tv.sh` já o faz.
+
+Nada disto foi medido na TV: daqui não há TV. Para medir, com a app aberta e depois de a usar um minuto:
+`adb shell dumpsys gfxinfo pt.caramelo.tv.nova | grep -A3 "Janky frames"`.
+
 ## Identidade
 
 A interface segue a marca **Caramelo do Brasil** (caramelodobrasil.com). A paleta foi
@@ -140,6 +192,36 @@ ninguém vê. Comparado a 1:1 com 1080 antes de decidir.
 As miniaturas saem do frame mais representativo de cada clipe, com o instante escolhido
 à vista (uns começam em preto, noutros o produto só aparece a meio), o mesmo corte
 quadrado e um tratamento leve de contraste, saturação e nitidez.
+
+## Loops das piteiras
+
+As 15 artes das piteiras de vidro animadas no Gemini, para a montra automática.
+Cada kit junta três (uma de 7, uma de 6 e uma de 5 mm) numa cena com as três
+piteiras do kit a rodar por cima.
+
+```bash
+python3 scripts/arte-piteiras.py        # artes da folha-mestra -> arte/piteiras/
+python3 scripts/prompts-piteiras.py     # os prompts -> arte/piteiras/PROMPTS.md
+./scripts/fechar-loop.sh clipe.mp4 formula-1   # clipe do Gemini -> videos/loops/
+./scripts/cena-kit.sh atletas           # três loops + piteiras -> videos/loops/cena-atletas.mp4
+```
+
+`arte/piteiras/16x9/` são as telas que vão ao Gemini: a arte a toda a largura de um
+quadro 1920x1080, com o que falta pintar a cinzento liso. Tapa-se o logótipo, o
+letreiro, o selo do H e as faixas de título (o vídeo entorta letras; o logótipo
+verdadeiro entra no fim pelo `fechar-loop.sh`) e o que faria o Gemini recusar a
+imagem: a folha, o THC do escudo, o LEGALIZE, o R$ 4,20. O cinzento também fixa a
+proporção, porque o editor de imagem devolve a da imagem que recebe.
+
+O `fechar-loop.sh` cruza o último segundo do clipe com o primeiro, por isso o
+vídeo fecha mesmo que o Veo não volte à pose inicial; com `0` no fim só tira o
+último fotograma (para clipes do Flow com a mesma imagem nas pontas). O
+`cena-kit.sh` tira as piteiras do modelo 3D do painel com fundo transparente
+(`kit-transparente.mjs`, o mesmo visualizador dos giros), põe uma volta por tema
+e assenta-as numa janela roxa da marca, medida pelas próprias piteiras, para se
+verem por cima de qualquer arte;
+`RASCUNHO=1` faz a cena com a arte parada, para ver o enquadramento antes de haver
+loops. Os modelos vêm de `../caramelo-b2b/saas/public`.
 
 ## Stack
 

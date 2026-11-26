@@ -19,8 +19,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Border
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.MaterialTheme
@@ -31,6 +31,11 @@ import pt.caramelo.tv.ui.theme.Creme
 /**
  * Botao unico para todo o projeto. Assenta em Surface em vez de Button para
  * manter uma so primitiva de foco, mais facil de afinar depois na TV real.
+ *
+ * No traco do ecra inicial (22/11/2026, "preciso que coloques tudo consistente"): cantos de 8 dp, o fundo quase
+ * transparente com o contorno bege fino das caixas da ficha tecnica, e o foco sempre a amarelo cheio com a letra a tinta
+ * (regra 3 das cores: so o foco acende a amarelo). O principal ja nasce amarelo. No papel (o tema antigo, que ja nenhum
+ * ecra usa) fica como era.
  */
 @Composable
 fun TvButton(
@@ -43,9 +48,8 @@ fun TvButton(
     enabled: Boolean = true,
     focusRequester: FocusRequester? = null,
 ) {
-    // No papel os botoes tem os cantos de 8dp e o contorno de tinta do manual (4/10/2026); no cabecalho escuro ficam como estavam.
     val papel = noPapel()
-    val shape = if (papel) RoundedCornerShape(8.dp) else RectangleShape
+    val shape = RoundedCornerShape(8.dp)
     val scheme = MaterialTheme.colorScheme
 
     Surface(
@@ -59,7 +63,8 @@ fun TvButton(
             containerColor = when {
                 primary -> scheme.primary
                 discreto -> Color.Transparent
-                else -> scheme.surfaceVariant
+                papel -> scheme.surfaceVariant
+                else -> Creme.copy(alpha = 0.08f)
             },
             contentColor = when {
                 primary -> scheme.onPrimary
@@ -68,12 +73,16 @@ fun TvButton(
             },
             focusedContainerColor = scheme.primary,
             focusedContentColor = scheme.onPrimary,
-            disabledContainerColor = scheme.surface,
+            disabledContainerColor = if (papel) scheme.surface else Creme.copy(alpha = 0.04f),
             disabledContentColor = scheme.onSurfaceVariant,
         ),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.06f),
         border = ClickableSurfaceDefaults.border(
-            border = if (papel) Border(BorderStroke(2.dp, scheme.onSurface), shape = shape) else Border.None,
+            border = when {
+                papel -> Border(BorderStroke(2.dp, scheme.onSurface), shape = shape)
+                primary || discreto -> Border.None
+                else -> Border(BorderStroke(1.5.dp, Creme.copy(alpha = 0.22f)), shape = shape)
+            },
             focusedBorder = Border(BorderStroke(2.dp, if (papel) scheme.onSurface else Creme), shape = shape),
         ),
     ) {
@@ -105,8 +114,9 @@ fun SelectableRow(
     marca: Color? = null,
 ) {
     val papel = noPapel()
-    // No papel as linhas sao cartoes brancos de cantos de 8dp, como os da loja; no escuro fica tudo como era.
-    val shape = if (papel) RoundedCornerShape(8.dp) else RectangleShape
+    // Cartoes de cantos de 8 dp: no mundo azul, o fundo quase transparente e o contorno bege fino das caixas da ficha
+    // tecnica (22/11/2026); o foco a amarelo cheio. No papel (o tema antigo) ficam brancos com o contorno a tinta.
+    val shape = RoundedCornerShape(8.dp)
     val scheme = MaterialTheme.colorScheme
 
     Surface(
@@ -116,14 +126,14 @@ fun SelectableRow(
             .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier),
         shape = ClickableSurfaceDefaults.shape(shape = shape),
         colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (papel) Color.White.copy(alpha = 0.6f) else scheme.surface,
+            containerColor = if (papel) Color.White.copy(alpha = 0.6f) else Creme.copy(alpha = 0.06f),
             contentColor = scheme.onSurface,
             focusedContainerColor = scheme.primary,
             focusedContentColor = scheme.onPrimary,
         ),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
         border = ClickableSurfaceDefaults.border(
-            border = if (papel) Border(BorderStroke(2.dp, scheme.onSurface), shape = shape) else Border.None,
+            border = if (papel) Border(BorderStroke(2.dp, scheme.onSurface), shape = shape) else Border(BorderStroke(1.5.dp, Creme.copy(alpha = 0.18f)), shape = shape),
             focusedBorder = Border(BorderStroke(2.dp, if (papel) scheme.onSurface else Creme), shape = shape),
         ),
     ) {
@@ -175,6 +185,7 @@ fun SectionHeader(text: String, modifier: Modifier = Modifier) {
         text = text.uppercase(),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
+        letterSpacing = 1.5.sp,
         modifier = modifier,
     )
 }

@@ -52,17 +52,21 @@ enum class Aroma(val pt: String, val en: String, val cor: Color, private val cha
     FRUTOS_VERMELHOS("Frutos vermelhos", "Red berries", Color(0xFFE13831), listOf("frutos vermelhos", "silvestre", "mirtilo", "baga", "berry", "morango", "cereja")),
     UVA("Uva", "Grape", Lilas, listOf("uva", "frutos escuros")),
     MANGA("Manga", "Mango", Laranja, listOf("manga")),
+    // 18/11/2026: os aromas do catalogo da TV que ficavam sem desenho ("fruta tropical", "frutado", "incenso", "creme")
+    TROPICAL("Tropical", "Tropical", VerdeClaro, listOf("tropical", "maracuj")),
+    FRUTADO("Frutado", "Fruity", Color(0xFFE13831), listOf("frutad", "fruta suave")),
+    INCENSO("Incenso", "Incense", Lilas, listOf("incenso", "almísc", "almisc")),
     PESSEGO("Pêssego", "Peach", Laranja, listOf("pêssego", "pessego", "alperce")),
     MACA("Maçã", "Apple", VerdeClaro, listOf("maçã", "maca verde")),
     PAPAIA("Papaia", "Papaya", LaranjaEscuro, listOf("papaia", "papaya")),
     TERRA("Terroso", "Earthy", LaranjaEscuro, listOf("terros", "terra")),
     PINHO("Pinho", "Pine", VerdeClaro, listOf("pinho", "pine")),
-    DOCE("Doce", "Sweet", Creme, listOf("doce", "forno", "açúcar", "mel")),
-    CREME("Cremoso", "Creamy", Creme, listOf("cremos", "baunilha", "nata")),
-    FLORAL("Floral", "Floral", Lilas, listOf("floral", "flores", "lavanda")),
+    DOCE("Doce", "Sweet", Creme, listOf("doce", "forno", "açúcar", "mel", "pastel")),
+    CREME("Cremoso", "Creamy", Creme, listOf("cremos", "creme", "baunilha", "nata")),
+    FLORAL("Floral", "Floral", Lilas, listOf("floral", "flores", "flor", "lavanda")),
     DIESEL("Diesel", "Diesel", Color(0xFF3374D8), listOf("diesel", "gasolina")),
     CAFE("Café", "Coffee", LaranjaEscuro, listOf("café", "cafe", "cacau", "chocolate")),
-    AMENDOIM("Amendoim", "Peanut", Amarelo, listOf("amendoim", "noz", "avelã")),
+    AMENDOIM("Amendoim", "Peanut", Amarelo, listOf("amendoim", "noz", "avelã", "frutos secos")),
     ESPECIARIA("Especiado", "Spiced", Laranja, listOf("especia", "pimenta", "canela")),
     RESINA("Resinoso", "Resinous", Amarelo, listOf("resin", "resina")),
     ERVAS("Herbáceo", "Herbal", VerdeClaro, listOf("herbác", "herbac", "ervas", "menta", "hortelã"));
@@ -168,6 +172,27 @@ private fun DrawScope.desenhar(a: Aroma, u: Float, s: Stroke, c: Color) {
         Aroma.MANGA -> {
             caminho { m(6f, 15f); q(4.5f, 6f, 13f, 5f); q(20.5f, 4.5f, 19f, 13f); q(17.5f, 21f, 10f, 20f); q(6.5f, 19.5f, 6f, 15f) }
             linha(13f, 5f, 12.5f, 2.5f)
+        }
+        // Tropical: uma palmeira, o tronco curvo e quatro palmas.
+        Aroma.TROPICAL -> {
+            caminho { m(12.5f, 21f); q(13.5f, 14f, 12f, 8.5f) }
+            caminho { m(12f, 8.5f); q(7f, 6f, 3.5f, 9f) }
+            caminho { m(12f, 8.5f); q(9f, 3.5f, 5f, 3.5f) }
+            caminho { m(12f, 8.5f); q(15f, 3.5f, 19f, 4f) }
+            caminho { m(12f, 8.5f); q(17f, 6.5f, 20.5f, 10f) }
+            linha(8.5f, 21f, 16.5f, 21f)
+        }
+        // Frutado: um fruto redondo com o pe e o brilho.
+        Aroma.FRUTADO -> {
+            caminho { m(12f, 8f); q(5f, 6.5f, 5f, 13.5f); q(5f, 20.5f, 12f, 20.5f); q(19f, 20.5f, 19f, 13.5f); q(19f, 6.5f, 12f, 8f) }
+            caminho { m(12f, 8f); q(12f, 5f, 14f, 3.5f) }
+            caminho { m(9f, 12f); q(8f, 14f, 9f, 16f) }
+        }
+        // Incenso: o cone e o ponto aceso, sem fumo.
+        Aroma.INCENSO -> {
+            caminho { m(12f, 4f); l(8f, 18f); l(16f, 18f); l(12f, 4f) }
+            linha(6f, 20.5f, 18f, 20.5f)
+            circulo(12f, 4f, 0.9f)
         }
         // Pessego: o circulo com o sulco e o pe.
         Aroma.PESSEGO -> {

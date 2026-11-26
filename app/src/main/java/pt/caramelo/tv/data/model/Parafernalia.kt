@@ -23,7 +23,29 @@ data class Parafernalia(
     val modelo3d: String? = null,
     /** O video da rotacao, que fecha em loop (public/3d/artigos/giro/<chave>.mp4 no site). So as piteiras e os kits o tem. */
     val giro: String? = null,
+    /**
+     * As fotos reais de cada cor (18/11/2026, Francisco: "nao quero usar modelos 3D, apenas as fotos reais dos artigos de
+     * parafernalia"): o ecra inicial troca-as no pedestal, uma a uma, com o nome da cor.
+     */
+    val fotos: List<FotoDeCor> = emptyList(),
+    /** A ficha tecnica da loja (artigos.json), em portugues: material, medidas, dentes... */
+    val ficha: List<Especificacao> = emptyList(),
+    /**
+     * Nas piteiras e nos kits: a arte animada da piteira com o giro ja dentro da janela, num video so (a TV so aguenta um
+     * video de cada vez). Feito por scripts/cena-tv.py; [cartaz] e' o primeiro fotograma.
+     */
+    val cena: String? = null,
+    val cartaz: String? = null,
 ) {
     val esgotado: Boolean get() = estado == "esgotado"
     val temGiro: Boolean get() = !giro.isNullOrBlank()
+    val temCena: Boolean get() = !cena.isNullOrBlank()
 }
+
+/** Uma cor de um artigo, com a foto real dela. [cor] vazio quando o artigo so tem uma. */
+@Serializable
+data class FotoDeCor(val cor: String = "", val imagem: String = "", val estado: String = "venda")
+
+/** Uma linha da ficha tecnica: "Material" / "Aluminio anodizado". */
+@Serializable
+data class Especificacao(val rotulo: String = "", val valor: String = "")

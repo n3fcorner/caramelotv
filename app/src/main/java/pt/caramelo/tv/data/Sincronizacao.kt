@@ -5,6 +5,8 @@ import kotlinx.serialization.json.Json
 import pt.caramelo.tv.data.model.MediaOrientation
 import pt.caramelo.tv.data.model.MenuItem
 import pt.caramelo.tv.data.model.Analise
+import pt.caramelo.tv.data.model.Especificacao
+import pt.caramelo.tv.data.model.FotoDeCor
 import pt.caramelo.tv.data.model.Parafernalia
 import pt.caramelo.tv.data.model.Section
 import pt.caramelo.tv.data.model.Strain
@@ -81,6 +83,11 @@ object Sincronizacao {
         val imagem: String? = null,
         val modelo3d: String? = null,
         val giro: String? = null,
+        /** Desde a versao 3 (18/11/2026): as fotos reais por cor, a ficha tecnica e a cena das piteiras. */
+        val fotos: List<FotoDeCor> = emptyList(),
+        val ficha: List<Especificacao> = emptyList(),
+        val cena: String? = null,
+        val cartaz: String? = null,
     )
 
     @Serializable
@@ -131,6 +138,10 @@ object Sincronizacao {
                 imagem = it.imagem.orEmpty(),
                 modelo3d = it.modelo3d,
                 giro = it.giro,
+                fotos = it.fotos.filter { f -> f.imagem.isNotBlank() },
+                ficha = it.ficha.filter { e -> e.valor.isNotBlank() },
+                cena = it.cena,
+                cartaz = it.cartaz,
             )
         }
 
@@ -225,6 +236,9 @@ object Sincronizacao {
                 // pousa nele como na loja; o cartaz da TV, com a margem roxa, so quando o CRM nao tem foto.
                 imageUrl = c.imagem?.takeIf { it.isNotBlank() } ?: base?.imageUrl.orEmpty(),
                 esgotado = c.estado == "esgotado",
+                preco = c.preco,
+                estado = c.estado,
+                loteUrl = c.lote?.url.orEmpty(),
                 analise = c.lote?.let { l -> l.analise?.let { a -> Analise(l.codigo, a.laboratorio, a.numero, a.data, a.metodo, a.thc, a.cbd, a.d9thc, a.cbg) } },
                 orientation = base?.orientation ?: MediaOrientation.SQUARE,
                 // A linha (CBD ou infundida) vem sempre do CRM, nunca da ficha de fabrica: e' o que manda

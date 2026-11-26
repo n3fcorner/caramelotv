@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.roborazzi)
 }
 
 // A chave de assinatura fica fora do git: quem a tiver assina em nome da marca.
@@ -26,6 +27,9 @@ android {
         val compilacao = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
         versionCode = compilacao
         versionName = "1.0.$compilacao"
+        // A variante "nova" (22/11/2026) desliga estas duas coisas: ver o build type abaixo.
+        buildConfigField("boolean", "ATUALIZA", "true")
+        manifestPlaceholders["arranque"] = "true"
     }
 
     signingConfigs {
@@ -49,6 +53,17 @@ android {
             // TCL fazem a diferenca entre fluido e aos solavancos (29/9/2026).
             signingConfig = if (chave.isNotEmpty()) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
         }
+        // A app nova ao lado da antiga, para experimentar na TV sem a apagar (22/11/2026, Francisco: "por a app nova na TV, sem
+        // apagar a antiga"). Outro pacote (pt.caramelo.tv.nova) e outro nome no ecra inicial; nao se atualiza pelo site (instalava
+        // a antiga por cima de si) nem abre quando a TV liga (essa e' a antiga). Compila-se com ./scripts/install-tv.sh <IP> --nova.
+        create("nova") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".nova"
+            versionNameSuffix = "-nova"
+            matchingFallbacks += listOf("release")
+            buildConfigField("boolean", "ATUALIZA", "false")
+            manifestPlaceholders["arranque"] = "false"
+        }
     }
 
     compileOptions {
@@ -63,6 +78,13 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    testOptions {
+        // Os testes de imagem desenham os ecras com os recursos da app (letras, cartazes do Caramelo).
+        unitTests.isIncludeAndroidResources = true
+        // O filme da app (FilmeTest) desenha mais de mil fotogramas de 1920 x 1080 seguidos: os 512 MB de omissao nao chegam.
+        unitTests.all { it.maxHeapSize = "3g" }
     }
 
     packaging {
@@ -97,4 +119,13 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

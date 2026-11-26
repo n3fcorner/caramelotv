@@ -14,6 +14,8 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.darkColorScheme
 import androidx.tv.material3.lightColorScheme
 
+// O esquema do mundo azul do ecra inicial (22/11/2026): as superficies eram o roxo tropical do tema antigo (cartoes roxos
+// cheios); passam ao azul do nicho, um degrau acima do fundo, para qualquer componente que as use ficar no tom da app nova.
 private val CarameloColors = darkColorScheme(
     primary = Amarelo,
     onPrimary = Marinho,
@@ -23,9 +25,9 @@ private val CarameloColors = darkColorScheme(
     onSecondary = Marinho,
     background = RoxoFundo,
     onBackground = Creme,
-    surface = Roxo,
+    surface = Color(0xFF0A2C4D),
     onSurface = Creme,
-    surfaceVariant = RoxoClaro,
+    surfaceVariant = Color(0xFF12365A),
     onSurfaceVariant = CremeFraco,
 )
 
